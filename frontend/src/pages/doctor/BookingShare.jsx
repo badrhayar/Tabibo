@@ -53,8 +53,21 @@ export default function BookingShare() {
       <body style="font-family:'Segoe UI',Arial,sans-serif;color:#15314A">
         <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;box-sizing:border-box">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-            <img src="${PUBLIC_BASE}/icons/icon-192.png" style="width:52px;height:52px;border-radius:14px" alt="Tabibo"/>
-            <span style="font-size:40px;font-weight:800;letter-spacing:-1px;color:#15314A">Tabib<span style="color:${G}">o</span></span>
+            <svg width="54" height="54" viewBox="0 0 48 48" aria-label="Tabibo">
+              <defs><linearGradient id="tbm-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#115C46"/><stop offset="0.55" stop-color="#0C4A37"/><stop offset="1" stop-color="#093226"/></linearGradient></defs>
+              <rect width="48" height="48" rx="11.5" fill="url(#tbm-g)"/>
+              <g transform="translate(3.84 8.81) scale(1.44)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3v-.5a1.4 1.4 0 0 1 1.4-1.4h.4"/><path d="M14 3v-.5a1.4 1.4 0 0 0-1.4-1.4h-.4"/><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/>
+              </g>
+            </svg>
+            <svg width="112" height="49" viewBox="0 0 92 40" role="img" aria-label="Tabibo">
+              <g transform="translate(1.2 0) skewX(-6)" fill="none" stroke="#0C4A37" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3.4 12.4 Q2.6 8.4 7.6 8 Q13.2 7.6 19 8.9"/><path d="M11.3 8.4 Q10.7 17 10.9 25.6 Q11 31.2 16.5 30.7"/>
+                <circle cx="27.5" cy="25.4" r="5.6"/><path d="M33.1 19.8 V31"/><path d="M38.3 9 V31"/><circle cx="43.9" cy="25.4" r="5.6"/>
+                <path d="M54.7 19.8 V31"/><ellipse cx="54.9" cy="14" rx="2" ry="1.5" fill="#0C4A37" stroke="none" transform="rotate(-14 54.9 14)"/>
+                <path d="M59.9 9 V31"/><circle cx="65.5" cy="25.4" r="5.6"/><circle cx="81.9" cy="25.4" r="5.6"/>
+              </g>
+            </svg>
           </div>
           <div style="font-size:34px;font-weight:800;margin:16px 0 30px">${esc(docName)}</div>
           <h1 style="font-size:34px;line-height:1.2;margin:0 0 12px">Réservez votre rendez-vous en ligne</h1>
