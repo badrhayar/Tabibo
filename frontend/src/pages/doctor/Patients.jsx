@@ -20,13 +20,13 @@ function ageFromDob(dob) {
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
-const BG = '#F4F8F5';
-const BORDER = '#EAEFEC';
+const BG = '#F5F9F7';
+const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 const ROW_ALT = '#F5F9F7';
 const BORDER_STRONG = '#D5E5DD';
 const HEADER_BG = '#EDF5F0';
-const CARD_SHADOW = '0 2px 12px rgba(21,49,74,0.08)';
+const CARD_SHADOW = '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)';
 
 const menuItemStyle = {
   display: 'block', width: '100%', textAlign: 'start', background: 'none', border: 'none',

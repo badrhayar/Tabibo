@@ -20,8 +20,8 @@ const PUBLIC_BASE = (import.meta.env.VITE_APP_URL || 'https://tabibo.ma').replac
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
-const BG = '#F4F8F5';
-const BORDER = '#EAEFEC';
+const BG = '#F5F9F7';
+const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 
 const emptyRow = () => ({ drug: '', dosage: '', duration: '', instructions: '' });

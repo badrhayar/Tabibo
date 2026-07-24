@@ -30,7 +30,6 @@ const SHADOW = '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -22px rgba(16,42,32,0
 const card = { background: '#fff', border: '1px solid #EAF1ED', borderRadius: 18, padding: 24, marginBottom: 16, boxShadow: SHADOW };
 const inp = { width: '100%', padding: '11px 13px', fontSize: 13.5, border: '1px solid #DCE6E1', borderRadius: 11, color: DARK, background: '#fff', boxSizing: 'border-box', fontFamily: 'inherit', outline: 'none', transition: 'border-color .12s, box-shadow .12s' };
 const lbl = { display: 'block', fontSize: 12, fontWeight: 600, color: '#5A6B65', margin: '0 0 6px', letterSpacing: '0.1px' };
-const h3s = { fontSize: 14, fontWeight: 600, color: DARK, margin: '0 0 12px', letterSpacing: '-0.2px' };
 
 const I = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
 const IC = {
@@ -827,7 +826,7 @@ export default function PatientFile({ state, setState, go }) {
 
       {/* Observation médicale */}
       <div style={card}>
-        <CardHead icon={IC.steth} title="Observation médicale" sub="« Enregistrer » garde un brouillon ; « Terminer la consultation » l'ajoute à l'historique." />
+        <CardHead icon={IC.steth} title="Observation médicale" sub="Interrogatoire, examen clinique et données de suivi." />
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
           <div><label style={lbl}>Nom du modèle</label><input value={obs.modele} onChange={(e) => setObs((o) => ({ ...o, modele: e.target.value }))} style={inp} /></div>
           <div><label style={lbl}>Motif</label><input value={obs.motif} onChange={(e) => setObs((o) => ({ ...o, motif: e.target.value }))} placeholder="Entrez le motif" style={inp} /></div>
@@ -838,27 +837,14 @@ export default function PatientFile({ state, setState, go }) {
         <label style={lbl}>Examen</label>
         <RichText value={obs.examen} onChange={(v) => setObs((o) => ({ ...o, examen: v }))} placeholder="Entrez les résultats de l'examen" />
         <div style={{ height: 14 }} />
-        <button onClick={() => setSuiviOpen((v) => !v)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: DARK, padding: 0, marginBottom: suiviOpen ? 10 : 14 }}>
+        <button onClick={() => setSuiviOpen((v) => !v)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: DARK, padding: 0, marginBottom: suiviOpen ? 10 : 0 }}>
           <span style={{ transform: suiviOpen ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>▸</span> Données de suivi
         </button>
         {suiviOpen && renderSuiviFields()}
-        <label style={lbl}>Conclusion</label>
-        <RichText value={obs.conclusion} onChange={(v) => setObs((o) => ({ ...o, conclusion: v }))} placeholder="Entrez votre conclusion" minHeight={64} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 11.5, color: MUTED }}>« Enregistrer » sauvegarde un brouillon ; « Terminer la consultation » l'ajoute à l'historique.</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
-            <button onClick={saveDraft} disabled={obsSaving} title="Enregistrer un brouillon — vous pourrez y revenir plus tard"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: obsSaving ? 0.7 : 1 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-              {obsSaving ? 'Enregistrement…' : 'Enregistrer'}
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* Ordonnance de la consultation — médicaments prescrits lors de cette visite.
-          Enregistrés avec la consultation et repris dans son compte-rendu (historique). */}
+      {/* Ordonnance de la consultation — placée AVANT la conclusion : les
+          médicaments prescrits lors de cette visite, joints au compte-rendu. */}
       <div style={card}>
         <CardHead icon={IC.rx} title="Ordonnance de la consultation" sub="Les médicaments prescrits lors de cette visite — joints au compte-rendu."
           right={
@@ -871,6 +857,23 @@ export default function PatientFile({ state, setState, go }) {
         {(obs.rx || []).length === 0 && (
           <div style={{ fontSize: 12, color: MUTED, marginTop: 10 }}>Ajoutez chaque médicament prescrit ; il apparaîtra dans l'historique du patient avec le compte-rendu.</div>
         )}
+      </div>
+
+      {/* Conclusion — clôt la consultation. Enregistrer = brouillon ; Terminer = historique. */}
+      <div style={card}>
+        <CardHead icon={IC.file} title="Conclusion" sub="Votre synthèse de la consultation."
+          right={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
+              <button onClick={saveDraft} disabled={obsSaving} title="Enregistrer un brouillon — vous pourrez y revenir plus tard"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 9, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: obsSaving ? 0.7 : 1, fontFamily: 'inherit' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+                {obsSaving ? 'Enregistrement…' : 'Enregistrer'}
+              </button>
+            </div>
+          } />
+        <RichText value={obs.conclusion} onChange={(v) => setObs((o) => ({ ...o, conclusion: v }))} placeholder="Entrez votre conclusion" minHeight={72} />
+        <div style={{ fontSize: 11.5, color: MUTED, marginTop: 12 }}>« Enregistrer » sauvegarde un brouillon ; « Terminer la consultation » (barre du bas) l'ajoute à l'historique du patient.</div>
       </div>
     </>
   );
@@ -963,10 +966,8 @@ export default function PatientFile({ state, setState, go }) {
 
   const renderTtt = () => (
     <div style={card}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h3 style={{ ...h3s, margin: 0 }}>Traitements en cours</h3>
-        <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>{mhSaving ? '…' : 'Enregistrer'}</button>
-      </div>
+      <CardHead icon={IC.pill} title="Traitements en cours" sub="Traitements de fond et ponctuels du patient."
+        right={<button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>} />
       <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
         <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 10 }}>Traitements de fond</div>
         <ItemList items={mh.tttFond} placeholder="Ex. METFORMINE 850 mg — 2/j"
@@ -1208,7 +1209,7 @@ export default function PatientFile({ state, setState, go }) {
 
   const renderAdmin = () => (
     <div style={card}>
-      <h3 style={h3s}>Infos administratives</h3>
+      <CardHead icon={IC.admin} title="Infos administratives" sub="Identité, contact et couverture du patient." />
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 4, fontSize: 13.5, color: DARK }}>
         {[['Nom complet', patient.name], ['CIN', patient.cin], ['Téléphone', patient.phone], ['Email', patient.email], ['Adresse', patient.address], ['Ville', patient.city], ['Assurance', patient.insurance], ['N° AMO', patient.amoNumber], ['Groupe sanguin', patient.blood]].map(([k, v]) => (
           <div key={k} style={{ display: 'flex', gap: 8, padding: '8px 0', borderBottom: `1px solid ${BORDER}` }}>
@@ -1221,7 +1222,12 @@ export default function PatientFile({ state, setState, go }) {
     </div>
   );
 
-  const renderSimple = (title, body) => <div style={card}><h3 style={h3s}>{title}</h3>{body}</div>;
+  const renderSimple = (title, body, opts = {}) => (
+    <div style={card}>
+      <CardHead icon={opts.icon || IC.file} title={title} sub={opts.sub} right={opts.right} />
+      {body}
+    </div>
+  );
 
   // ── Biologie et biométrie — Doctolib-style lab-results tool ─────────────────
   const bioData = mh.bio || { fav: [], res: {} };
@@ -1304,7 +1310,7 @@ export default function PatientFile({ state, setState, go }) {
           ))}
         </div>
         <div style={card}>
-          <h3 style={h3s}>{cat.label}</h3>
+          <CardHead icon={IC.bio} title={cat.label} sub="Résultats d'analyses par catégorie." />
           {bioTable(cat.params, true)}
           <div style={{ marginTop: 10, fontSize: 11.5, color: MUTED }}>
             Les valeurs hors normes de référence apparaissent <span style={{ background: '#FCE7EE', color: '#C2466A', borderRadius: 5, padding: '1px 7px', fontWeight: 600 }}>surlignées</span>. Biométrie (taille, poids, IMC, PA) : section « Données de suivi ».
@@ -1321,12 +1327,12 @@ export default function PatientFile({ state, setState, go }) {
     histo: renderHisto,
     antec: renderAntec,
     ttt: renderTtt,
-    suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>),
+    suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.chart, sub: 'Taille, poids, IMC et pression artérielle.' }),
     bio: renderBioTool,
-    prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>),
+    prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.shield, sub: 'Dépistages, rappels et conseils de prévention.' }),
     vaccin: () => renderSimple('Carnet de vaccination', <><ItemList items={mh.vaccins || []} placeholder="Ex. Tétanos — rappel 03/2024"
       onAdd={(v) => { const next = { ...mh, vaccins: [...(mh.vaccins || []), v] }; setMh(next); saveMh(next); }}
-      onRemove={(i) => { const next = { ...mh, vaccins: (mh.vaccins || []).filter((_, k) => k !== i) }; setMh(next); saveMh(next); }} /></>),
+      onRemove={(i) => { const next = { ...mh, vaccins: (mh.vaccins || []).filter((_, k) => k !== i) }; setMh(next); saveMh(next); }} /></>, { icon: IC.vaccin, sub: 'Vaccins effectués et rappels à prévoir.' }),
     factures: () => renderSimple('Factures', (() => {
       const paid = consults.filter((c) => c.status === 'Payé');
       return paid.length === 0
@@ -1339,7 +1345,7 @@ export default function PatientFile({ state, setState, go }) {
               <span style={{ fontWeight: 700, color: TEAL }}>{(c.amount || 0).toLocaleString('fr-FR')} MAD</span>
             </div>
           ))}</div>;
-    })()),
+    })(), { icon: IC.receipt, sub: 'Encaissements enregistrés pour ce patient.' }),
   };
 
   return (
@@ -1348,10 +1354,13 @@ export default function PatientFile({ state, setState, go }) {
       <style>{`.pfile input:focus,.pfile textarea:focus,.pfile select:focus{border-color:#0F6E56 !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}
 @keyframes pfPulse{0%{box-shadow:0 0 0 0 rgba(22,160,106,0.45)}70%{box-shadow:0 0 0 6px rgba(22,160,106,0)}100%{box-shadow:0 0 0 0 rgba(22,160,106,0)}}`}</style>
 
-      {/* ── Left sidebar ── */}
+      {/* ── Left sidebar — stretches to the full height of the content (the flex
+           row stretches it), with a sticky inner panel so the nav stays pinned
+           while the dossier scrolls. No more cut-off white block at the bottom. ── */}
       <aside style={isMobile
         ? { background: '#fff', borderBottom: `1px solid ${BORDER}`, padding: '12px 14px' }
-        : { width: 250, flexShrink: 0, background: '#fff', borderRight: `1px solid ${BORDER}`, padding: '18px 14px', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', boxSizing: 'border-box' }}>
+        : { width: 250, flexShrink: 0, background: '#fff', borderRight: `1px solid ${BORDER}`, boxSizing: 'border-box' }}>
+        <div style={isMobile ? {} : { position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto', padding: '18px 14px' }}>
         <button onClick={back}
           onMouseEnter={(e) => { e.currentTarget.style.background = '#F4FAF7'; e.currentTarget.style.borderColor = '#BFE0D4'; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#DCE6E1'; }}
@@ -1385,6 +1394,7 @@ export default function PatientFile({ state, setState, go }) {
             );
           })}
         </nav>
+        </div>
       </aside>
 
       {/* ── Main content ── */}

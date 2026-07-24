@@ -9,13 +9,13 @@ import ApptPanel from '../../components/ApptPanel';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
-const BG = '#F4F8F5';
-const BORDER = '#EAEFEC';
+const BG = '#F5F9F7';
+const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 const ROW_ALT = '#F5F9F7';
 const BORDER_STRONG = '#D5E5DD';
 const HEADER_BG = '#EDF5F0';
-const CARD_SHADOW = '0 2px 12px rgba(21,49,74,0.08)';
+const CARD_SHADOW = '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)';
 const PALETTE = ['#16A06A', '#2563EB', '#9333EA', '#EA580C', '#DB2777', '#0891B2', '#854D0E'];
 
 const STATUS_CONFIG = {
@@ -70,7 +70,7 @@ function RowActionsMenu({ actions }) {
   return (
     <>
       <button ref={btnRef} onClick={toggle} title="Actions" aria-label="Actions du rendez-vous"
-        style={{ background: open ? '#EAF9F1' : '#F4F8F5', border: `1px solid ${open ? PRIMARY : BORDER_STRONG}`, borderRadius: 8, width: 34, height: 34, cursor: 'pointer', color: open ? PRIMARY : DARK, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        style={{ background: open ? '#EAF9F1' : '#F5F9F7', border: `1px solid ${open ? PRIMARY : BORDER_STRONG}`, borderRadius: 8, width: 34, height: 34, cursor: 'pointer', color: open ? PRIMARY : DARK, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9" /><circle cx="12" cy="12" r="1.9" /><circle cx="19" cy="12" r="1.9" /></svg>
       </button>
       {open && (

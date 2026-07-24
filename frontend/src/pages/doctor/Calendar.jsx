@@ -16,7 +16,7 @@ import ApptPanel from '../../components/ApptPanel';
 
 const TEAL   = '#0F6E56';
 const DARK   = '#15314A';
-const BG     = '#F4F8F5';
+const BG     = '#F5F9F7';
 const MUTED  = '#6B7B76';
 const GRID   = '#ECF1EE';
 const GRID_SOFT = '#F4F7F5';
@@ -295,7 +295,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     const showNow = nowMin >= startH * 60 && nowMin <= endH * 60 && weekDays.some((d) => isoOf(d) === TODAY_STR);
     const nowTop = ((nowMin / 60) - startH) * hourH;
     return (
-      <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(21,49,74,0.06)' }}>
+      <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)' }}>
         {/* Headers */}
         <div style={{ display: 'flex', borderBottom: `1px solid ${GRID}` }}>
           <div style={{ width: GUTTER, flexShrink: 0, borderRight: `1px solid ${GRID}` }} />
@@ -374,7 +374,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     for (let m = startH * 60; m < endH * 60; m += 15) slots.push(m);
     const showNow = isToday && nowMin >= startH * 60 && nowMin <= endH * 60;
     return (
-      <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(21,49,74,0.06)' }}>
+      <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)' }}>
         <div style={{ display: 'flex', borderBottom: `1px solid ${GRID}`, background: isToday ? '#F2FAF7' : '#fff' }}>
           <div style={{ width: GUTTER, flexShrink: 0, borderRight: `1px solid ${GRID}` }} />
           <div style={{ flex: 1, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -450,7 +450,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
           const d = new Date(`${g.date}T12:00:00`);
           const isToday = g.date === TODAY_STR;
           return (
-            <div key={g.date} style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(21,49,74,0.05)' }}>
+            <div key={g.date} style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)' }}>
               <div style={{ padding: '11px 18px', borderBottom: `1px solid ${GRID}`, display: 'flex', alignItems: 'center', gap: 10, background: isToday ? '#F2FAF7' : '#FBFCFB' }}>
                 <span style={{ fontSize: 13.5, fontWeight: 800, color: isToday ? TEAL : DARK }}>
                   {isToday ? "Aujourd'hui — " : ''}{FR_DAYS_FULL[(d.getDay() + 6) % 7]} {d.getDate()} {FR_MONTHS[d.getMonth()]} {d.getFullYear()}

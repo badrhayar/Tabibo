@@ -8,8 +8,8 @@ import { monthComparison, deltaPct, monthLabel, monthOptions, ymOf, FR_WEEKDAYS 
 
 const PRIMARY = '#0F6E56';
 const DARK = '#15314A';
-const BG = '#F4F8F5';
-const BORDER = '#EAEFEC';
+const BG = '#F5F9F7';
+const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 const ROW_ALT = '#F5F9F7';
 const BORDER_STRONG = '#D5E5DD';

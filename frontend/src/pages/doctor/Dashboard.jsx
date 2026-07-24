@@ -7,8 +7,8 @@ import { monthlyReport, ymOf } from '../../lib/metrics';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
-const BG = '#F4F8F5';
-const BORDER = '#EAEFEC';
+const BG = '#F5F9F7';
+const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 const ROW_ALT = '#F7FBF9';
 const pad = (n) => String(n).padStart(2, '0');
@@ -41,13 +41,6 @@ const KPIS = [
   { label: 'Revenus du mois', value: '4 200', unit: 'MAD', badge: '+8%', up: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, ic: '#C28A1B', ib: 'linear-gradient(140deg,#FEF3DC,#FBE9C2)' },
   { label: 'Note moyenne', value: '4.8', unit: '★', badge: '+0.2', up: true, icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/></svg>, ic: '#C2466A', ib: 'linear-gradient(140deg,#FCE7EE,#F8D4E1)' },
 ];
-
-const TrendPill = ({ badge, up }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11.5, fontWeight: 800, background: up ? '#E3F8EE' : '#FCE7EE', color: up ? '#0E7C52' : '#C2466A', borderRadius: 20, padding: '3px 9px 3px 7px' }}>
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transform: up ? 'none' : 'rotate(180deg)' }}><path d="M5 15l7-7 7 7" /></svg>
-    {badge}
-  </span>
-);
 
 export default function Dashboard({ state, setState, go, openNewAppt, openAddPatient }) {
   const { isMobile } = useViewport();
@@ -143,7 +136,7 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
   // "Ce mois" = the whole current calendar month (start → end).
   const month = monthlyReport(state, ymOf(todayKey), null);
   const monthRevenue = month.revenue;   // Σ des consultations « Payé » du mois
-  const rating = state?.myDoctor?.rating ? `${state.myDoctor.rating}` : '—';
+  const rating = state?.myDoctor?.rating ? `${state.myDoctor.rating}` : (state?.demoDoctor ? '4.9' : '—');
   const acceptRate = month.acceptRate;
   const avgDur = month.avgDuration || 0;
 
@@ -288,12 +281,12 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 12 : 18, marginBottom: isMobile ? 16 : 26 }}>
         {kpis.map((card, i) => (
           <div key={i} className="sa-lift" style={{ background: '#fff', border: `1px solid ${BORDER_STRONG}`, borderRadius: 18, padding: 20, boxShadow: CARD_SHADOW }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 15 }}>
               <div style={{ width: 42, height: 42, borderRadius: 12, background: card.ib, color: card.ic, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)' }}>{card.icon}</div>
             </div>
-            <div style={{ fontSize: 13, color: MUTED, marginBottom: 6, fontWeight: 500 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: MUTED, marginBottom: 7, fontWeight: 500 }}>{card.label}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span className="sa-num" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 28, fontWeight: 800, color: DARK, lineHeight: 1, letterSpacing: '-1px' }}>{card.value}</span>
+              <span className="sa-num" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 29, fontWeight: 800, color: DARK, lineHeight: 1, letterSpacing: '-1px' }}>{card.value}</span>
               {card.unit && <span style={{ fontSize: 14, fontWeight: 700, color: MUTED }}>{card.unit}</span>}
             </div>
           </div>

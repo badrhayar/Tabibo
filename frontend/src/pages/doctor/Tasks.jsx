@@ -86,7 +86,7 @@ export default function Tasks({ state, setState, go }) {
   const openCount = auto.length + manual.filter((m) => !m.done).length;
 
   return (
-    <div className="tasks" style={{ padding: isMobile ? 12 : 30, background: '#F4F8F5', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="tasks" style={{ padding: isMobile ? 12 : 30, background: '#F5F9F7', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <style>{`.tasks input:focus{border-color:#0F6E56 !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}`}</style>
       <div style={{ maxWidth: 860 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: DARK, letterSpacing: '-0.4px' }}>Tâches</h1>
