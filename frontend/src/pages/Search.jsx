@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import LangPill from '../components/LangPill';
+import BrandMark, { Wordmark } from '../components/BrandMark';
 import { useViewport } from '../hooks/useViewport';
 import { DOCTORS, SPEC_INFO, SPEC_OPTS, CITY_OPTS, tint, initials, doctorCoords, docDisplayName } from '../shared.jsx';
 import NearbyMap from '../components/NearbyMap';
@@ -101,42 +102,43 @@ export default function Search() {
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>
 
-      {/* ── Header ── */}
-      <header style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: `1px solid ${BORDER}`, height: isMobile ? 60 : 66, display: 'flex', alignItems: 'center', padding: isMobile ? '0 16px' : '0 28px', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
-        <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-          <img loading="lazy" src="/icons/icon-192.png" alt="Tabibo" style={{ width: 31, height: 31, borderRadius: 9, boxShadow: '0 4px 12px -3px rgba(22,160,106,0.5)' }} />
-          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 800, color: DARK, letterSpacing: '-0.5px' }}>
-            Tabib<span style={{ color: PRIMARY }}>o</span>
-          </span>
-        </button>
-        {(() => {
-          const appUser = state.appUser;
-          const loggedIn = !!appUser || !!patient;
-          const isDoctorUser = appUser?.role === 'doctor' || state.isStaff;
-          const name = patient?.name || appUser?.full_name || '';
-          if (!loggedIn) return (
-            <button onClick={() => go('plogin')} style={{ background: GRAD, color: '#fff', border: 'none', borderRadius: 10, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 16px -5px rgba(22,160,106,0.6)' }}>
-              {tr('Se connecter', 'Sign in', 'تسجيل الدخول')}
-            </button>
-          );
-          return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {isDoctorUser && (
-                <button onClick={() => go('doctor')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#E7F6EE', color: '#0E7C52', border: '1px solid #CDE7DA', borderRadius: 24, padding: '7px 14px', cursor: 'pointer', fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 15a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg>
-                  {!isMobile && tr('Espace cabinet', 'Practice', 'العيادة')}
-                </button>
-              )}
-              <button onClick={() => go('paccount')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EAF6F0', border: '1px solid #C3E8D8', borderRadius: 24, padding: '6px 14px 6px 8px', cursor: 'pointer' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: GRAD, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
-                  {initials(name)}
-                </div>
-                {!isMobile && <span style={{ fontSize: 13, fontWeight: 600, color: DARK }}>{name?.split(' ')[0] || tr('Compte', 'Account', 'حسابي')}</span>}
+      {/* ── Header — premium deep-green, unified with the patient account ── */}
+      <header style={{ background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.08), 0 8px 24px -12px rgba(6,32,23,0.55)', position: 'sticky', top: 0, zIndex: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 60 : 66, padding: isMobile ? '0 16px' : '0 28px', gap: isMobile ? 8 : 12 }}>
+          <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+            <BrandMark plain size={32} />
+            <Wordmark size={21} />
+          </button>
+          <div style={{ flex: 1, minWidth: 8 }} />
+          <LangPill dark style={{ flexShrink: 0 }} />
+          {(() => {
+            const appUser = state.appUser;
+            const loggedIn = !!appUser || !!patient;
+            const isDoctorUser = appUser?.role === 'doctor' || state.isStaff;
+            const name = patient?.name || appUser?.full_name || '';
+            if (!loggedIn) return (
+              <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: isMobile ? '0 14px' : '0 16px', height: isMobile ? 40 : 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                {tr('Se connecter', 'Sign in', 'تسجيل الدخول')}
               </button>
-            </div>
-          );
-        })()}
-        <LangPill style={{ marginInlineStart: 8 }} />
+            );
+            return (
+              <>
+                {isDoctorUser && (
+                  <button onClick={() => go('doctor')} title={tr('Espace cabinet', 'Practice space', 'فضاء العيادة')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.24)', borderRadius: 9, padding: isMobile ? 0 : '7px 13px', width: isMobile ? 40 : 'auto', height: isMobile ? 40 : 'auto', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0, justifyContent: 'center' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 15a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg>
+                    {!isMobile && tr('Espace cabinet', 'Practice', 'العيادة')}
+                  </button>
+                )}
+                <button onClick={() => go('paccount')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 24, padding: '5px 13px 5px 6px', cursor: 'pointer', flexShrink: 0 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(150deg,#D7EFE3,#BFE6D2)', color: '#0C4A37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                    {initials(name)}
+                  </div>
+                  {!isMobile && <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{name?.split(' ')[0] || tr('Compte', 'Account', 'حسابي')}</span>}
+                </button>
+              </>
+            );
+          })()}
+        </div>
       </header>
 
       {/* ── Sticky filter bar ── */}

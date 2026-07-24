@@ -15,7 +15,7 @@ const saPopKeyframes = `
 `;
 
 export default function Confirm() {
-  const { state, go } = useApp();
+  const { state, go, setState } = useApp();
   const { isMobile } = useViewport();
   const tr = (fr, en, ar) => (state.lang === 'en' ? en : state.lang === 'ar' ? ar : fr);
   const doctors = state.doctors?.length ? state.doctors : (isSupabaseConfigured ? [] : DOCTORS);
@@ -170,7 +170,7 @@ export default function Confirm() {
 
         {/* Primary: guests are invited to create an account; patients see their RDV */}
         <button
-          onClick={() => go(state.guestBooking ? 'pregister' : 'paccount')}
+          onClick={() => { if (state.guestBooking) { go('pregister'); } else { setState({ paccountScrollTo: 'appointments' }); go('paccount'); } }}
           style={{
             width: '100%',
             padding: '13px 0',

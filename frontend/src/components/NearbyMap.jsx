@@ -24,9 +24,19 @@ const PIN_CSS = `
   background:linear-gradient(90deg,#7f8a93 0%,#eef1f3 45%,#7f8a93 100%);box-shadow:0 1px 1px rgba(0,0,0,.25)}
 .tbpin .head{position:absolute;left:50%;top:0;width:18px;height:18px;transform:translateX(-50%);border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#5ad6a0,#16A06A 55%,#0E7C52);
-  box-shadow:0 3px 6px rgba(14,124,82,.45),inset 0 -1px 2px rgba(0,0,0,.18)}
-.tbpin .head::after{content:'';position:absolute;left:4px;top:3px;width:6px;height:5px;border-radius:50%;background:rgba(255,255,255,.6)}
-.tbpin.sel .head{box-shadow:0 0 0 4px rgba(22,160,106,.25),0 4px 8px rgba(14,124,82,.5)}
+  box-shadow:0 3px 6px rgba(14,124,82,.45),inset 0 -1px 2px rgba(0,0,0,.18);
+  animation:tbGlow 2s ease-in-out infinite}
+/* Live "on/off" beacon: an expanding ring behind the head + a gentle glow breathe,
+   so every pin reads as a live, active marker even when the map is zoomed out. */
+.tbpin .head::before{content:'';position:absolute;left:50%;top:50%;width:18px;height:18px;
+  transform:translate(-50%,-50%);border-radius:50%;background:rgba(22,160,106,.5);z-index:-1;
+  animation:tbPulse 2s ease-out infinite}
+.tbpin .head::after{content:'';position:absolute;left:4px;top:3px;width:6px;height:5px;border-radius:50%;background:rgba(255,255,255,.6);z-index:1}
+.tbpin.sel .head{box-shadow:0 0 0 4px rgba(22,160,106,.25),0 4px 8px rgba(14,124,82,.5);animation:none}
+.tbpin.sel .head::before{animation-duration:1.4s;background:rgba(22,160,106,.6)}
+@keyframes tbPulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.65}70%{transform:translate(-50%,-50%) scale(2.8);opacity:0}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+@keyframes tbGlow{0%,100%{box-shadow:0 3px 6px rgba(14,124,82,.45),inset 0 -1px 2px rgba(0,0,0,.18),0 0 0 0 rgba(22,160,106,0)}50%{box-shadow:0 3px 10px rgba(14,124,82,.6),inset 0 -1px 2px rgba(0,0,0,.18),0 0 12px 2px rgba(90,214,160,.55)}}
+@media (prefers-reduced-motion:reduce){.tbpin .head,.tbpin .head::before{animation:none}}
 `;
 function injectCss() {
   if (typeof document === 'undefined' || document.getElementById('tbpin-css')) return;

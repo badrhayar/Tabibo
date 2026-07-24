@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import BrandMark from '../components/BrandMark';
+import BrandMark, { Wordmark } from '../components/BrandMark';
 import LangPill from '../components/LangPill';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
@@ -253,35 +253,27 @@ export default function Profile() {
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>
 
-      {/* ── Header ── */}
-      <header style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: `1px solid ${BORDER}`, height: isMobile ? 60 : 66, display: 'flex', alignItems: 'center', padding: isMobile ? '0 16px' : '0 28px', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
-        <button
-          onClick={() => go('home')}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-        >
-          <BrandMark size={31} shadow />
-          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 800, color: DARK, letterSpacing: '-0.5px' }}>
-            Tabib<span style={{ color: PRIMARY }}>o</span>
-          </span>
-        </button>
-        {patient ? (
-          <button
-            onClick={() => go('paccount')}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EAF6F0', border: '1px solid #C3E8D8', borderRadius: 24, padding: '6px 14px 6px 8px', cursor: 'pointer' }}
-          >
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: GRAD, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
-              {initials(patient.name)}
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: DARK }}>{patient.name?.split(' ')[0]}</span>
+      {/* ── Header — premium deep-green, unified with the patient account ── */}
+      <header style={{ background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.08), 0 8px 24px -12px rgba(6,32,23,0.55)', position: 'sticky', top: 0, zIndex: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 60 : 66, padding: isMobile ? '0 16px' : '0 28px', gap: isMobile ? 8 : 12 }}>
+          <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+            <BrandMark plain size={32} />
+            <Wordmark size={21} />
           </button>
-        ) : (
-          <button
-            onClick={() => go('plogin')}
-            style={{ ...greenBtn }}
-          >
-            Se connecter
-          </button>
-        )}
+          <div style={{ flex: 1, minWidth: 8 }} />
+          {patient ? (
+            <button onClick={() => go('paccount')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 24, padding: '5px 13px 5px 6px', cursor: 'pointer', flexShrink: 0 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(150deg,#D7EFE3,#BFE6D2)', color: '#0C4A37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                {initials(patient.name)}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{patient.name?.split(' ')[0]}</span>
+            </button>
+          ) : (
+            <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
+              Se connecter
+            </button>
+          )}
+        </div>
       </header>
 
       {/* ── Breadcrumb ── */}

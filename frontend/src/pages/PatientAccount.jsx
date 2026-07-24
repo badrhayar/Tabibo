@@ -186,6 +186,18 @@ export default function PatientAccount() {
 
   useEffect(() => { threadEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [thread.length]);
 
+  // Land on the appointments section when arriving from "Voir mes rendez-vous"
+  // (e.g. right after booking) instead of the top/bottom of the page.
+  useEffect(() => {
+    if (state.paccountScrollTo !== 'appointments') return undefined;
+    const t = setTimeout(() => {
+      document.getElementById('paccount-appointments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setState({ paccountScrollTo: null });
+    }, 250);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.paccountScrollTo]);
+
   // Real appointments for the signed-in patient (loaded into global state).
   const appts = state.myAppointments || [];
   const nowMs = now || Date.now();
@@ -483,7 +495,7 @@ export default function PatientAccount() {
           )}
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns: isMobile?'minmax(0,1fr)':'minmax(0,1.2fr) minmax(0,1fr)', gap: isMobile?16:22, alignItems:'start' }}>
+        <div id="paccount-appointments" style={{ display:'grid', gridTemplateColumns: isMobile?'minmax(0,1fr)':'minmax(0,1.2fr) minmax(0,1fr)', gap: isMobile?16:22, alignItems:'start', scrollMarginTop: 76 }}>
           {/* Appointments column */}
           <div style={{ display:'flex', flexDirection:'column', gap:22, minWidth:0 }}>
             {/* Upcoming */}

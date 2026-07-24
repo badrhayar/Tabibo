@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import BrandMark from '../components/BrandMark';
+import BrandMark, { Wordmark } from '../components/BrandMark';
 import { useApp } from '../context/AppContext';
 import PhoneField from '../components/PhoneField';
 import { useViewport } from '../hooks/useViewport';
@@ -205,35 +205,27 @@ export default function BookingInfo() {
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>
 
-      {/* ── Header ── */}
-      <header style={{ background: '#fff', borderBottom: `1px solid ${BORDER}`, height: 64, display: 'flex', alignItems: 'center', padding: '0 28px', justifyContent: 'space-between' }}>
-        <button
-          onClick={() => go('home')}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-        >
-          <BrandMark size={30} />
-          <span style={{ fontSize: 19, fontWeight: 700, color: DARK }}>
-            Tabib<span style={{ color: PRIMARY }}>o</span>
-          </span>
-        </button>
-        {patient ? (
-          <button
-            onClick={() => go('paccount')}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#EAF6F0', border: '1px solid #C3E8D8', borderRadius: 24, padding: '6px 14px 6px 8px', cursor: 'pointer' }}
-          >
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: PRIMARY, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
-              {(patient.name || '?')[0].toUpperCase()}
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: DARK }}>{patient.name?.split(' ')[0]}</span>
+      {/* ── Header — premium deep-green, unified with the patient account ── */}
+      <header style={{ background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.08), 0 8px 24px -12px rgba(6,32,23,0.55)', position: 'sticky', top: 0, zIndex: 30 }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: 64, padding: '0 28px', gap: 12 }}>
+          <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+            <BrandMark plain size={32} />
+            <Wordmark size={21} />
           </button>
-        ) : (
-          <button
-            onClick={() => go('plogin')}
-            style={{ ...greenBtn }}
-          >
-            Se connecter
-          </button>
-        )}
+          <div style={{ flex: 1, minWidth: 8 }} />
+          {patient ? (
+            <button onClick={() => go('paccount')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 24, padding: '5px 13px 5px 6px', cursor: 'pointer', flexShrink: 0 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(150deg,#D7EFE3,#BFE6D2)', color: '#0C4A37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                {(patient.name || '?')[0].toUpperCase()}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{patient.name?.split(' ')[0]}</span>
+            </button>
+          ) : (
+            <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
+              Se connecter
+            </button>
+          )}
+        </div>
       </header>
 
       {/* ── Page content ── */}
@@ -248,8 +240,8 @@ export default function BookingInfo() {
         </button>
         <div style={{ float: 'inline-end', marginTop: -52 }}><LangPill /></div>
 
-        {/* Doctor summary banner */}
-        <div style={{ background: `linear-gradient(135deg, ${PRIMARY} 0%, #12875A 100%)`, borderRadius: 14, padding: '16px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Doctor summary banner — premium deep green, matching the header */}
+        <div style={{ background: 'linear-gradient(135deg, #0C4A37 0%, #0A3D2D 100%)', borderRadius: 14, padding: '16px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 10px 26px -16px rgba(6,32,23,0.6)' }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{doc.name}</div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{dateStr}</div>
