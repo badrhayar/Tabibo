@@ -59,6 +59,7 @@ import Prescriptions from './Prescriptions';
 import Staff from './Staff';
 import PatientFile from './PatientFile';
 import Tasks from './Tasks';
+import Navigator from './Navigator';
 import { taskBadge } from '../../lib/tasks';
 
 const G = '#16A06A';
@@ -129,9 +130,11 @@ const IC = {
 // Level 1: primary destinations (icon + small label). Items with `items` open
 // a SECOND rail (lighter green) listing the group's screens.
 const IC_TASKS = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg>;
+const IC_NAV = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.4 2.7-5.2 6-5.2 1.2 0 2.3.2 3.2.7"/><path d="M14.5 17.5l2.2 2.2 4.3-4.6"/></svg>;
 const NAV = [
   { key:'doctor',   screen:'doctor', icon:IC.doctor, label:'Accueil' },
   { key:'dcal',     screen:'dcal',   icon:IC.dcal,   label:'Agenda' },
+  { key:'dnav',     screen:'dnav',   icon:IC_NAV,    label:'Navigateur patients' },
   { key:'dtasks',   screen:'dtasks', icon:IC_TASKS,  label:'Tâches', badge:'tasks' },
   { key:'patients', icon:IC.dpatients, label:'Gestion des patients', items:[
     { screen:'dpatients',  icon:IC.dpatients,  label:'Liste des patients' },
@@ -270,7 +273,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 

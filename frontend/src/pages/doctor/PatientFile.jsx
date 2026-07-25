@@ -7,6 +7,7 @@ import {
 import { moroccoNow } from '../../lib/time';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, initials } from '../../shared.jsx';
+import PatientDocs from './PatientDocs';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dossier patient — Doctolib-grade patient file.
@@ -80,6 +81,7 @@ const SECTIONS = [
   { id: 'ttt',      label: 'Traitement en cours',        icon: 'pill' },
   { id: 'suivi',    label: 'Données de suivi',           icon: 'chart' },
   { id: 'bio',      label: 'Biologie et biométrie',      icon: 'bio' },
+  { id: 'docs',     label: 'Documents',                  icon: 'file' },
   { id: 'prev',     label: 'Prévention',                 icon: 'shield' },
   { id: 'vaccin',   label: 'Carnet de vaccination',      icon: 'vaccin' },
   { id: 'factures', label: 'Factures',                   icon: 'receipt' },
@@ -1329,6 +1331,7 @@ export default function PatientFile({ state, setState, go }) {
     ttt: renderTtt,
     suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.chart, sub: 'Taille, poids, IMC et pression artérielle.' }),
     bio: renderBioTool,
+    docs: () => <PatientDocs state={state} setState={setState} patient={patient} pkey={pkey} isMobile={isMobile} card={card} CardHead={CardHead} IC_FILE={IC.file} />,
     prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.shield, sub: 'Dépistages, rappels et conseils de prévention.' }),
     vaccin: () => renderSimple('Carnet de vaccination', <><ItemList items={mh.vaccins || []} placeholder="Ex. Tétanos — rappel 03/2024"
       onAdd={(v) => { const next = { ...mh, vaccins: [...(mh.vaccins || []), v] }; setMh(next); saveMh(next); }}
