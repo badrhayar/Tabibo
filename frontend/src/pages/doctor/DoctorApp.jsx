@@ -60,6 +60,7 @@ import Staff from './Staff';
 import PatientFile from './PatientFile';
 import Tasks from './Tasks';
 import Navigator from './Navigator';
+import Requests from './Requests';
 import { taskBadge } from '../../lib/tasks';
 
 const G = '#16A06A';
@@ -142,6 +143,7 @@ const NAV = [
     { screen:'dappts',     icon:IC.dappts,     label:'Rendez-vous' },
     { screen:'dprescribe', icon:IC.dprescribe, label:'Ordonnances' },
     { screen:'ddocs',      icon:IC.ddocs,      label:'Documents' },
+    { screen:'dreq',       icon:IC.dchat,      label:'Demandes patients' },
     { screen:'dhist',      icon:IC.dhist,      label:'Historique consultations' },
     { screen:'dshare',     icon:IC.dshare,     label:'Inviter mes patients' },
   ] },
@@ -273,7 +275,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 

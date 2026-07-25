@@ -3,6 +3,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import { initials as initialsOf } from '../../shared.jsx';
 import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff } from '../../lib/api';
+import { loadStations, saveStations, STATION_KINDS, kindOf } from '../../lib/stations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigateur patients — the front-desk board for the whole day.
@@ -31,6 +32,8 @@ const IC = {
   note:  <svg {...I}><path d="M4 5h16v11H9l-4 4z" /></svg>,
   alert: <svg {...I}><path d="M12 4.5L2.8 20h18.4z" /><path d="M12 10v4M12 17.2v.1" /></svg>,
   file:  <svg {...I}><path d="M14 3v5h5" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /></svg>,
+  gear:  <svg {...I}><circle cx="12" cy="12" r="3.2" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" /></svg>,
+  arrow: <svg {...I}><path d="M5 12h14M13 6l6 6-6 6" /></svg>,
 };
 
 const AV = ['#0F6E56', '#2563EB', '#9333EA', '#EA580C', '#DB2777', '#0891B2'];
@@ -51,6 +54,12 @@ export default function Navigator({ state, setState, go }) {
   const [walkOpen, setWalkOpen] = useState(false);
   const [showOut, setShowOut] = useState(false);
   const [busy, setBusy] = useState(null);
+  const [stationFor, setStationFor] = useState(null);  // appointment being moved
+  const [stationsOpen, setStationsOpen] = useState(false);
+
+  // Postes de soins du cabinet (configurables par le médecin).
+  const [stations, setStations] = useState(() => loadStations(state, state?.appUser?.full_name || (state?.demoDoctor ? 'Dr. Démonstration' : 'Médecin')));
+  const persistStations = (l) => { setStations(l); saveStations(state, l); };
 
   // Practitioners = the doctor + active staff (each gets a consultation column).
   const [staff, setStaff] = useState([]);
@@ -75,7 +84,8 @@ export default function Navigator({ state, setState, go }) {
   const inConsult = today.filter((a) => inConsultAt(a) && a.status !== 'completed' && a.status !== 'no_show');
   const checkedOut = today.filter((a) => a.status === 'completed')
     .sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-  const withDoc = (name) => inConsult.filter((a) => (a.practitioner || me) === name);
+  // A patient sits in the station the desk sent them to (fallback: first station).
+  const atStation = (st) => inConsult.filter((a) => (a.stationId || stations[0]?.id) === st.id);
 
   // ── State transitions (optimistic + persisted) ────────────────────────────
   const patch = (id, fn) => setState({
@@ -91,13 +101,19 @@ export default function Navigator({ state, setState, go }) {
     setState({ toast: `${a.patientName || 'Patient'} est en salle d’attente ✓`, toastShow: true });
     setBusy(null);
   };
-  const enter = async (a, practitioner) => {
+  const enter = async (a, station) => {
     setBusy(a.id);
     const ts = new Date().toISOString();
-    patch(a.id, (x) => ({ ...x, inConsultAt: ts, arrivedAt: arrivedAt(x) || ts, practitioner }));
+    patch(a.id, (x) => ({ ...x, inConsultAt: ts, arrivedAt: arrivedAt(x) || ts, stationId: station.id, practitioner: station.kind === 'doctor' ? station.name : (x.practitioner || me) }));
     try { if (!isLocalId(a.id)) await markInConsultation(a.id, true); } catch (_) { /* optimistic */ }
-    setState({ toast: `${a.patientName || 'Patient'} est en consultation ✓`, toastShow: true });
+    setState({ toast: `${a.patientName || 'Patient'} → ${station.name} ✓`, toastShow: true });
     setBusy(null);
+  };
+  // Move an already-admitted patient to another station (labo, échographie…).
+  const moveStation = (a, station) => {
+    patch(a.id, (x) => ({ ...x, stationId: station.id, inConsultAt: inConsultAt(x) || new Date().toISOString() }));
+    setStationFor(null);
+    setState({ toast: `${a.patientName || 'Patient'} déplacé vers ${station.name} ✓`, toastShow: true });
   };
   const back = async (a) => {
     setBusy(a.id);
@@ -214,9 +230,13 @@ export default function Navigator({ state, setState, go }) {
           style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: showOut ? '#E9F5F0' : '#fff', color: TEAL, border: `1px solid ${showOut ? TEAL : BORDER}`, borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           {IC.out} Sorties récentes ({checkedOut.length})
         </button>
+        <button onClick={() => setStationsOpen(true)} title="Définir les postes de soins du cabinet"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#fff', color: DARK, border: `1px solid ${BORDER}`, borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          {IC.gear} Postes de soins
+        </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : `repeat(${2 + Math.min(practitioners.length, 3)}, minmax(0,1fr))`, gap: 14, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : `repeat(${2 + Math.min(stations.length, 4)}, minmax(0,1fr))`, gap: 14, alignItems: 'start' }}>
         {/* Visites à venir */}
         <Column title="Visites à venir" count={upcoming.length}>
           {upcoming.length === 0 && empty('Aucune visite à venir aujourd’hui.')}
@@ -232,34 +252,38 @@ export default function Navigator({ state, setState, go }) {
           {waiting.length === 0 && empty('Salle d’attente vide.')}
           {waiting.map((a) => (
             <Card key={a.id} a={a} tone="#9333EA" actions={
-              practitioners.length > 1 ? (
-                <select defaultValue="" onChange={(e) => { if (e.target.value) enter(a, e.target.value); }}
+              stations.length > 1 ? (
+                <select defaultValue="" onChange={(e) => { const st = stations.find((s) => s.id === e.target.value); if (st) enter(a, st); }}
                   style={{ ...btnGhost, color: TEAL, borderColor: TEAL, fontWeight: 700, cursor: 'pointer' }}>
-                  <option value="">Faire entrer chez…</option>
-                  {practitioners.map((p) => <option key={p} value={p}>{p}</option>)}
+                  <option value="">Envoyer vers…</option>
+                  {stations.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               ) : (
-                <button onClick={() => enter(a, me)} disabled={busy === a.id} style={btnPri}>Faire entrer</button>
+                <button onClick={() => enter(a, stations[0] || { id: 'st_doc', name: me, kind: 'doctor' })} disabled={busy === a.id} style={btnPri}>Faire entrer</button>
               )
             } />
           ))}
         </Column>
 
-        {/* Une colonne par praticien */}
-        {practitioners.slice(0, 3).map((p) => (
-          <Column key={p} title={p} count={withDoc(p).length}>
-            {withDoc(p).length === 0 && empty('Aucun patient en consultation.')}
-            {withDoc(p).map((a) => (
-              <Card key={a.id} a={a} tone="#0E7C52" actions={
-                <>
-                  <button onClick={() => checkout(a)} disabled={busy === a.id} style={btnPri}>Terminer la visite</button>
-                  <button onClick={() => openFile(a)} style={btnGhost}>Dossier</button>
-                  <button onClick={() => back(a)} style={btnGhost} title="Renvoyer en salle d’attente">↩</button>
-                </>
-              } />
-            ))}
-          </Column>
-        ))}
+        {/* Une colonne par poste de soins (configurable) */}
+        {stations.slice(0, 4).map((st) => {
+          const k = kindOf(st.kind);
+          return (
+            <Column key={st.id} title={st.name} count={atStation(st).length} tint={k.bg}>
+              {atStation(st).length === 0 && empty('Aucun patient à ce poste.')}
+              {atStation(st).map((a) => (
+                <Card key={a.id} a={a} tone={k.color} actions={
+                  <>
+                    <button onClick={() => checkout(a)} disabled={busy === a.id} style={btnPri}>Terminer la visite</button>
+                    <button onClick={() => setStationFor(a)} style={btnGhost} title="Envoyer vers un autre poste">Changer de poste</button>
+                    <button onClick={() => openFile(a)} style={btnGhost}>Dossier</button>
+                    <button onClick={() => back(a)} style={btnGhost} title="Renvoyer en salle d’attente">↩</button>
+                  </>
+                } />
+              ))}
+            </Column>
+          );
+        })}
       </div>
 
       {/* Sorties récentes */}
@@ -286,12 +310,123 @@ export default function Navigator({ state, setState, go }) {
       )}
 
       {noteFor && <NoteModal a={noteFor} onClose={() => setNoteFor(null)} onSave={saveNote} isMobile={isMobile} />}
+      {stationFor && (
+        <StationPicker a={stationFor} stations={stations} onClose={() => setStationFor(null)} onPick={(st) => moveStation(stationFor, st)} isMobile={isMobile} />
+      )}
+      {stationsOpen && (
+        <StationsManager stations={stations} onClose={() => setStationsOpen(false)} onSave={persistStations} isMobile={isMobile} />
+      )}
       {walkOpen && (
         <WalkinModal
           state={state} setState={setState} onClose={() => setWalkOpen(false)} isMobile={isMobile}
           practitioners={practitioners} doctorId={doctorId} me={me} todayKey={todayKey}
         />
       )}
+    </div>
+  );
+}
+
+// ── Envoyer le patient vers un poste de soins ────────────────────────────────
+function StationPicker({ a, stations, onClose, onPick, isMobile }) {
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(16,42,32,0.52)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', zIndex: 1400, padding: isMobile ? 0 : 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '18px 18px 0 0' : 20, width: '100%', maxWidth: 440, boxShadow: '0 30px 80px -20px rgba(13,43,30,0.55)', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 20px 14px', borderBottom: `1px solid ${BORDER}` }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15.5, fontWeight: 700, color: DARK }}>Poste de soins du patient</div>
+            <div style={{ fontSize: 12.5, color: MUTED, marginTop: 1 }}>{a.patientName || 'Patient'}</div>
+          </div>
+          <button onClick={onClose} aria-label="Fermer" style={{ width: 30, height: 30, borderRadius: 9, border: `1px solid ${BORDER}`, background: '#fff', color: MUTED, cursor: 'pointer', fontSize: 16 }}>×</button>
+        </div>
+        <div style={{ padding: 14, maxHeight: '60vh', overflowY: 'auto' }}>
+          {stations.map((s) => {
+            const k = kindOf(s.kind);
+            const on = a.stationId === s.id;
+            return (
+              <button key={s.id} onClick={() => onPick(s)}
+                style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'start', padding: '11px 13px', marginBottom: 8, border: `1px solid ${on ? TEAL : BORDER}`, borderRadius: 12, background: on ? '#F2FAF6' : '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <span style={{ width: 30, height: 30, borderRadius: 9, background: k.bg, color: k.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{s.name.slice(0, 2).toUpperCase()}</span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: DARK }}>{s.name}</span>
+                  <span style={{ display: 'block', fontSize: 11.5, color: MUTED }}>{k.label}</span>
+                </span>
+                {on ? <span style={{ fontSize: 11, fontWeight: 700, color: TEAL }}>Ici</span> : <span style={{ color: MUTED, display: 'flex' }}>{IC.arrow}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Définir les postes de soins du cabinet ───────────────────────────────────
+function StationsManager({ stations, onClose, onSave, isMobile }) {
+  const [list, setList] = useState(stations);
+  const [name, setName] = useState('');
+  const [kind, setKind] = useState('doctor');
+  const add = () => {
+    const n = name.trim();
+    if (!n) return;
+    setList([...list, { id: `st_${Date.now()}`, name: n, kind }]);
+    setName('');
+  };
+  const move = (i, d) => {
+    const j = i + d;
+    if (j < 0 || j >= list.length) return;
+    const next = list.slice();
+    [next[i], next[j]] = [next[j], next[i]];
+    setList(next);
+  };
+  const inp = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', border: `1px solid ${BORDER}`, borderRadius: 11, fontSize: 13.5, color: DARK, outline: 'none', fontFamily: 'inherit', background: '#fff' };
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(16,42,32,0.52)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', zIndex: 1400, padding: isMobile ? 0 : 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '18px 18px 0 0' : 20, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 30px 80px -20px rgba(13,43,30,0.55)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 20px 14px', borderBottom: `1px solid ${BORDER}` }}>
+          <span style={{ width: 36, height: 36, borderRadius: 11, background: '#E9F5F0', color: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{IC.gear}</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15.5, fontWeight: 700, color: DARK }}>Postes de soins du cabinet</div>
+            <div style={{ fontSize: 12.5, color: MUTED, marginTop: 1 }}>Médecins, laboratoire, échographie, salle de soins… chacun devient une colonne du navigateur.</div>
+          </div>
+          <button onClick={onClose} aria-label="Fermer" style={{ width: 30, height: 30, borderRadius: 9, border: `1px solid ${BORDER}`, background: '#fff', color: MUTED, cursor: 'pointer', fontSize: 16 }}>×</button>
+        </div>
+        <div style={{ padding: 20 }}>
+          {list.map((s, i) => {
+            const k = kindOf(s.kind);
+            return (
+              <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', border: `1px solid ${BORDER}`, borderRadius: 12, marginBottom: 8, background: '#FAFDFB' }}>
+                <span style={{ width: 28, height: 28, borderRadius: 9, background: k.bg, color: k.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{s.name.slice(0, 2).toUpperCase()}</span>
+                <input value={s.name} onChange={(e) => setList(list.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
+                  style={{ ...inp, flex: 1, padding: '7px 10px', background: '#fff' }} />
+                <select value={s.kind} onChange={(e) => setList(list.map((x, j) => j === i ? { ...x, kind: e.target.value } : x))}
+                  style={{ ...inp, width: 168, padding: '7px 10px', cursor: 'pointer' }}>
+                  {STATION_KINDS.map((x) => <option key={x.key} value={x.key}>{x.label}</option>)}
+                </select>
+                <button onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: 'none', border: 'none', color: i === 0 ? '#C9D6D1' : MUTED, cursor: i === 0 ? 'default' : 'pointer', fontSize: 14 }}>▲</button>
+                <button onClick={() => move(i, 1)} disabled={i === list.length - 1} title="Descendre" style={{ background: 'none', border: 'none', color: i === list.length - 1 ? '#C9D6D1' : MUTED, cursor: i === list.length - 1 ? 'default' : 'pointer', fontSize: 14 }}>▼</button>
+                <button onClick={() => setList(list.filter((_, j) => j !== i))} aria-label="Supprimer" style={{ background: 'none', border: 'none', color: '#C2263F', cursor: 'pointer', fontSize: 17, lineHeight: 1 }}>×</button>
+              </div>
+            );
+          })}
+          {list.length === 0 && <div style={{ padding: '18px 0', fontSize: 13, color: MUTED, textAlign: 'center' }}>Aucun poste — ajoutez-en un ci-dessous.</div>}
+
+          <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+            <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()}
+              placeholder="Nom du poste (ex. Dr. Alaoui, Laboratoire…)" style={{ ...inp, flex: '1 1 200px' }} />
+            <select value={kind} onChange={(e) => setKind(e.target.value)} style={{ ...inp, width: 190, cursor: 'pointer' }}>
+              {STATION_KINDS.map((x) => <option key={x.key} value={x.key}>{x.label}</option>)}
+            </select>
+            <button onClick={add} style={{ padding: '10px 15px', borderRadius: 11, border: `1px solid #CFE4DB`, background: '#E9F5F0', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>+ Ajouter</button>
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 20px', borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
+          <button onClick={onClose} style={{ padding: '9px 15px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
+          <button onClick={() => { onSave(list); onClose(); }}
+            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Enregistrer les postes
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

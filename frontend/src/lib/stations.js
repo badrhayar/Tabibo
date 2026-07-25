@@ -1,0 +1,40 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Postes de soins (stations) — the physical/functional places a patient can be
+// sent to inside the cabinet: l'accueil, chaque médecin, le laboratoire,
+// l'échographie, la salle de soins… The doctor defines them once; the
+// navigateur patients then routes every patient to the right one.
+// Stored per signed-in user (localStorage), so a cabinet keeps its own layout.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const STATION_KINDS = [
+  { key: 'desk',   label: 'Accueil / administratif', color: '#3B6FB0', bg: '#E8F1FC' },
+  { key: 'doctor', label: 'Médecin',                 color: '#0E7C52', bg: '#E7F6EE' },
+  { key: 'care',   label: 'Salle de soins',          color: '#12875A', bg: '#E3F8EE' },
+  { key: 'lab',    label: 'Laboratoire',             color: '#6B57A6', bg: '#EFEAFB' },
+  { key: 'imaging',label: 'Imagerie / échographie',  color: '#0891B2', bg: '#E3F5FA' },
+  { key: 'other',  label: 'Autre',                   color: '#5A6B65', bg: '#EEF3F0' },
+];
+export const kindOf = (k) => STATION_KINDS.find((x) => x.key === k) || STATION_KINDS[STATION_KINDS.length - 1];
+
+const key = (state) => `tabibo_stations_${state?.appUser?.id || 'demo'}`;
+
+/** Default layout for a cabinet that has not configured anything yet. */
+export function defaultStations(doctorName = 'Médecin') {
+  return [
+    { id: 'st_desk', name: 'Accueil et admin', kind: 'desk' },
+    { id: 'st_doc',  name: doctorName,          kind: 'doctor' },
+    { id: 'st_care', name: 'Salle de soins',    kind: 'care' },
+  ];
+}
+
+export function loadStations(state, doctorName) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key(state)) || 'null');
+    if (Array.isArray(raw) && raw.length) return raw;
+  } catch { /* private mode */ }
+  return defaultStations(doctorName);
+}
+
+export function saveStations(state, list) {
+  try { localStorage.setItem(key(state), JSON.stringify(list)); } catch { /* private mode */ }
+}

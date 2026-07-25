@@ -90,10 +90,16 @@ function layoutDay(appts) {
 
 export default function Calendar({ state, setState, go, openNewAppt }) {
   const { isMobile } = useViewport();
-  const consultations = [...(state?.manualConsults || []), ...(state?.consultations || [])];
+  const allConsultations = [...(state?.manualConsults || []), ...(state?.consultations || [])];
 
   // Default: week on desktop, day on mobile (week is too wide for phones).
   const [view, setView] = useState(isMobile ? 'Journée' : 'Semaine');
+  // ── Left panel: mini-calendar month cursor + filters ──
+  const [miniOffset, setMiniOffset] = useState(0);      // months from the displayed week
+  const [sideOpen, setSideOpen] = useState(!isMobile);
+  const [fServices, setFServices] = useState([]);        // [] = tous les types
+  const [fStatus, setFStatus] = useState([]);            // [] = tous les statuts
+  const [openGroup, setOpenGroup] = useState({ cal: true, status: true, types: true });
   const [weekOffset, setWeekOffset] = useState(0);
   const [selDayIdx, setSelDayIdx] = useState(((new Date(_mo.year, _mo.month, _mo.day)).getDay() + 6) % 7);
   const [dayMenu, setDayMenu] = useState(null);          // { dateISO, x, y }
@@ -116,6 +122,11 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
   const offFor = (dateISO) => timeOff.find((r) => dateISO >= r.start_date && dateISO <= r.end_date) || null;
 
   // Service colours from the doctor's own services.
+  // The grid shows only what passes the left-panel filters (the raw list stays
+  // authoritative for conflict detection when moving an appointment).
+  const consultations = allConsultations.filter((c) =>
+    (fServices.length === 0 || fServices.includes(c.service))
+    && (fStatus.length === 0 || fStatus.includes(c.status)));
   const svcNames = (state?.services?.length ? state.services.map((s) => s.name).filter(Boolean) : []);
   const svcColorMap = {};
   svcNames.forEach((n, i) => { svcColorMap[n] = PALETTE[i % PALETTE.length]; });
@@ -133,7 +144,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
   // A ghost of the appointment follows the cursor over the grid; clicking a
   // free slot re-schedules it there. Entered from the appointment panel.
   const moveId = state?.moveAppt || null;
-  const movingConsult = moveId ? consultations.find((c) => c.id === moveId) || null : null;
+  const movingConsult = moveId ? allConsultations.find((c) => c.id === moveId) || null : null;
   const durMove = movingConsult ? Math.max(15, Number(movingConsult.durationMin) || 30) : 30;
   const [ghost, setGhost] = useState(null);              // { dateISO, min }
   const cancelMove = () => { setGhost(null); setState({ moveAppt: null }); };
@@ -158,7 +169,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
 
   const conflictAt = (dateISO, startMin) => {
     const end = startMin + durMove;
-    return consultations.some((c) => c.id !== moveId && c.date === dateISO && c.status !== 'Annulé'
+    return allConsultations.some((c) => c.id !== moveId && c.date === dateISO && c.status !== 'Annulé'
       && startMin < hm(c.time) + Math.max(15, Number(c.durationMin) || 30) && end > hm(c.time));
   };
   const freeFor = (dateISO, startMin) => !offFor(dateISO) && !conflictAt(dateISO, startMin);
@@ -480,6 +491,142 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     );
   };
 
+  // ── Left panel — mini month calendar + filter tree ────────────────────────
+  const STATUS_OPTS = ['En attente', 'Payé', 'Annulé'];
+  const typeOpts = [...new Set([...svcNames, ...allConsultations.map((c) => c.service)].filter(Boolean))];
+  const toggle = (arr, set, v) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+
+  const renderMini = () => {
+    // Month shown = month of the selected day, shifted by the mini arrows.
+    const base = new Date(selDate.getFullYear(), selDate.getMonth() + miniOffset, 1);
+    const y = base.getFullYear(), m = base.getMonth();
+    const firstIdx = ((new Date(y, m, 1)).getDay() + 6) % 7;      // Monday-first
+    const days = new Date(y, m + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < firstIdx; i++) cells.push(null);
+    for (let d = 1; d <= days; d++) cells.push(d);
+    const busyOn = (iso) => allConsultations.some((c) => c.date === iso && c.status !== 'Annulé');
+    return (
+      <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, padding: '12px 12px 10px', marginBottom: 12, boxShadow: '0 1px 3px rgba(13,43,30,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <button onClick={() => setMiniOffset((o) => o - 1)} aria-label="Mois précédent"
+            style={{ width: 24, height: 24, borderRadius: 7, border: `1px solid ${GRID}`, background: '#fff', cursor: 'pointer', color: DARK, fontSize: 13, lineHeight: 1 }}>‹</button>
+          <span style={{ fontSize: 12.5, fontWeight: 800, color: DARK, textTransform: 'capitalize' }}>{FR_MONTHS[m]} {y}</span>
+          <button onClick={() => setMiniOffset((o) => o + 1)} aria-label="Mois suivant"
+            style={{ width: 24, height: 24, borderRadius: 7, border: `1px solid ${GRID}`, background: '#fff', cursor: 'pointer', color: DARK, fontSize: 13, lineHeight: 1 }}>›</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 4 }}>
+          {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+            <span key={i} style={{ fontSize: 9.5, fontWeight: 700, color: MUTED, textAlign: 'center' }}>{d}</span>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+          {cells.map((d, i) => {
+            if (!d) return <span key={i} />;
+            const iso = `${y}-${p2(m + 1)}-${p2(d)}`;
+            const isSel = iso === selISO;
+            const isToday = iso === TODAY_STR;
+            const inWeek = weekDays.some((wd) => isoOf(wd) === iso);
+            const busy = busyOn(iso);
+            return (
+              <button key={i} onClick={() => { jumpTo(iso); setMiniOffset(0); }}
+                title={busy ? 'Des rendez-vous ce jour' : 'Aucun rendez-vous'}
+                style={{ position: 'relative', height: 26, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                  fontSize: 11.5, fontWeight: isSel || isToday ? 800 : 500,
+                  background: isSel ? TEAL : inWeek ? '#E9F5F0' : 'transparent',
+                  color: isSel ? '#fff' : isToday ? TEAL : DARK, transition: 'background .12s' }}>
+                {d}
+                {busy && !isSel && <span style={{ position: 'absolute', bottom: 3, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: TEAL }} />}
+              </button>
+            );
+          })}
+        </div>
+        <button onClick={() => { goToday(); setMiniOffset(0); }}
+          style={{ width: '100%', marginTop: 9, padding: '7px 0', borderRadius: 9, border: `1px solid ${GRID}`, background: '#FAFDFB', color: TEAL, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Aujourd’hui
+        </button>
+      </div>
+    );
+  };
+
+  const FilterGroup = ({ id, title, children, count }) => (
+    <div style={{ background: '#fff', border: `1px solid ${GRID}`, borderRadius: 14, marginBottom: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(13,43,30,0.05)' }}>
+      <button onClick={() => setOpenGroup((g) => ({ ...g, [id]: !g[id] }))}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '11px 13px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <span style={{ flex: 1, textAlign: 'start', fontSize: 12.5, fontWeight: 800, color: DARK }}>{title}</span>
+        {count > 0 && <span style={{ fontSize: 10, fontWeight: 800, color: '#fff', background: TEAL, borderRadius: 20, padding: '1px 7px' }}>{count}</span>}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+          style={{ transform: openGroup[id] ? 'none' : 'rotate(-90deg)', transition: 'transform .15s' }}><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+      {openGroup[id] && <div style={{ padding: '2px 13px 12px' }}>{children}</div>}
+    </div>
+  );
+
+  // Tri-state "Tous" row + children, exactly like the reference tree.
+  const CheckRow = ({ label, checked, indeterminate, onChange, bold, dot }) => (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', cursor: 'pointer', fontSize: 12.5, color: DARK, fontWeight: bold ? 700 : 500 }}>
+      <input type="checkbox" checked={checked} ref={(el) => { if (el) el.indeterminate = !!indeterminate; }}
+        onChange={onChange} style={{ accentColor: TEAL, width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }} />
+      {dot && <span style={{ width: 9, height: 9, borderRadius: 3, background: dot.bg, border: `2px solid ${dot.color}`, flexShrink: 0 }} />}
+      <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+    </label>
+  );
+
+  const renderSidebar = () => (
+    <>
+      <button onClick={openNewAppt}
+        style={{ width: '100%', marginBottom: 12, padding: '12px 14px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+          background: 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)', color: '#fff', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+        + Nouveau rendez-vous
+      </button>
+
+      {renderMini()}
+
+      <FilterGroup id="types" title="Types de rendez-vous" count={fServices.length}>
+        <CheckRow label="Tous les types" bold
+          checked={fServices.length === 0}
+          indeterminate={fServices.length > 0 && fServices.length < typeOpts.length}
+          onChange={() => setFServices([])} />
+        <div style={{ paddingInlineStart: 10, borderInlineStart: `1px solid ${GRID}`, marginInlineStart: 6 }}>
+          {typeOpts.map((t) => (
+            <CheckRow key={t} label={t} dot={svcColor(t)}
+              checked={fServices.length === 0 || fServices.includes(t)}
+              onChange={() => {
+                // First click on a child from "all" isolates that child.
+                if (fServices.length === 0) setFServices(typeOpts.filter((x) => x !== t));
+                else toggle(fServices, setFServices, t);
+              }} />
+          ))}
+          {typeOpts.length === 0 && <div style={{ fontSize: 11.5, color: MUTED, padding: '4px 0' }}>Aucun type défini.</div>}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup id="status" title="Statut du patient" count={fStatus.length}>
+        <CheckRow label="Tous les statuts" bold
+          checked={fStatus.length === 0}
+          indeterminate={fStatus.length > 0 && fStatus.length < STATUS_OPTS.length}
+          onChange={() => setFStatus([])} />
+        <div style={{ paddingInlineStart: 10, borderInlineStart: `1px solid ${GRID}`, marginInlineStart: 6 }}>
+          {STATUS_OPTS.map((s) => (
+            <CheckRow key={s} label={s}
+              checked={fStatus.length === 0 || fStatus.includes(s)}
+              onChange={() => {
+                if (fStatus.length === 0) setFStatus(STATUS_OPTS.filter((x) => x !== s));
+                else toggle(fStatus, setFStatus, s);
+              }} />
+          ))}
+        </div>
+      </FilterGroup>
+
+      {(fServices.length || fStatus.length) > 0 && (
+        <button onClick={() => { setFServices([]); setFStatus([]); }}
+          style={{ width: '100%', padding: '9px 0', borderRadius: 10, border: `1px solid ${GRID}`, background: '#fff', color: MUTED, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Réinitialiser les filtres
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div style={{ padding: isMobile ? 6 : 26, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
 
@@ -498,6 +645,13 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
 
       {/* ── Top bar ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        {!isMobile && (
+          <button onClick={() => setSideOpen((v) => !v)} aria-label="Afficher/masquer le panneau"
+            title={sideOpen ? 'Masquer le panneau' : 'Afficher le panneau'}
+            style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${GRID}`, background: sideOpen ? '#E9F5F0' : '#fff', color: sideOpen ? TEAL : DARK, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        )}
         <div style={{ display: 'flex', gap: 4 }}>
           {[['‹', goPrev], ['›', goNext]].map(([a, fn]) => (
             <button key={a} onClick={fn} aria-label={a === '‹' ? 'Précédent' : 'Suivant'} style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${GRID}`, background: '#fff', cursor: 'pointer', fontSize: 16, color: DARK, fontWeight: 600, lineHeight: 1 }}>{a}</button>
@@ -516,11 +670,21 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
         </div>
       </div>
 
-      {view === 'Semaine' && (isMobile
-        ? <div style={{ overflowX: 'auto' }}><div style={{ minWidth: 720 }}>{renderWeek()}</div></div>
-        : renderWeek())}
-      {view === 'Journée' && renderDay()}
-      {view === 'Liste' && renderList()}
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+        {/* ── Left panel: mini-calendar + filters ── */}
+        {sideOpen && !isMobile && (
+          <aside style={{ width: 236, flexShrink: 0 }}>
+            {renderSidebar()}
+          </aside>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {view === 'Semaine' && (isMobile
+            ? <div style={{ overflowX: 'auto' }}><div style={{ minWidth: 720 }}>{renderWeek()}</div></div>
+            : renderWeek())}
+          {view === 'Journée' && renderDay()}
+          {view === 'Liste' && renderList()}
+        </div>
+      </div>
 
       {/* ── Legend ── */}
       {view !== 'Liste' && svcNames.length > 0 && (

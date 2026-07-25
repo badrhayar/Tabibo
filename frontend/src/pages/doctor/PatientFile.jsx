@@ -72,6 +72,38 @@ function CardHead({ icon, title, sub, right }) {
   );
 }
 
+// ── Right action rail building blocks (module scope: their open/closed state
+//    must survive a re-render of the dossier). ─────────────────────────────
+function RailGroup({ title, children, defaultOpen = true }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, marginBottom: 12, overflow: 'hidden', boxShadow: SHADOW }}>
+      <button onClick={() => setOpen((o) => !o)}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '12px 14px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <span style={{ flex: 1, textAlign: 'start', fontSize: 13.5, fontWeight: 700, color: DARK, letterSpacing: '-0.2px' }}>{title}</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+          style={{ transform: open ? 'none' : 'rotate(-90deg)', transition: 'transform .15s' }}><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+      {open && <div style={{ padding: '0 10px 10px' }}>{children}</div>}
+    </div>
+  );
+}
+function RailItem({ icon, label, sub, onClick, tint = '#E9F5F0', color = TEAL }) {
+  return (
+    <button onClick={onClick}
+      onMouseEnter={(e) => { e.currentTarget.style.background = '#F4FAF7'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+      style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'start', padding: '9px 10px', border: 'none', borderRadius: 11, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', transition: 'background .12s' }}>
+      <span style={{ width: 30, height: 30, borderRadius: 9, background: tint, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+        {sub && <span style={{ display: 'block', fontSize: 11, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</span>}
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B7C2BD" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 18l6-6-6-6" /></svg>
+    </button>
+  );
+}
+
 const SECTIONS = [
   { id: 'consult',  label: 'Consultation en cours',      icon: 'steth' },
   { id: 'profil',   label: 'Profil patient',             icon: 'idcard' },
@@ -880,27 +912,55 @@ export default function PatientFile({ state, setState, go }) {
     </>
   );
 
-  const renderPlanDeSoins = () => (
-    <div style={{ ...card, position: isMobile ? 'static' : 'sticky', top: 12 }}>
-      <CardHead icon={IC.file} title="Plan de soins" sub="Prescrire et partager en un clic." />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {[
-          { label: 'Ordonnance pharmacie', icon: IC.rx, fn: rxGo },
-          { label: 'Ordonnance de biologie', icon: IC.bio, fn: bioGo },
-          { label: 'Courrier', icon: IC.mail, fn: courrierGo },
-          { label: 'Autres documents', icon: IC.more, fn: () => go('ddocs') },
-        ].map((b) => (
-          <button key={b.label} onClick={b.fn}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, padding: '14px 8px', border: '1px solid #E7EEEA', borderRadius: 12, background: '#fff', cursor: 'pointer', transition: 'all .12s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#BFE0D4'; e.currentTarget.style.background = '#F5FAF8'; e.currentTarget.style.boxShadow = '0 4px 12px -6px rgba(13,43,30,0.18)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E7EEEA'; e.currentTarget.style.background = '#fff'; e.currentTarget.style.boxShadow = 'none'; }}>
-            <span style={{ width: 34, height: 34, borderRadius: '50%', background: '#E9F5F0', color: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{b.icon}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: DARK, textAlign: 'center', lineHeight: 1.3 }}>{b.label}</span>
-          </button>
-        ))}
+  // ── Right action rail — the dossier's cockpit, grouped like a real EMR:
+  //    navigateur (poste de soins), documents à produire, facturation,
+  //    prochains rendez-vous. Every entry does something real.
+  const renderPlanDeSoins = () => {
+    const nextAppts = consults
+      .filter((c) => c.date >= todayISO && c.status !== 'Annulé')
+      .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+      .slice(0, 3);
+    return (
+      <div style={{ position: isMobile ? 'static' : 'sticky', top: 12 }}>
+        {/* Navigateur patient — where this patient physically is */}
+        <RailGroup title="Navigateur patient">
+          <RailItem icon={IC.steth} label="Changer de poste de soins" sub="Labo, échographie, salle de soins…" onClick={() => go('dnav')} />
+          <RailItem icon={IC.clock} label="Suivre la visite" sub="Salle d’attente → sortie" onClick={() => go('dnav')} />
+        </RailGroup>
+
+        {/* Documents à produire */}
+        <RailGroup title="Documents">
+          <RailItem icon={IC.rx} label="Ordonnance pharmacie" onClick={rxGo} tint="#EFEAFB" color="#6B57A6" />
+          <RailItem icon={IC.bio} label="Ordonnance de biologie" onClick={bioGo} tint="#E8F1FC" color="#3B6FB0" />
+          <RailItem icon={IC.mail} label="Courrier médical" onClick={courrierGo} tint="#FEF4DD" color="#9A6510" />
+          <RailItem icon={IC.file} label="Documents du patient" sub="Importer, classer, consulter" onClick={() => setSection('docs')} />
+        </RailGroup>
+
+        {/* Facturation */}
+        <RailGroup title="Facturation">
+          <RailItem icon={IC.receipt} label={linkedAppt?.paid ? 'Consultation encaissée ✓' : 'Encaisser la consultation'}
+            sub={linkedAppt ? `${(linkedAppt.fee || 0).toLocaleString('fr-FR')} MAD` : 'Depuis un rendez-vous lié'}
+            tint="#FEF3DC" color="#C28A1B"
+            onClick={() => { if (linkedAppt && !linkedAppt.paid) { setPayAmount(String(linkedAppt.fee || '')); setPayOpen(true); } else { setSection('factures'); } }} />
+          <RailItem icon={IC.receipt} label="Factures du patient" onClick={() => setSection('factures')} tint="#FEF3DC" color="#C28A1B" />
+        </RailGroup>
+
+        {/* Prochains rendez-vous */}
+        <RailGroup title="Rendez-vous">
+          {nextAppts.length === 0 && (
+            <div style={{ fontSize: 12, color: MUTED, padding: '4px 10px 8px' }}>Aucun rendez-vous à venir.</div>
+          )}
+          {nextAppts.map((c) => (
+            <RailItem key={c.id} icon={IC.clock}
+              label={c.service || 'Consultation'}
+              sub={`${new Date(`${c.date}T12:00:00`).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · ${c.time}`}
+              onClick={() => go('dcal')} />
+          ))}
+          <RailItem icon={IC.play} label="Planifier un rendez-vous" onClick={() => go('dcal')} />
+        </RailGroup>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderSuiviFields = () => (
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
