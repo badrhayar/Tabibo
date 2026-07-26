@@ -64,6 +64,92 @@ function Card({ title, children }) {
   );
 }
 
+
+// ── Aperçu de démonstration ─────────────────────────────────────────────────
+// Ce que le médecin verra une fois son compte activé : les membres de son
+// équipe, leurs droits et l'invitation d'une secrétaire. Purement illustratif.
+const PREVIEW_MEMBERS = [
+  { id: 'p1', name: 'Salma Idrissi',  email: 'salma.idrissi@cabinet.ma',  role: 'Secrétaire',            active: true,  since: 'Mars 2026' },
+  { id: 'p2', name: 'Youssef Amrani', email: 'y.amrani@cabinet.ma',       role: 'Secrétaire',            active: true,  since: 'Juin 2026' },
+  { id: 'p3', name: 'Dr Karima Naji', email: 'k.naji@cabinet.ma',         role: 'Médecin remplaçant',    active: false, since: 'Juillet 2026' },
+];
+
+function StaffPreview() {
+  const demoToast = () => {
+    const el = document.createElement('div');
+    el.textContent = "Aperçu de démonstration — l'équipe devient modifiable dès l'activation de votre compte.";
+    el.style.cssText = 'position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:2000;background:#15314A;color:#fff;padding:12px 22px;border-radius:10px;font-size:13.5px;font-family:Inter,sans-serif;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.18);max-width:90vw;text-align:center';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2800);
+  };
+  return (
+    <div style={{ padding: 32, background: BG, minHeight: '100vh' }}>
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>Mon équipe</h1>
+      </div>
+      <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '14px 18px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
+          <span><strong>Aperçu de démonstration.</strong> Voici la page telle qu'elle fonctionnera dès l'activation de votre compte. Les membres ci-dessous sont fictifs et aucune action n'est enregistrée.</span>
+        </div>
+
+        <div style={{ background: '#EAF6F0', border: '1px solid #CDEBDD', borderRadius: 16, padding: '16px 20px', fontSize: 14, lineHeight: 1.6, color: DARK }}>
+          Votre secrétaire crée d'abord un compte Tabibo (gratuit) avec son email, puis vous l'invitez ici.
+          Elle pourra gérer votre agenda, vos rendez-vous et vos patients — sans accès à votre facturation
+          ni à votre abonnement.
+        </div>
+
+        <Card title="Inviter un membre">
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 220 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>Email du membre</label>
+              <input disabled value="" placeholder="secretaire@email.com"
+                style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F7FAF9', width: '100%', boxSizing: 'border-box' }} />
+            </div>
+            <button onClick={demoToast}
+              style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', opacity: 0.6 }}>Inviter</button>
+          </div>
+        </Card>
+
+        <Card title="Membres de l'équipe">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {PREVIEW_MEMBERS.map((m, i) => (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: '16px 0', borderBottom: i < PREVIEW_MEMBERS.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
+                  {m.name.replace(/^Dr\s*/, '')[0]}
+                </div>
+                <div style={{ flex: 1, minWidth: 160 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: DARK }}>{m.name}</div>
+                  <div style={{ fontSize: 13, color: MUTED }}>{m.email} · depuis {m.since}</div>
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: PRIMARY, background: '#EAF6F0', border: '1px solid #CDEBDD', borderRadius: 999, padding: '4px 12px', whiteSpace: 'nowrap' }}>{m.role}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, color: MUTED, whiteSpace: 'nowrap' }}>{m.active ? 'Actif' : 'Inactif'}</span>
+                  <Toggle checked={m.active} onChange={demoToast} />
+                </div>
+                <button onClick={demoToast} style={{ background: 'transparent', border: `1px solid ${BORDER}`, color: '#cc4444', fontSize: 14, cursor: 'pointer', padding: '7px 12px', borderRadius: 8, fontWeight: 600, flexShrink: 0 }}>Retirer</button>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card title="Ce que voit chaque rôle">
+          {[
+            ['Secrétaire', 'Agenda, rendez-vous, patients, salle d\'attente et documents. Ni facturation du cabinet, ni ordonnances, ni abonnement.'],
+            ['Médecin remplaçant', "Tout le dossier médical et les ordonnances pendant la période de remplacement. Pas la facturation du cabinet."],
+            ['Médecin titulaire', 'Accès complet, y compris la facturation, l\'équipe et l\'abonnement.'],
+          ].map(([role, txt], i, a) => (
+            <div key={role} style={{ padding: '12px 0', borderBottom: i < a.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: DARK, marginBottom: 3 }}>{role}</div>
+              <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{txt}</div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export default function Staff() {
   const { state, setState } = useApp();
   const doctorId = state?.myDoctor?.id;
@@ -113,23 +199,10 @@ export default function Staff() {
     );
   }
 
-  // Doctor account not yet activated.
-  if (!doctorId) {
-    return (
-      <div style={{ padding: 32, background: BG, minHeight: '100vh' }}>
-        <div style={{
-          maxWidth: 520,
-          margin: '40px auto 0',
-          textAlign: 'center',
-          color: MUTED,
-          fontSize: 15,
-          fontWeight: 500,
-        }}>
-          Disponible une fois votre compte médecin activé.
-        </div>
-      </div>
-    );
-  }
+  // Compte médecin pas encore activé (démonstration) → aperçu de la page telle
+  // qu'elle sera une fois le cabinet ouvert. Présentation seule : rien n'agit
+  // sur de vraies données, et chaque commande le dit clairement.
+  if (!doctorId) return <StaffPreview />;
 
   async function onInvite(e) {
     e?.preventDefault?.();

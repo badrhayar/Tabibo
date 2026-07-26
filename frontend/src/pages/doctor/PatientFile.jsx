@@ -8,6 +8,7 @@ import { moroccoNow } from '../../lib/time';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, initials } from '../../shared.jsx';
 import PatientDocs, { fetchPatientDocs, loadDocMeta, docCat } from './PatientDocs';
+import { loadInvoices, saveInvoices, makeInvoice, advance } from '../../lib/billing';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dossier patient — Doctolib-grade patient file.
@@ -776,6 +777,24 @@ export default function PatientFile({ state, setState, go }) {
   const toggleTlCat = (k) => setTlCatsOn((l) => (l.includes(k) ? l.filter((x) => x !== k) : [...l, k]));
   const toggleQuarter = (k) => setTlClosed((l) => (l.includes(k) ? l.filter((x) => x !== k) : [...l, k]));
 
+  // Émettre une facture pour ce patient depuis le dossier : elle est vraiment
+  // enregistrée dans le module Facturation, puis on y bascule.
+  const createInvoice = (kind) => {
+    const amount = linkedAppt?.fee || consults[0]?.amount || 0;
+    const service = linkedAppt?.service || obs.motif || consults[0]?.service || 'Consultation';
+    const list = loadInvoices(state);
+    const inv = advance(makeInvoice({
+      list, patient: patient.name, service, amount, kind,
+      sentTo: kind === 'amo' ? 'CNSS' : 'Patient', date: todayISO,
+    }), 'sent');
+    saveInvoices(state, [inv, ...list]);
+    setState({
+      billTab: kind === 'amo' ? 'amo' : 'prive', billStatus: 'open',
+      toast: `${kind === 'amo' ? 'Feuille de soins' : 'Facture'} n° ${inv.no} créée pour ${patient.name} ✓`, toastShow: true,
+    });
+    go('dbill');
+  };
+
   // Plan de soins actions — all real destinations.
   const rxGo = () => { setState({ rxPrefill: { name: patient.name, patientId: patient.userId || null } }); go('dprescribe'); };
   const bioGo = () => { setState({ rxPrefill: { name: patient.name, patientId: patient.userId || null }, toast: 'Astuce : listez les analyses demandées comme lignes de l’ordonnance.', toastShow: true }); go('dprescribe'); };
@@ -1013,6 +1032,12 @@ export default function PatientFile({ state, setState, go }) {
             sub={linkedAppt ? `${(linkedAppt.fee || 0).toLocaleString('fr-FR')} MAD` : 'Depuis un rendez-vous lié'}
             tint="#FEF3DC" color="#C28A1B"
             onClick={() => { if (linkedAppt && !linkedAppt.paid) { setPayAmount(String(linkedAppt.fee || '')); setPayOpen(true); } else { setSection('factures'); } }} />
+          {/* Émettre depuis le dossier — la facture part directement dans le
+              module Facturation du cabinet, au bon onglet. */}
+          <RailItem icon={IC.file} label="Créer une feuille de soins AMO" sub="CNSS · CNOPS"
+            tint="#E7F6EE" color="#0E7C52" onClick={() => createInvoice('amo')} />
+          <RailItem icon={IC.receipt} label="Créer une facture privée" sub="Réglée par le patient"
+            tint="#FEF3DC" color="#C28A1B" onClick={() => createInvoice('prive')} />
           <RailItem icon={IC.receipt} label="Factures du patient" onClick={() => setSection('factures')} tint="#FEF3DC" color="#C28A1B" />
         </RailGroup>
 

@@ -61,6 +61,8 @@ import PatientFile from './PatientFile';
 import Tasks from './Tasks';
 import Navigator from './Navigator';
 import Requests from './Requests';
+import Billing from './Billing';
+import PlanDetails from './PlanDetails';
 import { taskBadge } from '../../lib/tasks';
 
 const G = '#16A06A';
@@ -138,6 +140,7 @@ const IC = {
 // Level 1: primary destinations (icon + small label). Items with `items` open
 // a SECOND rail (lighter green) listing the group's screens.
 const IC_TASKS = <svg {...S}><path fillRule="evenodd" d="M12 2.2a9.8 9.8 0 1 0 0 19.6 9.8 9.8 0 0 0 0-19.6zm4.72 7.05a1.1 1.1 0 0 0-1.56-1.56l-4.6 4.6-1.72-1.72a1.1 1.1 0 1 0-1.56 1.56l2.5 2.5a1.1 1.1 0 0 0 1.56 0z"/></svg>;
+const IC_BILL = <svg {...S}><path d="M14.9 3.4a1.3 1.3 0 0 1 0 2.6h-2.1c-2 0-3.7 1.2-4.5 3h6.6a1.3 1.3 0 0 1 0 2.6H7.9a5.4 5.4 0 0 0 0 .8h7a1.3 1.3 0 0 1 0 2.6H8.3c.8 1.8 2.5 3 4.5 3h2.1a1.3 1.3 0 0 1 0 2.6h-2.1c-3.6 0-6.6-2.3-7.5-5.6H4.3a1.3 1.3 0 0 1 0-2.6h.9a7.7 7.7 0 0 1 0-.8h-.9a1.3 1.3 0 0 1 0-2.6h1c.9-3.3 3.9-5.6 7.5-5.6z"/></svg>;
 const IC_NAV = <svg {...S}><circle cx="9.4" cy="7.3" r="3.9"/><path d="M9.4 12.9c-4 0-7.2 2.4-7.2 5.55 0 .8.65 1.45 1.45 1.45h8.2a6.55 6.55 0 0 1 2.2-6.44 11.6 11.6 0 0 0-4.65-.56z"/><path fillRule="evenodd" d="M17.5 13.1a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4zm2.36 3.06a.95.95 0 0 0-1.34-.11l-2.13 1.8-.72-.72a.95.95 0 1 0-1.34 1.34l1.33 1.33a.95.95 0 0 0 1.28.05l2.8-2.36a.95.95 0 0 0 .12-1.33z"/></svg>;
 const NAV = [
   { key:'doctor',   screen:'doctor', icon:IC.doctor, label:'Accueil' },
@@ -156,6 +159,7 @@ const NAV = [
   ] },
   { key:'dstaff',   screen:'dstaff', icon:IC.dstaff, label:'Équipe' },
   { key:'dchat',    screen:'dchat',  icon:IC.dchat,  label:'Messagerie', badge:'chat' },
+  { key:'dbill',    screen:'dbill',  icon:IC_BILL,   label:'Facturation' },
   { key:'dstats',   screen:'dstats', icon:IC.dstats, label:'Statistiques' },
   { key:'settings', icon:IC.dsettings, label:'Paramètres', items:[
     { screen:'dsettings', icon:IC.dpatients, label:'Mon profil' },
@@ -173,7 +177,7 @@ const RAIL2_W  = 236;
 
 // Items a secretary/assistant must not see (billing, team management, and
 // prescribing — an ordonnance is a medical act signed by the doctor only).
-const STAFF_HIDDEN = new Set(['dabo', 'dstaff', 'dprescribe']);
+const STAFF_HIDDEN = new Set(['dabo', 'dstaff', 'dprescribe', 'dbill']);
 
 // One cohesive top-bar utility button — cool glass pill, consistent hover +
 // active state, optional notification badge. Grouped in a translucent tray so
@@ -282,7 +286,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 

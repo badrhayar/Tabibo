@@ -3,6 +3,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { SPEC_INFO, subscriptionState, renewalInfo, paymentRef, greenBtn, greenBtnBusy } from '../../shared.jsx';
 import { moroccoNow } from '../../lib/time.js';
 import { fetchDoctorPayments, declarePayment, doctorRequestActivation, notifyVerification } from '../../lib/api';
+import { PLAN_DEF, planFeatures } from '../../lib/plans';
 
 const PRIMARY = '#0F6E56';
 const DARK = '#15314A';
@@ -25,29 +26,16 @@ const Download = ({ c = PRIMARY }) => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
 );
 
-// Two plans only, with a clear value ladder.
+// Les deux formules — définies une seule fois dans lib/plans.js, pour que la
+// carte, la page de détail et le paiement ne puissent jamais diverger.
 const PLANS = {
   pro: {
-    key: 'pro', name: 'Pro', price: 299, tagline: 'Pour un cabinet individuel',
-    features: [
-      'Rendez-vous illimités',
-      'Agenda & rappels WhatsApp (500/mois)',
-      'Messagerie patients',
-      'Documents médicaux',
-      'Statistiques & revenus',
-      'Support prioritaire',
-    ],
+    ...PLAN_DEF.pro,
+    features: planFeatures('pro').map((f) => f.label),
   },
   premium: {
-    key: 'premium', name: 'Premium', price: 499, tagline: 'Pour les cabinets multi-praticiens',
-    features: [
-      'Tout ce qui est inclus dans Pro',
-      'Rappels WhatsApp illimités',
-      'Tableau de bord multi-cabinet',
-      'Comptes secrétaires multiples',
-      'Intégrations API',
-      'Gestionnaire de compte dédié',
-    ],
+    ...PLAN_DEF.premium,
+    features: planFeatures('premium').map((f) => f.label),
   },
 };
 
@@ -75,7 +63,7 @@ export default function Subscription({ state, setState, go }) {
 
   const currentKey = state?.plan || 'pro';
   const annual = !!state?.aboAnnual;
-  const priceOf = (p) => (annual ? Math.round(p.price * 0.8) : p.price);
+  const priceOf = (p) => (p.price == null ? null : (annual ? Math.round(p.price * 0.8) : p.price));
 
   const currentPlan = PLANS[currentKey] || PLANS.pro;
 
@@ -144,33 +132,50 @@ export default function Subscription({ state, setState, go }) {
   const card = (p) => {
     const isCurrent = sub.active && currentKey === p.key;   // only "current" once paid/active
     const recommended = p.key === 'pro';
-    const label = isCurrent ? 'Votre formule actuelle' : (pendingPay ? 'Activation en attente' : `Choisir ${p.name}`);
-    const locked = isCurrent || !!pendingPay;
+    const soon = p.available === false;                     // Premium : ouverture prochaine
+    const label = soon ? 'Bientôt disponible'
+      : isCurrent ? 'Votre formule actuelle'
+      : (pendingPay ? 'Activation en attente' : `Choisir ${p.name}`);
+    const locked = soon || isCurrent || !!pendingPay;
+    const price = priceOf(p);
     return (
-      <div style={{ flex: 1, minWidth: 260, background: '#fff', border: `2px solid ${isCurrent ? PRIMARY : BORDER}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: isCurrent ? '0 14px 34px -16px rgba(22,160,106,0.45)' : 'none' }}>
+      <div key={p.key} style={{ flex: 1, minWidth: 280, background: '#fff', border: `2px solid ${isCurrent ? PRIMARY : BORDER}`, borderRadius: 16, padding: 26, display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: isCurrent ? '0 14px 34px -16px rgba(22,160,106,0.45)' : 'none', opacity: soon ? 0.97 : 1 }}>
         {recommended && (
-          <div style={{ position: 'absolute', top: -13, left: 24, background: PRIMARY, color: '#fff', borderRadius: 20, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>Recommandé</div>
+          <div style={{ position: 'absolute', top: -13, left: 24, background: PRIMARY, color: '#fff', borderRadius: 20, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>Seule formule disponible</div>
+        )}
+        {soon && (
+          <div style={{ position: 'absolute', top: -13, left: 24, background: '#FEF3DC', color: '#8A6210', border: '1px solid #F0DCAE', borderRadius: 20, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>Bientôt disponible</div>
         )}
         <div style={{ fontWeight: 800, fontSize: 19, color: DARK }}>{p.name}</div>
-        <div style={{ fontSize: 13, color: MUTED, marginTop: 2, marginBottom: 14 }}>{p.tagline}</div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 18 }}>
-          <span style={{ fontSize: 34, fontWeight: 800, color: DARK }}>{priceOf(p)}</span>
-          <span style={{ fontSize: 15, fontWeight: 500, color: MUTED }}>MAD/mois</span>
+        <div style={{ fontSize: 13, color: MUTED, marginTop: 2, marginBottom: 12 }}>{p.tagline}</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 12, minHeight: 42 }}>
+          {price != null
+            ? <><span style={{ fontSize: 34, fontWeight: 800, color: DARK }}>{price}</span><span style={{ fontSize: 15, fontWeight: 500, color: MUTED }}>MAD/mois</span></>
+            : <span style={{ fontSize: 15, fontWeight: 600, color: MUTED }}>Tarif annoncé à l'ouverture</span>}
         </div>
-        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px 0', display: 'flex', flexDirection: 'column', gap: 11 }}>
+        <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, margin: '0 0 16px' }}>{p.pitch}</p>
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 18px 0', display: 'flex', flexDirection: 'column', gap: 11 }}>
           {p.features.map((f, i) => (
-            <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 13.5, color: DARK, fontWeight: i === 0 && p.key === 'premium' ? 700 : 400 }}>
-              <span style={{ flexShrink: 0, marginTop: 1 }}><Check /></span> {f}
+            <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 13.5, color: DARK, fontWeight: i === 0 && p.key === 'premium' ? 700 : 400, lineHeight: 1.45 }}>
+              <span style={{ flexShrink: 0, marginTop: 2 }}><Check c={p.key === 'premium' ? '#5B45A0' : PRIMARY} /></span> {f}
             </li>
           ))}
         </ul>
-        <button
-          onClick={() => choosePlan(p.key)}
-          disabled={locked}
-          style={{ marginTop: 'auto', width: '100%', background: locked ? '#EAF6F0' : (recommended ? '#0F6E56' : 'transparent'), color: locked ? '#0E7C52' : (recommended ? '#fff' : '#0F6E56'), border: locked ? `1px solid #C3E8D8` : `1px solid #0F6E56`, borderRadius: 9, padding: '9px 0', fontWeight: 600, fontSize: 13, cursor: locked ? 'default' : 'pointer' }}
-        >
-          {label}
-        </button>
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 9 }}>
+          <button
+            onClick={() => choosePlan(p.key)}
+            disabled={locked}
+            style={{ width: '100%', background: locked ? '#EAF6F0' : (recommended ? '#0F6E56' : 'transparent'), color: locked ? '#0E7C52' : (recommended ? '#fff' : '#0F6E56'), border: locked ? '1px solid #C3E8D8' : '1px solid #0F6E56', borderRadius: 9, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: locked ? 'default' : 'pointer', fontFamily: 'inherit' }}
+          >
+            {label}
+          </button>
+          {/* Chaque formule mène à sa page de description détaillée */}
+          <button onClick={() => { setState({ planDetail: p.key }); go('dplans'); }}
+            style={{ width: '100%', background: 'transparent', border: 'none', color: MUTED, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '2px 0' }}>
+            Plus de détails
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
       </div>
     );
   };

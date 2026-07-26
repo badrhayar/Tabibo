@@ -19,7 +19,11 @@ export default function BookingShare() {
   // Always the PUBLIC production domain (not the Vercel preview), so the shared
   // link + QR point to tabibo.ma/dr-… wherever the doctor generated them.
   const PUBLIC_BASE = (import.meta.env.VITE_APP_URL || 'https://tabibo.ma').replace(/\/$/, '');
-  const link = slug ? `${PUBLIC_BASE}/${slug}` : (doctorId ? `${PUBLIC_BASE}/?doc=${doctorId}` : '');
+  // En démonstration (compte pas encore activé) on prévisualise la page avec un
+  // lien d'exemple, pour que le médecin voie exactement ce qu'il aura.
+  const preview = !doctorId;
+  const link = slug ? `${PUBLIC_BASE}/${slug}`
+    : (doctorId ? `${PUBLIC_BASE}/?doc=${doctorId}` : `${PUBLIC_BASE}/dr-exemple-cabinet`);
   const prettyLink = 'www.' + link.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
   // Visiting this page = the "Invitez vos patients" onboarding step is done —
@@ -39,7 +43,9 @@ export default function BookingShare() {
   const toast = (msg) => setState({ toast: msg, toastShow: true });
   // Escape anything interpolated into the poster HTML (defense-in-depth).
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const previewToast = () => toast("Aperçu de démonstration — actif dès l'activation de votre compte.");
   const copy = async () => {
+    if (!doctorId) { previewToast(); return; }
     try { await navigator.clipboard.writeText(link); toast('Lien copié ✓'); }
     catch { toast('Copie impossible — sélectionnez le lien manuellement.'); }
   };
@@ -84,19 +90,16 @@ export default function BookingShare() {
   const card = { background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: 22 };
   const btn = (bg, color, border) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '7px 14px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: bg, color, border: border || 'none', textDecoration: 'none' });
 
-  if (!doctorId) {
-    return (
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ ...card, textAlign: 'center', color: MUT }}>
-          Votre lien de réservation s'affichera ici une fois votre compte médecin activé.
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto' }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: DARK, margin: '0 0 4px' }}>Invitez vos patients à réserver en ligne</h1>
+      {preview && (
+        <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '13px 17px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11, margin: '12px 0 18px' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
+          <span><strong>Aperçu de démonstration.</strong> Le lien et le QR code ci-dessous sont des exemples. À l'activation de votre compte, ils sont remplacés par votre adresse réelle — de la forme <em>tabibo.ma/dr-votre-nom</em> — et toutes les commandes deviennent actives.</span>
+        </div>
+      )}
       <p style={{ fontSize: 14, color: MUT, margin: '0 0 22px', lineHeight: 1.6 }}>
         Partagez votre lien ou votre QR code avec vos patients actuels. Ils réservent en quelques
         secondes — vous réduisez les appels et remplissez votre agenda automatiquement.
@@ -114,15 +117,15 @@ export default function BookingShare() {
             </button>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <a href={`https://wa.me/?text=${waText}`} target="_blank" rel="noreferrer" style={btn('#16A06A', '#fff')}>
+            <a href={preview ? undefined : `https://wa.me/?text=${waText}`} onClick={(e) => { if (preview) { e.preventDefault(); previewToast(); } }} target="_blank" rel="noreferrer" style={btn('#16A06A', '#fff')}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-3.3-1-5.4-4.4-5.6-4.6-.2-.2-1.4-1.8-1.4-3.5s.9-2.5 1.2-2.8c.3-.3.6-.4.8-.4h.6c.2 0 .5 0 .7.5l.9 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2 1.3 2.3 1.5.3.1.5.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.4.2.5.3.1.2.1.7-.1 1.4z"/></svg>
               Partager sur WhatsApp
             </a>
-            <a href={qr || '#'} download={`tabibo-qr-${doctorId}.png`} style={btn(BG, DARK, `1px solid ${BORDER}`)}>
+            <a href={preview ? undefined : (qr || '#')} onClick={(e) => { if (preview) { e.preventDefault(); previewToast(); } }} download={`tabibo-qr-${doctorId || 'exemple'}.png`} style={btn(BG, DARK, `1px solid ${BORDER}`)}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               Télécharger le QR
             </a>
-            <button onClick={printPoster} style={btn(BG, DARK, `1px solid ${BORDER}`)}>
+            <button onClick={() => (preview ? previewToast() : printPoster())} style={btn(BG, DARK, `1px solid ${BORDER}`)}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
               Imprimer l'affiche
             </button>
