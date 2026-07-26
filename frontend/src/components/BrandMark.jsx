@@ -1,3 +1,5 @@
+import { WORDMARK_VIEWBOX, WORDMARK_RATIO, WORDMARK_TRANSFORM, WORDMARK_PATHS } from './wordmarkPath';
+
 // Tabibo brand mark — the single source of truth for the logo icon.
 // Same form as the historical mark (rounded green square + white stethoscope)
 // but vector-crisp at any size, optically centered, with the app's brand
@@ -6,34 +8,20 @@
 // `plain` renders ONLY the white stethoscope (no tile) — for the deep-green
 // surfaces (rails, headers, footer). The tile version is for white backgrounds
 // and is the exact drawing the PWA icons are rendered from.
-// "Tabibo" wordmark — CUSTOM hand-drawn lettering (not a font), in the spirit
-// of Doctolib's logotype: rounded monoline strokes, gentle 6° slant, a swash
-// crossbar + curled foot on the T, geometric bowls and a tilted i-dot.
-// Pure SVG → renders identically on every device, no webfont involved.
-// Single source of truth: use this everywhere the brand name is written out.
+// "Tabibo" wordmark — le logotype fourni par le cabinet, tel quel.
+// Le dessin vient de l'image d'origine (public/brand/logo-tabibo.png),
+// vectorisée sans retouche : mêmes contours, mais net à toutes les tailles et
+// colorable (blanc sur les fonds verts, vert profond sur les fonds clairs).
+// Source unique : à utiliser partout où le nom de la marque est écrit.
+export { WORDMARK_RATIO };
+
 export function Wordmark({ size = 21, color = '#fff', style }) {
-  const h = Math.round(size * 1.3);
-  const w = Math.round(h * 2.3);
+  const h = Math.round(size * 1.05);
+  const w = Math.round(h * WORDMARK_RATIO);
   return (
-    <svg width={w} height={h} viewBox="0 0 92 40" role="img" aria-label="Tabibo" style={{ display: 'block', flexShrink: 0, ...style }}>
-      <g transform="translate(1.2 0) skewX(-6)" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-        {/* T — entry-hook swash crossbar + gently curved stem with a foot curl */}
-        <path d="M3.4 12.4 Q2.6 8.4 7.6 8 Q13.2 7.6 19 8.9" />
-        <path d="M11.3 8.4 Q10.7 17 10.9 25.6 Q11 31.2 16.5 30.7" />
-        {/* a — uniform 5.2u ink rhythm from here on */}
-        <circle cx="27.5" cy="25.4" r="5.6" />
-        <path d="M33.1 19.8 V31" />
-        {/* b */}
-        <path d="M38.3 9 V31" />
-        <circle cx="43.9" cy="25.4" r="5.6" />
-        {/* i — tilted oval dot */}
-        <path d="M54.7 19.8 V31" />
-        <ellipse cx="54.9" cy="14" rx="2" ry="1.5" fill={color} stroke="none" transform="rotate(-14 54.9 14)" />
-        {/* b */}
-        <path d="M59.9 9 V31" />
-        <circle cx="65.5" cy="25.4" r="5.6" />
-        {/* o */}
-        <circle cx="81.9" cy="25.4" r="5.6" />
+    <svg width={w} height={h} viewBox={WORDMARK_VIEWBOX} role="img" aria-label="Tabibo" style={{ display: 'block', flexShrink: 0, ...style }}>
+      <g transform={WORDMARK_TRANSFORM} fill={color} stroke="none">
+        {WORDMARK_PATHS.map((d, i) => <path key={i} d={d} />)}
       </g>
     </svg>
   );
