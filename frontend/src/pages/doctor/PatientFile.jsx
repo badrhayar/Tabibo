@@ -7,7 +7,7 @@ import {
 import { moroccoNow } from '../../lib/time';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, initials } from '../../shared.jsx';
-import PatientDocs from './PatientDocs';
+import PatientDocs, { fetchPatientDocs, loadDocMeta, docCat } from './PatientDocs';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dossier patient — Doctolib-grade patient file.
@@ -103,6 +103,30 @@ function RailItem({ icon, label, sub, onClick, tint = '#E9F5F0', color = TEAL })
     </button>
   );
 }
+
+// ── Timeline (« Historique ») categories — every event of the patient's course
+//    of care carries one, and each has its own colour so the timeline reads at a
+//    glance. The chips above the timeline filter on these keys.
+const TL_CATS = [
+  { key: 'consult',  label: 'Consultation',   color: '#0E7C52', bg: '#E7F6EE' },
+  { key: 'compte',   label: 'Compte-rendu',   color: '#0891B2', bg: '#E3F5FA' },
+  { key: 'ordo',     label: 'Ordonnance',     color: '#6B57A6', bg: '#EFEAFB' },
+  { key: 'labo',     label: 'Analyses',       color: '#12875A', bg: '#E3F8EE' },
+  { key: 'imagerie', label: 'Imagerie',       color: '#3B6FB0', bg: '#E8F1FC' },
+  { key: 'admin',    label: 'Administratif',  color: '#9A6510', bg: '#FEF4DD' },
+  { key: 'facture',  label: 'Facture',        color: '#C28A1B', bg: '#FEF3DC' },
+  { key: 'autre',    label: 'Autre',          color: '#5A6B65', bg: '#EEF3F0' },
+];
+const tlCat = (k) => TL_CATS.find((c) => c.key === k) || TL_CATS[TL_CATS.length - 1];
+// A document's cabinet category → its timeline category.
+const DOC_TO_TL = { labo: 'labo', imagerie: 'imagerie', radio: 'imagerie', ecg: 'imagerie', ordo: 'ordo', compte: 'compte', courrier: 'admin', arret: 'admin', assur: 'admin', facture: 'facture' };
+// Quarter helpers — the timeline is grouped by trimestre, like a real dossier.
+const QUARTER = (iso) => { const d = new Date(`${iso}T12:00:00`); return `${d.getFullYear()}-T${Math.floor(d.getMonth() / 3) + 1}`; };
+const QUARTER_LBL = (key) => { const [y, t] = key.split('-T'); return `${t === '1' ? '1er' : `${t}e`} trimestre ${y}`; };
+const QUARTER_SUB = (key) => {
+  const t = Number(key.split('-T')[1]);
+  return [['janv.', 'mars'], ['avr.', 'juin'], ['juil.', 'sept.'], ['oct.', 'déc.']][t - 1].join(' – ');
+};
 
 const SECTIONS = [
   { id: 'consult',  label: 'Consultation en cours',      icon: 'steth' },
@@ -477,6 +501,15 @@ export default function PatientFile({ state, setState, go }) {
   const [rx, setRx] = useState([]);
   const [q, setQ] = useState('');
   const [detail, setDetail] = useState(null);   // history entry shown in the detail window
+  // Documents of this patient — the timeline shows them alongside the
+  // consultations, using exactly the rows and classification of the cabinet.
+  const [tlDocs, setTlDocs] = useState([]);
+  const [docMeta, setDocMeta] = useState(() => loadDocMeta(state?.appUser?.id));
+  const [tlCatsOn, setTlCatsOn] = useState([]);        // [] = toutes les catégories
+  const [tlClosed, setTlClosed] = useState([]);        // collapsed quarter keys
+  // Re-read the classification when coming back from the Documents section, so
+  // a document just re-classified lands in the right colour on the timeline.
+  useEffect(() => { setDocMeta(loadDocMeta(state?.appUser?.id)); }, [section, state?.appUser?.id]);
 
   // Restore an in-progress consultation draft (observation + running chrono) so
   // the doctor can leave the page and come back to exactly where they were.
@@ -517,6 +550,21 @@ export default function PatientFile({ state, setState, go }) {
     return () => { on = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pkey, doctorId]);
+
+  // Documents feeding the timeline. Failures are silent here: the timeline
+  // still shows consultations, and the Documents section reports the error.
+  useEffect(() => {
+    if (!patient) return undefined;
+    let on = true;
+    (async () => {
+      try {
+        const rows = await fetchPatientDocs({ state, patient, pkey });
+        if (on) setTlDocs(rows || []);
+      } catch (_) { if (on) setTlDocs([]); }
+    })();
+    return () => { on = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pkey, doctorId, state?.demoPatientDocs]);
 
   if (!patient) {
     return <PatientPicker state={state} setState={setState} go={go} isMobile={isMobile} />;
@@ -675,7 +723,7 @@ export default function PatientFile({ state, setState, go }) {
         suivi: b.suivi, conclusion: b.conclusion, oral: '',
         ordonnance: b.ordonnance || [], durationSec: c.durationMin ? c.durationMin * 60 : b.dur,
       } : null;
-      return { kind: 'Consultation', icon: IC.steth, date: c.date, title: c.service || 'Consultation',
+      return { kind: 'Consultation', cat: 'consult', icon: IC.steth, date: c.date, title: c.service || 'Consultation',
         sub: `${c.time} · ${c.status}`, status: c.status, planned: !completed, full,
         searchText: `${c.service} ${c.status} ${completed ? `${b.interrogatoire} ${b.conclusion}` : ''}`, id: `c_${c.id}` };
     }),
@@ -683,27 +731,50 @@ export default function PatientFile({ state, setState, go }) {
       const full = { motif: n.data?.motif, interrogatoire: n.data?.interrogatoire, examen: n.data?.examen,
         suivi: n.data?.suivi || {}, conclusion: n.data?.conclusion, oral: n.data?.oral,
         ordonnance: n.data?.rx || [], durationSec: n.data?.durationSec };
-      return { kind: 'Compte-rendu', icon: IC.file, date: String(n.created_at).slice(0, 10),
+      return { kind: 'Compte-rendu', cat: 'compte', icon: IC.file, date: String(n.created_at).slice(0, 10),
         title: n.data?.motif || 'Compte-rendu de consultation',
         sub: [durLbl(n.data?.durationSec) && `Durée ${durLbl(n.data?.durationSec)}`, previewOf(full)].filter(Boolean).join(' — ') || 'Observation médicale',
         full,
         searchText: `${n.data?.motif || ''} ${stripHtml(n.data?.interrogatoire)} ${stripHtml(n.data?.examen)} ${stripHtml(n.data?.conclusion)}`,
         id: `n_${n.id}` };
     }),
-    ...rx.map((r) => ({ kind: 'Ordonnance', icon: IC.rx, date: String(r.created_at).slice(0, 10), title: 'Ordonnance',
+    ...rx.map((r) => ({ kind: 'Ordonnance', cat: 'ordo', icon: IC.rx, date: String(r.created_at).slice(0, 10), title: 'Ordonnance',
       sub: (r.items || []).map((i) => i.drug).filter(Boolean).slice(0, 3).join(', '),
       full: { ordonnance: (r.items || []).map((i) => ({ drug: i.drug, dose: i.dosage || '', duree: i.duration || '' })) },
       searchText: (r.items || []).map((i) => i.drug).join(' '), id: `r_${r.id}` })),
+    // Documents received / imported for this patient — same rows and same
+    // classification as the Documents section of the dossier.
+    ...tlDocs.map((d) => {
+      const key = docMeta[d.id]?.category || d.category || 'autre';
+      const dc = docCat(key);
+      return { kind: 'Document', cat: DOC_TO_TL[key] || 'autre', icon: IC.file,
+        date: String(d.at || '').slice(0, 10), title: d.name || 'Document',
+        sub: [dc.label, d.source].filter(Boolean).join(' · '),
+        goto: 'docs', searchText: `${d.name} ${dc.label} ${d.source || ''}`, id: `d_${d.id}` };
+    }),
+    // Encaissements — the financial thread of the course of care.
+    ...consults.filter((c) => c.status === 'Payé').map((c) => ({
+      kind: 'Facture', cat: 'facture', icon: IC.receipt, date: c.date,
+      title: `Encaissement — ${c.service || 'Consultation'}`,
+      sub: [(c.amount || 0).toLocaleString('fr-FR') + ' MAD', c.pay].filter(Boolean).join(' · '),
+      goto: 'factures', searchText: `facture encaissement ${c.service} ${c.pay || ''}`, id: `f_${c.id}` })),
   ]
     .filter((x) => x.date)
     .filter((x) => !q.trim() || (x.title + ' ' + x.sub + ' ' + (x.searchText || '')).toLowerCase().includes(q.trim().toLowerCase()))
     .sort((a, b) => b.date.localeCompare(a.date));
+  // Timeline = the feed narrowed to the active category chips, grouped by
+  // trimestre. Counts are computed BEFORE the category filter so each chip
+  // always shows how many events it holds.
+  const tlCounts = feed.reduce((acc, x) => { acc[x.cat] = (acc[x.cat] || 0) + 1; return acc; }, {});
+  const tlFeed = tlCatsOn.length ? feed.filter((x) => tlCatsOn.includes(x.cat)) : feed;
   const feedGroups = [];
-  feed.forEach((x) => {
-    const key = x.date === todayISO ? "Aujourd'hui" : new Date(`${x.date}T12:00:00`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  tlFeed.forEach((x) => {
+    const key = QUARTER(x.date);
     const g = feedGroups.find((y) => y.key === key);
     g ? g.items.push(x) : feedGroups.push({ key, items: [x] });
   });
+  const toggleTlCat = (k) => setTlCatsOn((l) => (l.includes(k) ? l.filter((x) => x !== k) : [...l, k]));
+  const toggleQuarter = (k) => setTlClosed((l) => (l.includes(k) ? l.filter((x) => x !== k) : [...l, k]));
 
   // Plan de soins actions — all real destinations.
   const rxGo = () => { setState({ rxPrefill: { name: patient.name, patientId: patient.userId || null } }); go('dprescribe'); };
@@ -1043,47 +1114,116 @@ export default function PatientFile({ state, setState, go }) {
     </div>
   );
 
+  // ── Historique — the patient's course of care as one vertical timeline.
+  //    Everything that happened lands here (consultations, comptes-rendus,
+  //    ordonnances, documents reçus, encaissements), each colour-coded by
+  //    category, filterable by chips, grouped by trimestre.
+  const openEvent = (x) => {
+    if (x.goto) { setSection(x.goto); return; }
+    if (x.full || x.planned) setDetail(x);
+  };
   const renderHisto = () => (
     <div style={card}>
-      <CardHead icon={IC.clock} title="Historique du patient" sub="Le parcours médical : consultations, comptes-rendus et ordonnances de ce patient." />
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+      <CardHead icon={IC.clock} title="Historique du patient"
+        sub="Le parcours de soins complet : consultations, comptes-rendus, ordonnances, documents et encaissements."
+        right={<span style={{ fontSize: 11.5, fontWeight: 600, color: TEAL, background: '#E9F5F0', borderRadius: 20, padding: '4px 11px' }}>{tlFeed.length} événement{tlFeed.length > 1 ? 's' : ''}</span>} />
+
+      {/* Recherche */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 8, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '9px 13px', background: '#fff' }}>
           <span style={{ color: MUTED, display: 'flex' }}>{IC.search}</span>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher (ex. Diabète)…" style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13.5, color: DARK, background: 'none' }} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher dans l'historique (ex. Diabète)…" style={{ border: 'none', outline: 'none', flex: 1, fontSize: 13.5, color: DARK, background: 'none' }} />
         </div>
-        {q && <button onClick={() => setQ('')} style={{ background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Tout réinitialiser</button>}
+        {(q || tlCatsOn.length > 0) && (
+          <button onClick={() => { setQ(''); setTlCatsOn([]); }}
+            style={{ background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Tout réinitialiser</button>
+        )}
       </div>
-      {feedGroups.length === 0 && <div style={{ fontSize: 13, color: MUTED, padding: '18px 0', textAlign: 'center' }}>{q ? 'Aucun résultat pour cette recherche.' : 'Aucun événement pour ce patient.'}</div>}
-      {feedGroups.map((g) => (
-        <div key={g.key} style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 600, color: MUTED, textTransform: 'capitalize', letterSpacing: '0.3px', margin: '0 0 8px' }}>{g.key}</div>
-          {g.items.map((x) => {
-            const clickable = !!x.full || x.planned;
-            const KIND_C = { Consultation: ['#0E7C52', '#E7F6EE'], 'Compte-rendu': ['#3B6FB0', '#E8F1FC'], Ordonnance: ['#6B57A6', '#EFEAFB'] }[x.kind] || ['#0E7C52', '#E7F6EE'];
-            return (
-              <div key={x.id} onClick={() => clickable && setDetail(x)}
-                onMouseEnter={(e) => { if (clickable) { e.currentTarget.style.borderColor = '#CFE4DB'; e.currentTarget.style.boxShadow = '0 6px 18px -12px rgba(13,43,30,0.22)'; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = 'none'; }}
-                style={{ border: `1px solid ${BORDER}`, borderRadius: 14, padding: '12px 15px', marginBottom: 9, cursor: clickable ? 'pointer' : 'default', background: '#fff', transition: 'border-color .14s, box-shadow .14s' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ width: 34, height: 34, borderRadius: 11, background: KIND_C[1], color: KIND_C[0], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{x.icon}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                      <span style={{ fontSize: 10.5, fontWeight: 600, color: KIND_C[0], background: KIND_C[1], borderRadius: 20, padding: '2px 9px', flexShrink: 0, letterSpacing: '0.1px' }}>{x.kind}</span>
-                      <span style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{x.title}</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{x.sub}</div>
-                  </div>
-                  <span style={{ fontSize: 11.5, color: MUTED, flexShrink: 0 }}>{new Date(`${x.date}T12:00:00`).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                  {clickable && (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA8A2" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 18l6-6-6-6"/></svg>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+
+      {/* Filtres par catégorie — chaque pastille porte sa couleur de timeline */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 18 }}>
+        {TL_CATS.map((c) => {
+          const n = tlCounts[c.key] || 0;
+          const on = tlCatsOn.includes(c.key);
+          return (
+            <button key={c.key} onClick={() => toggleTlCat(c.key)} disabled={n === 0}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 12px 6px 10px', borderRadius: 20, cursor: n === 0 ? 'default' : 'pointer',
+                border: `1px solid ${on ? c.color : BORDER}`, background: on ? c.bg : '#fff', opacity: n === 0 ? 0.42 : 1,
+                fontFamily: 'inherit', fontSize: 12, fontWeight: 600, color: on ? c.color : (n === 0 ? MUTED : DARK), transition: 'background .12s, border-color .12s' }}>
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
+              {c.label}
+              <span style={{ fontSize: 11, fontWeight: 700, color: on ? c.color : MUTED }}>{n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {feedGroups.length === 0 && (
+        <div style={{ fontSize: 13, color: MUTED, padding: '26px 0', textAlign: 'center' }}>
+          {q || tlCatsOn.length ? 'Aucun événement ne correspond à cette recherche.' : 'Aucun événement pour ce patient.'}
         </div>
-      ))}
+      )}
+
+      {feedGroups.map((g) => {
+        const closed = tlClosed.includes(g.key);
+        return (
+          <div key={g.key} style={{ marginBottom: 6 }}>
+            {/* En-tête de trimestre */}
+            <button onClick={() => toggleQuarter(g.key)}
+              style={{ display: 'flex', alignItems: 'center', gap: 9, width: '100%', textAlign: 'start', padding: '9px 12px', marginBottom: 10, borderRadius: 11, border: `1px solid ${BORDER}`, background: '#F6FAF8', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={TEAL} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transform: closed ? 'rotate(-90deg)' : 'none', transition: 'transform .15s', flexShrink: 0 }}><path d="M6 9l6 6 6-6" /></svg>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: DARK, letterSpacing: '-0.1px' }}>{QUARTER_LBL(g.key)}</span>
+              <span style={{ fontSize: 11.5, color: MUTED }}>{QUARTER_SUB(g.key)}</span>
+              <span style={{ flex: 1 }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: MUTED }}>{g.items.length}</span>
+            </button>
+
+            {!closed && g.items.map((x, i) => {
+              const c = tlCat(x.cat);
+              const clickable = !!x.full || x.planned || !!x.goto;
+              const last = i === g.items.length - 1;
+              const d = new Date(`${x.date}T12:00:00`);
+              return (
+                <div key={x.id} style={{ display: 'flex', alignItems: 'stretch', gap: isMobile ? 8 : 12 }}>
+                  {/* Date */}
+                  <div style={{ width: isMobile ? 44 : 62, flexShrink: 0, textAlign: 'end', paddingTop: 14 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: DARK, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums' }}>{String(d.getDate()).padStart(2, '0')}</div>
+                    <div style={{ fontSize: 10.5, color: MUTED, textTransform: 'lowercase' }}>{d.toLocaleDateString('fr-FR', { month: 'short' })}</div>
+                  </div>
+
+                  {/* Rail + pastille de catégorie */}
+                  <div style={{ position: 'relative', width: 14, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+                    <span style={{ position: 'absolute', top: 0, bottom: last ? 'calc(100% - 22px)' : 0, width: 2, background: '#E7EFEA', borderRadius: 2 }} />
+                    <span style={{ position: 'absolute', top: 16, width: 11, height: 11, borderRadius: '50%', background: c.color, boxShadow: `0 0 0 3px ${c.bg}` }} />
+                  </div>
+
+                  {/* Carte de l'événement */}
+                  <div onClick={() => clickable && openEvent(x)}
+                    onMouseEnter={(e) => { if (clickable) { e.currentTarget.style.borderColor = c.color; e.currentTarget.style.boxShadow = '0 8px 22px -16px rgba(13,43,30,0.30)'; } }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = 'none'; }}
+                    style={{ flex: 1, minWidth: 0, border: `1px solid ${BORDER}`, borderInlineStart: `3px solid ${c.color}`, borderRadius: 14, padding: '11px 14px', marginBottom: 10, background: '#fff', cursor: clickable ? 'pointer' : 'default', transition: 'border-color .14s, box-shadow .14s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                      <span style={{ width: 32, height: 32, borderRadius: 10, background: c.bg, color: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{x.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 600, color: c.color, background: c.bg, borderRadius: 20, padding: '2px 9px', flexShrink: 0, letterSpacing: '0.1px' }}>{c.label}</span>
+                          <span style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{x.title}</span>
+                          {x.planned && <span style={{ fontSize: 10.5, fontWeight: 600, color: '#9A6510', background: '#FEF4DD', borderRadius: 20, padding: '2px 9px', flexShrink: 0 }}>À venir</span>}
+                        </div>
+                        <div style={{ fontSize: 12, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{x.sub}</div>
+                      </div>
+                      {clickable && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA8A2" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 18l6-6-6-6" /></svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 

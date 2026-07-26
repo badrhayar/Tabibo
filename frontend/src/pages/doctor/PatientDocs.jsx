@@ -51,6 +51,24 @@ const kb = (n) => (n ? (n > 1048576 ? `${(n / 1048576).toFixed(1)} Mo` : `${Math
 const metaKey = (uid) => `tabibo_docmeta_${uid || 'demo'}`;
 const loadMeta = (uid) => { try { return JSON.parse(localStorage.getItem(metaKey(uid)) || '{}'); } catch { return {}; } };
 const saveMeta = (uid, m) => { try { localStorage.setItem(metaKey(uid), JSON.stringify(m)); } catch { /* private mode */ } };
+export const loadDocMeta = loadMeta;
+
+// Single source of truth for "which documents belong to this patient" — used by
+// this cabinet AND by the dossier's Verlauf timeline, so both always agree.
+export async function fetchPatientDocs({ state, patient, pkey }) {
+  const doctorId = state?.myDoctor?.id;
+  if (!doctorId) {
+    const seeded = (state?.demoPatientDocs || {})[pkey];
+    return seeded || demoSeed(patient);
+  }
+  const all = await listDocuments();
+  return (all || [])
+    .filter((d) => String(d.patient_id || '') === String(patient?.userId || '') || (d.notes || '').includes(`[${pkey}]`))
+    .map((d) => ({
+      id: d.id, name: (d.notes || '').replace(/\s*\[.*?\]\s*$/, '') || 'Document',
+      type: d.file_type || '', path: d.file_url, at: d.uploaded_at, source: 'Cabinet', size: 0,
+    }));
+}
 
 export default function PatientDocs({ state, setState, patient, pkey, isMobile, card, CardHead, IC_FILE }) {
   const doctorId = state?.myDoctor?.id;
@@ -77,17 +95,8 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
     (async () => {
       setLoading(true);
       try {
-        if (isDemo) {
-          const seeded = (state?.demoPatientDocs || {})[pkey];
-          if (on) setDocs(seeded || demoSeed(patient));
-        } else {
-          const all = await listDocuments();
-          const mine = (all || []).filter((d) => String(d.patient_id || '') === String(patient?.userId || '') || (d.notes || '').includes(`[${pkey}]`));
-          if (on) setDocs(mine.map((d) => ({
-            id: d.id, name: (d.notes || '').replace(/\s*\[.*?\]\s*$/, '') || 'Document',
-            type: d.file_type || '', path: d.file_url, at: d.uploaded_at, source: 'Cabinet', size: 0,
-          })));
-        }
+        const rows = await fetchPatientDocs({ state, patient, pkey });
+        if (on) setDocs(rows);
       } catch (e) {
         setState({ toast: 'Chargement des documents échoué : ' + (e?.message || 'erreur'), toastShow: true });
       } finally { on && setLoading(false); }
