@@ -7,6 +7,7 @@ import { DOCTORS, SPEC_INFO, SPEC_OPTS, CITY_OPTS, tint, initials, doctorCoords,
 import NearbyMap from '../components/NearbyMap';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import Pager, { usePager } from '../components/Pager';
+import { Stethoscope } from '../components/BrandMark';
 
 const PRIMARY = '#16A06A';
 const DARK    = '#15314A';
@@ -125,7 +126,7 @@ export default function Search() {
               <>
                 {isDoctorUser && (
                   <button onClick={() => go('doctor')} title={tr('Espace cabinet', 'Practice space', 'فضاء العيادة')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.24)', borderRadius: 9, padding: isMobile ? 0 : '7px 13px', width: isMobile ? 40 : 'auto', height: isMobile ? 40 : 'auto', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0, justifyContent: 'center' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 15a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg>
+                    <Stethoscope size={16} />
                     {!isMobile && tr('Espace cabinet', 'Practice', 'العيادة')}
                   </button>
                 )}

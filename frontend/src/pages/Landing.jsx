@@ -9,6 +9,7 @@ import SecurityTrust from '../components/SecurityTrust';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import MarketingFooter from '../components/MarketingFooter';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
+import { Stethoscope } from '../components/BrandMark';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -178,7 +179,7 @@ export default function Landing() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {isDoctorUser && (
                     <button onClick={() => go('doctor')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#E7F6EE', color: '#0E7C52', border: '1px solid #CDE7DA', borderRadius: 24, padding: '7px 15px', cursor: 'pointer', fontSize: 13, fontWeight: 700, minHeight: 44 }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 15a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg>
+                      <Stethoscope size={15} />
                       {tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}
                     </button>
                   )}

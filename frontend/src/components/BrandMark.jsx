@@ -1,4 +1,5 @@
 import { WORDMARK_VIEWBOX, WORDMARK_RATIO, WORDMARK_TRANSFORM, WORDMARK_PATHS } from './wordmarkPath';
+import { STETH_VIEWBOX, STETH_RATIO, STETH_TRANSFORM, STETH_PATH, stethPlacement } from './stethoscopePath';
 
 // Tabibo brand mark — the single source of truth for the logo icon.
 // Same form as the historical mark (rounded green square + white stethoscope)
@@ -13,7 +14,18 @@ import { WORDMARK_VIEWBOX, WORDMARK_RATIO, WORDMARK_TRANSFORM, WORDMARK_PATHS } 
 // vectorisée sans retouche : mêmes contours, mais net à toutes les tailles et
 // colorable (blanc sur les fonds verts, vert profond sur les fonds clairs).
 // Source unique : à utiliser partout où le nom de la marque est écrit.
-export { WORDMARK_RATIO };
+export { WORDMARK_RATIO, STETH_RATIO };
+
+// Pictogramme stéthoscope de la marque — recadré au plus juste (aucune marge
+// morte), donc il remplit vraiment la taille demandée. `size` = hauteur en px.
+export function Stethoscope({ size = 16, color = 'currentColor', style }) {
+  return (
+    <svg width={Math.round(size * STETH_RATIO)} height={size} viewBox={STETH_VIEWBOX} role="img" aria-label="Stéthoscope"
+      style={{ display: 'block', flexShrink: 0, ...style }}>
+      <g transform={STETH_TRANSFORM} fill={color} stroke="none"><path d={STETH_PATH} /></g>
+    </svg>
+  );
+}
 
 export function Wordmark({ size = 21, color = '#fff', style }) {
   const h = Math.round(size * 1.05);
@@ -28,14 +40,12 @@ export function Wordmark({ size = 21, color = '#fff', style }) {
 }
 
 export default function BrandMark({ size = 32, radius = 11.5, shadow = false, plain = false, style }) {
+  // Sans tuile : le pictogramme seul, presque plein cadre (marges réduites au
+  // strict nécessaire) — pour les rails et en-têtes vert profond.
   if (plain) return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={{ display: 'block', flexShrink: 0, ...style }}>
-      <g transform="translate(1.9 6.8) scale(1.6)" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 3v-.5a1.4 1.4 0 0 1 1.4-1.4h.4" />
-        <path d="M14 3v-.5a1.4 1.4 0 0 0-1.4-1.4h-.4" />
-        <path d="M6 3v5a4 4 0 0 0 8 0V3" />
-        <path d="M10 12v3a5 5 0 0 0 10 0v-2" />
-        <circle cx="20" cy="10" r="2" />
+      <g transform={stethPlacement(42)}>
+        <g transform={STETH_TRANSFORM} fill="#fff" stroke="none"><path d={STETH_PATH} /></g>
       </g>
     </svg>
   );
@@ -61,14 +71,10 @@ export default function BrandMark({ size = 32, radius = 11.5, shadow = false, pl
       </defs>
       <rect width="48" height="48" rx={radius} fill="url(#tbm-g)" />
       <rect width="48" height="48" rx={radius} fill="url(#tbm-hl)" />
-      {/* Stethoscope, optically centered in the tile. The ear tubes round off
-          at the top and finish horizontally inward, like real binaurals. */}
-      <g transform="translate(3.84 8.81) scale(1.44)" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 3v-.5a1.4 1.4 0 0 1 1.4-1.4h.4" />
-        <path d="M14 3v-.5a1.4 1.4 0 0 0-1.4-1.4h-.4" />
-        <path d="M6 3v5a4 4 0 0 0 8 0V3" />
-        <path d="M10 12v3a5 5 0 0 0 10 0v-2" />
-        <circle cx="20" cy="10" r="2" />
+      {/* Pictogramme centré dans la tuile — 34/48 de hauteur : la zone utile
+          d'une icône d'application, sans marge inutile. */}
+      <g transform={stethPlacement(34)}>
+        <g transform={STETH_TRANSFORM} fill="#fff" stroke="none"><path d={STETH_PATH} /></g>
       </g>
     </svg>
   );

@@ -6,6 +6,7 @@ import { updateAppointmentStatus, updateAppointment, markAppointmentPaid, markAr
 import { moroccoToUTCISO, moPartsOf } from '../../lib/time.js';
 import Pager, { usePager } from '../../components/Pager';
 import ApptPanel from '../../components/ApptPanel';
+import { Stethoscope } from '../../components/BrandMark';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -364,7 +365,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       { key: 'arrive', label: appt.arrivedAt ? "Annuler l'arrivée" : 'Marquer arrivé', active: !!appt.arrivedAt, disabled: wf, onClick: () => toggleArrived(appt),
         icon: <svg {...AI}><circle cx="9" cy="7" r="4" /><path d="M2 21c0-4 3-6 7-6" /><path d="M16 11l2 2 4-4" /></svg> },
       { key: 'consult', label: appt.inConsultAt ? 'Renvoyer en salle' : 'Entrer en consultation', active: !!appt.inConsultAt, disabled: wf, onClick: () => toggleConsult(appt),
-        icon: <svg {...AI}><path d="M6 3v5a4 4 0 0 0 8 0V3" /><path d="M10 15a5 5 0 0 0 10 0v-2" /><circle cx="20" cy="10" r="2" /></svg> },
+        icon: <Stethoscope size={16} /> },
       { key: 'confirm', label: 'Confirmer', disabled: appt.rawStatus === 'confirmed' || cancelled, onClick: () => confirmAppt(appt.id),
         icon: <svg {...AI}><path d="M20 6L9 17l-5-5" /></svg> },
       { key: 'pay', label: 'Terminer & encaisser', tone: '#2563EB', disabled: wf, onClick: () => openPay(appt),

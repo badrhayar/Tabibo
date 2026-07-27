@@ -12,6 +12,7 @@ import { buildPrescriptionPDF, pdfOpen, loadBrandLogo } from '../lib/pdf';
 import ChatImage from '../components/ChatImage';
 import PhoneField from '../components/PhoneField';
 import Pager, { usePager } from '../components/Pager';
+import { Stethoscope } from '../components/BrandMark';
 
 const PUBLIC_BASE = (import.meta.env.VITE_APP_URL || 'https://tabibo.ma').replace(/\/$/, '');
 
@@ -433,7 +434,7 @@ export default function PatientAccount() {
           {/* Staff members hop back to the cabinet they work for. */}
           {(state.isStaff || state.appUser?.role === 'doctor') && (
             <button onClick={() => go('doctor')} title="Espace cabinet" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.24)', cursor:'pointer', padding: isMobile?0:'7px 13px', width: isMobile?44:'auto', height: isMobile?44:'auto', borderRadius:9, fontSize:13, fontWeight:600, whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 15a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="10" r="2"/></svg>
+              <Stethoscope size={16} />
               {!isMobile && tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}
             </button>
           )}

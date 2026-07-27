@@ -1,16 +1,25 @@
 import { useViewport } from '../hooks/useViewport';
+import { STETH_TRANSFORM, STETH_PATH, STETH_BOX } from './stethoscopePath';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
 const MUTED = '#6B7B76';
 const BORDER = '#EAEFEC';
 
+// Pictogramme de marque adapté au repère 24×24 des autres icônes de la carte.
+const STETH_K = 20 / STETH_BOX.h;
+const STETH_ICON = (
+  <g transform={`translate(${12 - (STETH_BOX.x + STETH_BOX.w / 2) * STETH_K} ${12 - (STETH_BOX.y + STETH_BOX.h / 2) * STETH_K}) scale(${STETH_K})`}>
+    <g transform={STETH_TRANSFORM} fill="currentColor" stroke="none"><path d={STETH_PATH} /></g>
+  </g>
+);
+
 // Line icons (professional, brand-consistent).
 const IC = {
   lock: <path d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V7a4 4 0 0 1 8 0v4" />,
   shield: <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />,
   scale: <><path d="M12 3v18M7 21h10" /><path d="M12 6l-6 2 3 5a3 3 0 0 0 6 0l3-5-6-2" /></>,
-  steth: <><path d="M6 3v5a4 4 0 0 0 8 0V3" /><path d="M10 15a5 5 0 0 0 10 0v-2" /><circle cx="20" cy="10" r="2" /></>,
+  steth: STETH_ICON,
   key: <><circle cx="8" cy="15" r="4" /><path d="M11 12l9-9M17 6l2 2M14 9l2 2" /></>,
   noshare: <><circle cx="12" cy="12" r="9" /><path d="M6 6l12 12" /></>,
 };
