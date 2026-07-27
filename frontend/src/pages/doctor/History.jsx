@@ -54,6 +54,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
   const [filterService, setFilterService] = useState('');
   const [filterPay, setFilterPay] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [searchQ, setSearchQ] = useState('');
   const [filterFrom, setFilterFrom] = useState('');   // YYYY-MM-DD
   const [filterTo, setFilterTo] = useState('');
 
@@ -66,6 +67,8 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
 
   // Apply filters (incl. a date range) — the KPIs below react to these.
   const filtered = consultations.filter(c => {
+    const q = searchQ.trim().toLowerCase();
+    if (q && !`${c.patient || ''} ${c.service || ''}`.toLowerCase().includes(q)) return false;
     if (filterService && c.service !== filterService) return false;
     if (filterPay && c.pay !== filterPay) return false;
     if (filterStatus && c.status !== filterStatus) return false;
@@ -289,7 +292,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
       {/* Header */}
       <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK }}>Historique des consultations</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK }}>Consultations</h1>
           <p style={{ margin: '4px 0 0', fontSize: 13.5, color: MUTED }}>Journal de tous vos rendez-vous — date, statut et paiement. Le détail médical d'un patient se trouve dans son dossier &gt; Historique.</p>
         </div>
         <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', minHeight: 30, border: `1px solid ${BORDER_STRONG}`, borderRadius: 8, background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -298,8 +301,35 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         </button>
       </div>
 
-      {/* Filter bar */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+      {/* Summary cards — computed from live data */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
+        {[
+          { label: 'Total consultations', value: totalCount.toString(), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg> },
+          { label: 'Total encaissé',      value: totalEncaisse.toLocaleString('fr-FR') + ' MAD', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+          { label: 'Panier moyen',        value: panierMoyen + ' MAD', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V10M12 21V4M19 21v-7"/></svg> },
+        ].map((card, i) => (
+          <div key={i} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 11, background: HEADER_BG, color: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {card.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: MUTED, fontWeight: 600, marginBottom: 2 }}>{card.label}</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: DARK }}>{card.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recherche + filtres — même présentation que la page Rendez-vous */}
+      <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER_STRONG}`, padding: '16px 20px', marginBottom: 20, boxShadow: '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)' }}>
+        <div style={{ position: 'relative', marginBottom: 14 }}>
+          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: MUTED, pointerEvents: 'none', display: 'flex' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          </span>
+          <input type="text" placeholder="Rechercher un patient, un service..." value={searchQ} onChange={e => setSearchQ(e.target.value)}
+            style={{ width: '100%', boxSizing: 'border-box', padding: '10px 14px 10px 38px', border: `1.5px solid ${BORDER}`, borderRadius: 10, fontSize: 14, color: DARK, outline: 'none', background: BG }} />
+        </div>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Service</div>
           <select
@@ -348,31 +378,14 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
             style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
         </div>
         <button
-          onClick={() => { setFilterService(''); setFilterPay(''); setFilterStatus(''); setFilterFrom(''); setFilterTo(''); }}
+          onClick={() => { setSearchQ(''); setFilterService(''); setFilterPay(''); setFilterStatus(''); setFilterFrom(''); setFilterTo(''); }}
           style={{ padding: '9px 20px', border: `1px solid ${BORDER_STRONG}`, background: '#fff', color: MUTED, border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-end' }}
         >
           Réinitialiser
         </button>
       </div>
-
-      {/* Summary cards — computed from live data */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>
-        {[
-          { label: 'Total consultations', value: totalCount.toString(), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg> },
-          { label: 'Total encaissé',      value: totalEncaisse.toLocaleString('fr-FR') + ' MAD', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-          { label: 'Panier moyen',        value: panierMoyen + ' MAD', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 21V10M12 21V4M19 21v-7"/></svg> },
-        ].map((card, i) => (
-          <div key={i} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 11, background: HEADER_BG, color: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {card.icon}
-            </div>
-            <div>
-              <div style={{ fontSize: 11.5, color: MUTED, fontWeight: 600, marginBottom: 2 }}>{card.label}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: DARK }}>{card.value}</div>
-            </div>
-          </div>
-        ))}
       </div>
+
 
       {/* Table */}
       <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 14, overflowX: isMobile ? 'auto' : 'hidden', overflowY: 'hidden' }}>

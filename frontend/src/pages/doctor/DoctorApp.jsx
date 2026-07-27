@@ -154,7 +154,7 @@ const NAV = [
     { screen:'dprescribe', icon:IC.dprescribe, label:'Ordonnances' },
     { screen:'ddocs',      icon:IC.ddocs,      label:'Documents' },
     { screen:'dreq',       icon:IC.dchat,      label:'Demandes patients' },
-    { screen:'dhist',      icon:IC.dhist,      label:'Historique consultations' },
+    { screen:'dhist',      icon:IC.dhist,      label:'Consultations' },
     { screen:'dshare',     icon:IC.dshare,     label:'Inviter mes patients' },
   ] },
   { key:'dstaff',   screen:'dstaff', icon:IC.dstaff, label:'Équipe' },

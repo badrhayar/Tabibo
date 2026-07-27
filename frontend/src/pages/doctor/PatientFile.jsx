@@ -402,51 +402,77 @@ const AV_COLORS = ['#0F6E56', '#2563EB', '#9333EA', '#EA580C', '#DB2777', '#0891
 function PatientPicker({ state, setState, go, isMobile }) {
   const [q, setQ] = useState('');
   const roster = state.patients?.length ? state.patients : (isSupabaseConfigured ? [] : DEMO_PATIENTS);
-  const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const list = roster.filter((p) => !q.trim()
     || norm(p.name).includes(norm(q)) || norm(p.cin).includes(norm(q)) || String(p.phone || '').replace(/\s/g, '').includes(q.replace(/\s/g, '')));
   const open = (p) => setState({ pfilePatient: p, pfileApptId: null, pfileFrom: null });
+  const HEADER_BG = '#F2F8F5';
+  const th = { padding: '12px 16px', textAlign: 'start', fontWeight: 600, color: MUTED, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' };
+
   return (
-    <div style={{ padding: isMobile ? '18px 14px' : '36px 32px', fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100%', boxSizing: 'border-box' }}>
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
-        <h1 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: DARK, letterSpacing: '-0.3px' }}>Dossier patient</h1>
-        <p style={{ margin: '4px 0 18px', fontSize: 13, color: MUTED }}>Sélectionnez un patient pour ouvrir son dossier médical.</p>
+    <div style={{ padding: isMobile ? '18px 14px' : '32px', fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100%', boxSizing: 'border-box' }}>
+      {/* En-tête pleine largeur — même gabarit que Rendez-vous et Consultations */}
+      <div style={{ marginBottom: 22 }}>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK, letterSpacing: '-0.3px' }}>Dossier patient</h1>
+        <p style={{ margin: '4px 0 0', fontSize: 13.5, color: MUTED }}>Sélectionnez un patient pour ouvrir son dossier médical.</p>
+      </div>
 
-        <div style={{ position: 'relative', marginBottom: 14 }}>
-          <span style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: MUTED, display: 'flex' }}>{IC.search}</span>
+      {/* Recherche — carte blanche, comme sur les autres sections */}
+      <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, padding: '16px 20px', marginBottom: 20, boxShadow: SHADOW }}>
+        <div style={{ position: 'relative' }}>
+          <span style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: MUTED, display: 'flex', pointerEvents: 'none' }}>{IC.search}</span>
           <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher par nom, CIN, téléphone…"
-            style={{ ...inp, padding: '11px 13px 11px 38px', fontSize: 13.5, borderRadius: 11 }} />
+            style={{ ...inp, padding: '11px 13px 11px 38px', fontSize: 14, borderRadius: 10, background: BG }} />
         </div>
+      </div>
 
-        <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
-          <div style={{ maxHeight: 430, overflowY: 'auto' }}>
-            {list.map((p, i) => (
-              <button key={p.id} onClick={() => open(p)}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#F4FAF7'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', boxSizing: 'border-box', padding: '11px 16px', background: 'transparent', border: 'none', borderBottom: i < list.length - 1 ? '1px solid #F1F5F3' : 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
-                <span style={{ width: 36, height: 36, borderRadius: '50%', background: p.color || AV_COLORS[i % AV_COLORS.length], color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12.5, fontWeight: 700, flexShrink: 0 }}>{p.initials || initials(p.name)}</span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, color: DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
-                  <span style={{ display: 'block', fontSize: 12, color: MUTED, marginTop: 1 }}>
-                    {[p.age != null ? `${p.age} ans` : null, p.sex === 'M' ? 'Homme' : p.sex === 'F' ? 'Femme' : null, p.phone && p.phone !== '—' ? p.phone : null].filter(Boolean).join(' · ') || '—'}
-                  </span>
-                </span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA8A2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-            ))}
-            {list.length === 0 && (
-              <div style={{ padding: '34px 20px', textAlign: 'center', fontSize: 13, color: MUTED }}>
-                {roster.length === 0
-                  ? <>Aucun patient pour le moment. Ajoutez votre premier patient depuis la liste des patients.</>
-                  : <>Aucun patient ne correspond à « {q} ».</>}
-              </div>
-            )}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 16px', borderTop: `1px solid ${BORDER}`, background: '#FAFCFB' }}>
-            <span style={{ fontSize: 12, color: MUTED }}>{roster.length} patient{roster.length > 1 ? 's' : ''}</span>
-            <button onClick={() => go('dpatients')} style={{ background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', padding: 0 }}>Gérer mes patients</button>
-          </div>
+      {/* Tableau pleine largeur */}
+      <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, overflow: 'hidden', boxShadow: SHADOW }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <thead>
+              <tr style={{ background: HEADER_BG, borderBottom: `2px solid ${BORDER}` }}>
+                {['Patient', 'Âge / Sexe', 'CIN', 'Téléphone', ''].map((c, i) => <th key={i} style={th}>{c}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((p, i) => (
+                <tr key={p.id} onClick={() => open(p)}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#F7FBF9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  style={{ borderBottom: i < list.length - 1 ? '1px solid #F1F5F3' : 'none', cursor: 'pointer', transition: 'background .12s' }}>
+                  <td style={{ padding: '13px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{ width: 38, height: 38, borderRadius: '50%', background: p.color || AV_COLORS[i % AV_COLORS.length], color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{p.initials || initials(p.name)}</span>
+                      <span style={{ fontSize: 14.5, fontWeight: 600, color: DARK }}>{p.name}</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '13px 16px', color: MUTED, whiteSpace: 'nowrap' }}>
+                    {[p.age != null ? `${p.age} ans` : null, p.sex === 'M' ? 'Homme' : p.sex === 'F' ? 'Femme' : null].filter(Boolean).join(' · ') || '—'}
+                  </td>
+                  <td style={{ padding: '13px 16px', color: MUTED, whiteSpace: 'nowrap' }}>{p.cin && p.cin !== '—' ? p.cin : '—'}</td>
+                  <td style={{ padding: '13px 16px', color: MUTED, whiteSpace: 'nowrap', direction: 'ltr' }}>{p.phone && p.phone !== '—' ? p.phone : '—'}</td>
+                  <td style={{ padding: '13px 16px', textAlign: 'end', width: 150 }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 700, color: TEAL, whiteSpace: 'nowrap' }}>
+                      Ouvrir le dossier
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {list.length === 0 && (
+                <tr><td colSpan={5} style={{ padding: '40px 20px', textAlign: 'center', fontSize: 13, color: MUTED }}>
+                  {roster.length === 0
+                    ? 'Aucun patient pour le moment. Ajoutez votre premier patient depuis la liste des patients.'
+                    : `Aucun patient ne correspond à « ${q} ».`}
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '11px 16px', borderTop: `1px solid ${BORDER}`, background: '#FAFCFB' }}>
+          <span style={{ fontSize: 12.5, color: MUTED }}>{list.length} patient{list.length > 1 ? 's' : ''}{q.trim() ? ` sur ${roster.length}` : ''}</span>
+          <button onClick={() => go('dpatients')} style={{ background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>Gérer mes patients</button>
         </div>
       </div>
     </div>

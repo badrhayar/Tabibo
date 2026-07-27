@@ -41,6 +41,9 @@ const IconCheck = ({ c }) => (<svg width="20" height="20" viewBox="0 0 24 24" fi
 export default function Patients({ state, setState, go, openNewAppt, openAddPatient }) {
   const { isMobile } = useViewport();
   const [activeFilter, setActiveFilter] = useState('Tous');
+  const [fNext, setFNext] = useState('');      // prochain RDV : avec / sans
+  const [fFrom, setFFrom] = useState('');      // dernière visite — du
+  const [fTo, setFTo] = useState('');          // dernière visite — au
   const [patientSearch, setPatientSearch] = useState('');
   // Real roster when connected; demo data only when Supabase isn't configured.
   const patientList = state.patients?.length ? state.patients : (isSupabaseConfigured ? [] : DEMO_PATIENTS);
@@ -181,7 +184,12 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
       p.name.toLowerCase().includes(patientSearch.toLowerCase()) ||
       p.cin.toLowerCase().includes(patientSearch.toLowerCase()) ||
       p.phone.includes(patientSearch);
-    return matchFilter && matchSearch;
+    const hasNext = p.nextAppt && p.nextAppt !== '—';
+    const matchNext = !fNext || (fNext === 'avec' ? hasNext : !hasNext);
+    const lv = p.lastVisit && p.lastVisit !== '—' ? p.lastVisit : '';
+    const matchFrom = !fFrom || (lv && lv >= fFrom);
+    const matchTo = !fTo || (lv && lv <= fTo);
+    return matchFilter && matchSearch && matchNext && matchFrom && matchTo;
   });
   const pager = usePager(filtered, 10);
 
@@ -239,23 +247,43 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
             }}
           />
         </div>
-        {/* Filter pills */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {filters.map(f => (
-            <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              style={{
-                padding: '5px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600,
-                cursor: 'pointer', transition: 'all 0.15s',
-                background: activeFilter === f ? '#0F6E56' : '#fff',
-                color: activeFilter === f ? '#fff' : MUTED,
-                border: activeFilter === f ? `1px solid #0F6E56` : `1px solid ${BORDER}`,
-              }}
-            >
-              {f}
-            </button>
-          ))}
+        {/* Ligne de filtres étiquetés — même présentation que Rendez-vous et Consultations */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Statut</div>
+            <select value={activeFilter} onChange={e => setActiveFilter(e.target.value)}
+              style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
+              {filters.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Prochain RDV</div>
+            <select value={fNext} onChange={e => setFNext(e.target.value)}
+              style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: fNext ? DARK : MUTED, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
+              <option value="">Tous</option>
+              <option value="avec">Avec rendez-vous</option>
+              <option value="sans">Sans rendez-vous</option>
+            </select>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Dernière visite — du</div>
+            <input type="date" value={fFrom} max={fTo || undefined} onChange={e => setFFrom(e.target.value)}
+              style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Au</div>
+            <input type="date" value={fTo} min={fFrom || undefined} onChange={e => setFTo(e.target.value)}
+              style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
+          </div>
+          {(() => {
+            const on = activeFilter !== 'Tous' || !!fNext || !!fFrom || !!fTo || !!patientSearch;
+            return (
+              <button onClick={() => { setActiveFilter('Tous'); setFNext(''); setFFrom(''); setFTo(''); setPatientSearch(''); }} disabled={!on} title="Réinitialiser les filtres"
+                style={{ padding: '9px 16px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, fontWeight: 600, background: '#fff', color: on ? DARK : '#B7C2BD', cursor: on ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
+                Réinitialiser
+              </button>
+            );
+          })()}
         </div>
       </div>
 
