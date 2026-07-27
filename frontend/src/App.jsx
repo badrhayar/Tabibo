@@ -40,7 +40,7 @@ const PrescriptionVerify = lazy(() => import('./pages/PrescriptionVerify'));
 const DOCTOR_SCREENS = new Set([
   'doctor', 'dcal', 'dappts', 'dhist', 'dpatients', 'ddocs',
   'davail', 'dnotif', 'dstats', 'dabo', 'dsettings', 'dchat', 'dshare',
-  'dprescribe', 'dstaff', 'dpfile', 'dtasks', 'dnav', 'dreq', 'dbill', 'dplans',
+  'dprescribe', 'dstaff', 'dpfile', 'dtasks', 'dnav', 'dreq', 'dbill', 'dplans', 'dstations',
 ]);
 
 const SCREEN_MAP = {

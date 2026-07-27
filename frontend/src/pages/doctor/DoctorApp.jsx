@@ -63,6 +63,8 @@ import Navigator from './Navigator';
 import Requests from './Requests';
 import Billing from './Billing';
 import PlanDetails from './PlanDetails';
+import Stations from './Stations';
+import { loadStations } from '../../lib/stations';
 import { taskBadge } from '../../lib/tasks';
 
 const G = '#16A06A';
@@ -164,6 +166,7 @@ const NAV = [
   { key:'settings', icon:IC.dsettings, label:'Paramètres', items:[
     { screen:'dsettings', icon:IC.dpatients, label:'Mon profil' },
     { screen:'davail',    icon:IC.davail,    label:'Disponibilités' },
+    { screen:'dstations', icon:IC.dstaff,    label:'Postes de soins' },
     { screen:'dabo',      icon:IC.dabo,      label:'Abonnement' },
     { screen:'dnotif',    icon:IC.dnotif,    label:'Rappels & Notifications' },
   ] },
@@ -286,7 +289,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails, dstations: Stations,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 
@@ -338,6 +341,7 @@ export default function DoctorApp() {
           patientName: na.name,
           patientPhone: na.phone || null,
           patientEmail: na.email || null,
+          stationId: na.stationId || null,
         });
         setState({ newApptOpen:false, apptCreated:true, ...patientsPatch });
         reloadAppointments();                       // refresh from DB (real id, real data)
@@ -356,7 +360,7 @@ export default function DoctorApp() {
 
     // ── Local-only fallback (demo mode / not signed in) ──
     const id = 'local_' + Date.now();
-    const appt = { id, datetime: new Date(`${na.date}T${na.time}:00`).toISOString(), durationMin: na.durationMinutes || 30, status:'pending', patientName: na.name, patientPhone: na.phone || '', reason: na.motif, notes: na.notes || '' };
+    const appt = { id, datetime: new Date(`${na.date}T${na.time}:00`).toISOString(), durationMin: na.durationMinutes || 30, status:'pending', patientName: na.name, patientPhone: na.phone || '', reason: na.motif, notes: na.notes || '', bookedStationId: na.stationId || null };
     const svc  = (state.services || []).find(s => s.name === na.motif);
     const consult = { id, patient: na.name, age: age ?? '—', sex: sexLetter, service: na.motif, date: na.date, time: na.time, durationMin: na.durationMinutes || 30, amount: svc?.price || 0, pay:'—', status:'En attente', notes: na.notes || '' };
     setState({
@@ -413,6 +417,8 @@ export default function DoctorApp() {
   const groupOfScreen = navItems.find(g => g.items && g.items.some(it => it.screen === screen))?.key || null;
   const openKey = popMore === '__none' ? null : (popMore || groupOfScreen);
   const openGroupDef = navItems.find(g => g.key === openKey && g.items) || null;
+  // Les postes du cabinet — proposés à la création d'un rendez-vous.
+  const apptStations = loadStations(state, docName);
   const tasksCount = taskBadge(state);
   const badgeOf = (b) => b === 'chat' ? unreadChat : b === 'tasks' ? tasksCount : 0;
   const clickNav = (g) => {
@@ -747,6 +753,17 @@ export default function DoctorApp() {
                 <select value={newAppt.motif || motifOpts[0]} onChange={e => setNA('motif', e.target.value)} style={{ width:'100%', padding:'11px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', cursor:'pointer', marginBottom:14, boxSizing:'border-box' }}>
                   {motifOpts.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
+                {apptStations.length > 1 && (
+                  <>
+                    <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>
+                      Poste de soins <span style={{ color:'#9AA8A2', fontWeight:500 }}>(optionnel)</span>
+                    </label>
+                    <select value={newAppt.stationId || ''} onChange={e => setNA('stationId', e.target.value)} style={{ width:'100%', padding:'11px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', cursor:'pointer', marginBottom:14, boxSizing:'border-box' }}>
+                      <option value="">Aucun poste précisé</option>
+                      {apptStations.map(st => <option key={st.id} value={st.id}>{st.name}</option>)}
+                    </select>
+                  </>
+                )}
                 <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap:14, marginBottom:8 }}>
                   <div style={{ minWidth:0 }}>
                     <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Date</label>

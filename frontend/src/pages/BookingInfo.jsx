@@ -5,6 +5,7 @@ import PhoneField from '../components/PhoneField';
 import { useViewport } from '../hooks/useViewport';
 import { DOCTORS, MOTIF_OPTS, greenBtn, greenBtnBusy } from '../shared.jsx';
 import { createAppointment, guestBookingEnabled, guestBookingStart, guestBookingVerify, fetchRelatives } from '../lib/api';
+import { stationsOf } from '../lib/stations';
 import { moroccoToUTCISO } from '../lib/time.js';
 import LangPill from '../components/LangPill';
 
@@ -49,6 +50,8 @@ export default function BookingInfo() {
   const motifOpts = (doc?.services?.length ? doc.services.map((s) => s.name).filter(Boolean) : MOTIF_OPTS);
   const selectedMotif = info.motif && motifOpts.includes(info.motif) ? info.motif : motifOpts[0];
   const selSvc = (doc?.services || []).find((s) => s.name === selectedMotif);
+  // Postes de soins déclarés par le cabinet — le choix reste facultatif.
+  const stationOpts = stationsOf(doc);
   const price = (selSvc && Number(selSvc.price)) || doc?.price || 300;
 
   const slot = bookSlot || '';
@@ -150,6 +153,7 @@ export default function BookingInfo() {
           relativeId:  bookForRel?.id || null,
           patientName: bookForRel?.full_name || null,
           durationMinutes: doc.slotMinutes || 30,   // the visit lasts one of the doctor's slots
+          stationId: info.stationId || null,
         });
         setState({ lastAppointmentId: appt.id });
         await reloadAppointments();
@@ -330,6 +334,20 @@ export default function BookingInfo() {
               ))}
             </select>
           </div>
+
+          {/* Poste de soins — proposé seulement si le cabinet en a déclaré */}
+          {stationOpts.length > 1 && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>
+                {tr('Poste de soins', 'Care station', 'وحدة الرعاية')}{' '}
+                <span style={{ fontWeight: 400, color: MUTED }}>{tr('(optionnel)', '(optional)', '(اختياري)')}</span>
+              </label>
+              <select value={info.stationId || ''} onChange={(e) => setInfo('stationId', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">{tr('Peu importe — le cabinet choisira', 'No preference — the practice will decide', 'لا يهم — ستحدّد العيادة')}</option>
+                {stationOpts.map((st) => <option key={st.id} value={st.id}>{st.name}</option>)}
+              </select>
+            </div>
+          )}
 
           {/* Notes (full width) */}
           <div style={{ marginBottom: 24 }}>

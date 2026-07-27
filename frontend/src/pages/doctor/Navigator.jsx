@@ -3,7 +3,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import { initials as initialsOf } from '../../shared.jsx';
 import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff } from '../../lib/api';
-import { loadStations, saveStations, STATION_KINDS, kindOf } from '../../lib/stations';
+import { loadStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigateur patients — the front-desk board for the whole day.
@@ -54,7 +54,8 @@ export default function Navigator({ state, setState, go }) {
   const [walkOpen, setWalkOpen] = useState(false);
   const [showOut, setShowOut] = useState(false);
   const [busy, setBusy] = useState(null);
-  const [stationFor, setStationFor] = useState(null);  // appointment being moved
+  const [stationFor, setStationFor] = useState(null);
+  const [enterFor, setEnterFor] = useState(null);   // faire entrer depuis la salle d'attente  // appointment being moved
   const [stationsOpen, setStationsOpen] = useState(false);
 
   // Postes de soins du cabinet (configurables par le médecin).
@@ -143,6 +144,11 @@ export default function Navigator({ state, setState, go }) {
   };
 
   // ── Card ──────────────────────────────────────────────────────────────────
+  // Le poste demandé lors de la prise de rendez-vous (par le cabinet ou par le
+  // patient lui-même). Facultatif : souvent vide.
+  const bookedStation = (a) => stations.find((s) => s.id === (a.bookedStationId || a.stationId));
+  const bookedName = (a) => stationName(stations, a.bookedStationId);
+
   const Card = ({ a, tone, actions }) => {
     const wait = arrivedAt(a) && !inConsultAt(a) ? minsSince(arrivedAt(a), now) : null;
     const busyMin = inConsultAt(a) ? minsSince(inConsultAt(a), now) : null;
@@ -162,6 +168,11 @@ export default function Navigator({ state, setState, go }) {
               </button>
               {urgent && <span title="Urgence signalée" style={{ display: 'inline-flex', color: URGENT, flexShrink: 0 }}>{IC.alert}</span>}
               {a.walkin && <span style={{ fontSize: 9.5, fontWeight: 800, color: '#9A6510', background: '#FEF4DD', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>WALK-IN</span>}
+              {!inConsultAt(a) && bookedName(a) && (
+                <span title="Poste choisi à la réservation" style={{ fontSize: 9.5, fontWeight: 800, color: TEAL, background: '#E9F5F0', borderRadius: 5, padding: '1px 6px', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                  {bookedName(a)}
+                </span>
+              )}
             </div>
             <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 170 }}>{a.reason || 'Consultation'}</span>
@@ -252,12 +263,21 @@ export default function Navigator({ state, setState, go }) {
           {waiting.length === 0 && empty('Salle d’attente vide.')}
           {waiting.map((a) => (
             <Card key={a.id} a={a} tone="#9333EA" actions={
+              /* Un vrai sélecteur en fenêtre : la liste déroulante native se
+                 refermait au premier rafraîchissement du chrono de salle. */
               stations.length > 1 ? (
-                <select defaultValue="" onChange={(e) => { const st = stations.find((s) => s.id === e.target.value); if (st) enter(a, st); }}
-                  style={{ ...btnGhost, color: TEAL, borderColor: TEAL, fontWeight: 700, cursor: 'pointer' }}>
-                  <option value="">Envoyer vers…</option>
-                  {stations.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
+                bookedStation(a) ? (
+                  <>
+                    <button onClick={() => enter(a, bookedStation(a))} disabled={busy === a.id} style={btnPri}>
+                      Faire entrer → {bookedStation(a).name}
+                    </button>
+                    <button onClick={() => setEnterFor(a)} style={btnGhost}>Autre poste…</button>
+                  </>
+                ) : (
+                  <button onClick={() => setEnterFor(a)} style={{ ...btnGhost, color: TEAL, borderColor: TEAL, fontWeight: 700 }}>
+                    Envoyer vers…
+                  </button>
+                )
               ) : (
                 <button onClick={() => enter(a, stations[0] || { id: 'st_doc', name: me, kind: 'doctor' })} disabled={busy === a.id} style={btnPri}>Faire entrer</button>
               )
@@ -310,6 +330,10 @@ export default function Navigator({ state, setState, go }) {
       )}
 
       {noteFor && <NoteModal a={noteFor} onClose={() => setNoteFor(null)} onSave={saveNote} isMobile={isMobile} />}
+      {enterFor && (
+        <StationPicker a={enterFor} stations={stations} title="Envoyer vers un poste"
+          onClose={() => setEnterFor(null)} onPick={(st) => { enter(enterFor, st); setEnterFor(null); }} isMobile={isMobile} />
+      )}
       {stationFor && (
         <StationPicker a={stationFor} stations={stations} onClose={() => setStationFor(null)} onPick={(st) => moveStation(stationFor, st)} isMobile={isMobile} />
       )}
@@ -327,13 +351,13 @@ export default function Navigator({ state, setState, go }) {
 }
 
 // ── Envoyer le patient vers un poste de soins ────────────────────────────────
-function StationPicker({ a, stations, onClose, onPick, isMobile }) {
+function StationPicker({ a, stations, onClose, onPick, isMobile, title = 'Poste de soins du patient' }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(16,42,32,0.52)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', zIndex: 1400, padding: isMobile ? 0 : 20 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: isMobile ? '18px 18px 0 0' : 20, width: '100%', maxWidth: 440, boxShadow: '0 30px 80px -20px rgba(13,43,30,0.55)', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 20px 14px', borderBottom: `1px solid ${BORDER}` }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15.5, fontWeight: 700, color: DARK }}>Poste de soins du patient</div>
+            <div style={{ fontSize: 15.5, fontWeight: 700, color: DARK }}>{title}</div>
             <div style={{ fontSize: 12.5, color: MUTED, marginTop: 1 }}>{a.patientName || 'Patient'}</div>
           </div>
           <button onClick={onClose} aria-label="Fermer" style={{ width: 30, height: 30, borderRadius: 9, border: `1px solid ${BORDER}`, background: '#fff', color: MUTED, cursor: 'pointer', fontSize: 16 }}>×</button>

@@ -295,8 +295,8 @@ export const DEMO_PATIENTS = [
 ];
 
 export const DOCTORS = [
-  {id:1,name:'Dr. Leila Marmioui',spec:'gyneco',city:'Tanger',clinic:'Clinique du Parc',rating:4.8,reviews:128,price:300,conv:true,tele:true,langs:['Français','Arabe'],exp:15,next:'tomorrow',x:60,y:18},
-  {id:2,name:'Dr. Karim Benali',spec:'cardio',city:'Casablanca',clinic:'Institut Cardio Casa',rating:4.9,reviews:208,price:500,conv:true,tele:false,langs:['Français','Arabe'],exp:20,next:'today',x:37,y:61},
+  {id:1,name:'Dr. Leila Marmioui',spec:'gyneco',city:'Tanger',clinic:'Clinique du Parc',rating:4.8,reviews:128,price:300,conv:true,tele:true,langs:['Français','Arabe'],exp:15,next:'tomorrow',x:60,y:18,stations:[{id:'st_doc',name:'Dr. Leila Marmioui',kind:'doctor'},{id:'st_echo',name:'Échographie',kind:'imaging'},{id:'st_care',name:'Salle de soins',kind:'care'}]},
+  {id:2,name:'Dr. Karim Benali',spec:'cardio',city:'Casablanca',clinic:'Institut Cardio Casa',rating:4.9,reviews:208,price:500,conv:true,tele:false,langs:['Français','Arabe'],exp:20,next:'today',x:37,y:61,stations:[{id:'st_doc',name:'Dr. Karim Benali',kind:'doctor'},{id:'st_doc2',name:'Dr. Hind Sefrioui',kind:'doctor'},{id:'st_lab',name:'Laboratoire',kind:'lab'},{id:'st_echo',name:'Échographie cardiaque',kind:'imaging'}]},
   {id:3,name:'Dr. Sara Idrissi',spec:'dermato',city:'Rabat',clinic:'Skin Care Rabat',rating:4.7,reviews:96,price:400,conv:false,tele:true,langs:['Français','Arabe','Darija'],exp:11,next:'today',x:45,y:49},
   {id:4,name:'Dr. Youssef Tahiri',spec:'generaliste',city:'Casablanca',clinic:'Cabinet Médical Anfa',rating:4.6,reviews:142,price:200,conv:true,tele:true,langs:['Français','Arabe','Darija'],exp:9,next:'today',x:40,y:58},
   {id:5,name:'Dr. Amina Bennani',spec:'pediatre',city:'Marrakech',clinic:'Cabinet Pédiatrique Guéliz',rating:4.9,reviews:164,price:250,conv:true,tele:true,langs:['Français','Arabe'],exp:14,next:'tomorrow',x:33,y:79},

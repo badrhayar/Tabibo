@@ -572,35 +572,52 @@ export default function ForDoctors() {
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 18 }}>
             {[
               {
-                name: 'Pro', price: 299, popular: true,
+                name: 'Pro', price: 399, popular: true, available: true,
+                tag: lang === 'ar' ? 'العيادة الرقمية الكاملة' : lang === 'en' ? 'The complete digital practice' : 'Le cabinet numérique complet',
                 feats: lang === 'ar'
-                  ? ['أجندة وحجوزات غير محدودة', 'رابط حجز شخصي + ملصق QR', 'ملفات المرضى والوصفات الإلكترونية', 'تذكيرات تلقائية', 'إحصائيات العيادة']
-                  : ['Agenda & réservations illimitées', 'Lien de réservation personnel + affiche QR', 'Dossiers patients & e-ordonnances', 'Rappels automatiques', 'Statistiques du cabinet'],
+                  ? ['ملف المريض الرقمي', 'إدارة الوثائق', 'الفوترة ونظرة مالية شاملة', 'مواعيد غير محدودة', 'أجندة وتذكيرات بالبريد وواتساب (500/شهر)', 'مراسلة المرضى', 'مطابقة القانون 09-08 (CNDP)']
+                  : lang === 'en'
+                  ? ['Digital patient record', 'Document management', 'Billing and financial overview', 'Unlimited appointments', 'Agenda & email / WhatsApp reminders (500/month)', 'Patient messaging', 'Law 09-08 (CNDP) compliance']
+                  : ['Dossier patient numérique', 'Gestion documentaire', 'Facturation et aperçu financier', 'Rendez-vous illimités', 'Agenda & rappels e-mail / WhatsApp (500 / mois)', 'Messagerie patients', 'Conformité loi 09-08 (CNDP)'],
               },
               {
-                name: 'Premium', price: 499, popular: false,
+                name: 'Premium', price: null, popular: false, available: false,
+                tag: lang === 'ar' ? 'الذكاء الاصطناعي والفيديو' : lang === 'en' ? 'Artificial intelligence and video' : "L'intelligence artificielle et la vidéo",
                 feats: lang === 'ar'
-                  ? ['كل مزايا Pro', 'الاستشارة عن بُعد بالفيديو', 'حساب السكرتير/ة', 'أولوية الدعم', 'ظهور معزّز في البحث']
-                  : ['Tout le plan Pro', 'Téléconsultation vidéo', 'Compte secrétaire', 'Support prioritaire', 'Visibilité renforcée dans la recherche'],
+                  ? ['كل ما في Pro', 'مساعد هاتفي بالذكاء الاصطناعي', 'مساعد استشارة بالذكاء الاصطناعي', 'مساعد فوترة بالذكاء الاصطناعي', 'الاستشارة عن بُعد بالفيديو', 'تذكيرات غير محدودة']
+                  : lang === 'en'
+                  ? ['Everything in Pro', 'AI phone assistant', 'AI consultation assistant', 'AI billing assistant', 'Video teleconsultation', 'Unlimited reminders']
+                  : ['Tout ce qui est inclus dans Pro', 'Assistant téléphonique IA', 'Assistant de consultation IA', 'Assistant de facturation IA', 'Téléconsultation vidéo', 'Rappels e-mail / WhatsApp illimités'],
               },
             ].map((p) => (
               <div key={p.name} style={{ background: '#fff', border: p.popular ? `2px solid ${PRIMARY}` : `1px solid ${BORDER}`, borderRadius: 18, padding: '26px 26px 22px', position: 'relative' }}>
-                {p.popular && <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: PRIMARY, color: '#fff', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px' }}>{lang === 'ar' ? 'الأكثر اختياراً' : lang === 'en' ? 'Most popular' : 'Le plus choisi'}</span>}
+                {p.available && <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: PRIMARY, color: '#fff', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px' }}>{lang === 'ar' ? 'الصيغة الوحيدة المتاحة' : lang === 'en' ? 'Only plan available' : 'Seule formule disponible'}</span>}
+                {!p.available && <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: '#FEF3DC', color: '#8A6210', border: '1px solid #F0DCAE', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px' }}>{lang === 'ar' ? 'قريباً' : lang === 'en' ? 'Coming soon' : 'Bientôt disponible'}</span>}
                 <div style={{ fontSize: 16, fontWeight: 800, color: DARK }}>{p.name}</div>
-                <div style={{ margin: '10px 0 16px' }}>
-                  <span style={{ fontSize: 38, fontWeight: 900, color: DARK, letterSpacing: '-1px' }}>{p.price}</span>
-                  <span style={{ fontSize: 14, color: MUTED, fontWeight: 600 }}> MAD / {lang === 'ar' ? 'شهر' : lang === 'en' ? 'month' : 'mois'}</span>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 2 }}>{p.tag}</div>
+                <div style={{ margin: '10px 0 16px', minHeight: 46 }}>
+                  {p.price != null ? (
+                    <>
+                      <span style={{ fontSize: 38, fontWeight: 900, color: DARK, letterSpacing: '-1px' }}>{p.price}</span>
+                      <span style={{ fontSize: 14, color: MUTED, fontWeight: 600 }}> MAD / {lang === 'ar' ? 'شهر' : lang === 'en' ? 'month' : 'mois'}</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: 15, color: MUTED, fontWeight: 600 }}>{lang === 'ar' ? 'يُعلن السعر عند الإطلاق' : lang === 'en' ? 'Price announced at launch' : "Tarif annoncé à l'ouverture"}</span>
+                  )}
                 </div>
                 <ul style={{ listStyle: 'none', margin: '0 0 20px', padding: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
                   {p.feats.map((f) => (
                     <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13.5, color: BODY }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><path d="M20 6L9 17l-5-5"/></svg>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={p.available ? PRIMARY : '#5B45A0'} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><path d="M20 6L9 17l-5-5"/></svg>
                       {f}
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => go('docregister')} style={{ width: '100%', background: p.popular ? PRIMARY : '#fff', color: p.popular ? '#fff' : DARK, border: p.popular ? 'none' : `1.5px solid ${BORDER}`, borderRadius: 10, padding: '12px 0', fontSize: 14.5, fontWeight: 700, cursor: 'pointer' }}>
-                  {lang === 'ar' ? 'ابدأ التجربة المجانية' : lang === 'en' ? 'Start free trial' : 'Commencer l\'essai gratuit'}
+                <button onClick={() => p.available && go('docregister')} disabled={!p.available}
+                  style={{ width: '100%', background: p.available ? PRIMARY : '#EAF6F0', color: p.available ? '#fff' : '#0E7C52', border: p.available ? 'none' : '1px solid #C3E8D8', borderRadius: 10, padding: '12px 0', fontSize: 14.5, fontWeight: 700, cursor: p.available ? 'pointer' : 'default' }}>
+                  {p.available
+                    ? (lang === 'ar' ? 'ابدأ التجربة المجانية' : lang === 'en' ? 'Start free trial' : 'Commencer l\'essai gratuit')
+                    : (lang === 'ar' ? 'قريباً' : lang === 'en' ? 'Coming soon' : 'Bientôt disponible')}
                 </button>
               </div>
             ))}

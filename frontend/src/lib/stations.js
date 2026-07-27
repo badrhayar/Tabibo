@@ -27,7 +27,11 @@ export function defaultStations(doctorName = 'Médecin') {
   ];
 }
 
+/** Les postes du cabinet connecté : la base fait foi, le cache local prend le
+ *  relais hors ligne et en démonstration. */
 export function loadStations(state, doctorName) {
+  const fromDb = state?.myDoctor?.stations;
+  if (Array.isArray(fromDb) && fromDb.length) return fromDb;
   try {
     const raw = JSON.parse(localStorage.getItem(key(state)) || 'null');
     if (Array.isArray(raw) && raw.length) return raw;
@@ -37,4 +41,16 @@ export function loadStations(state, doctorName) {
 
 export function saveStations(state, list) {
   try { localStorage.setItem(key(state), JSON.stringify(list)); } catch { /* private mode */ }
+}
+
+/** Les postes proposés au patient sur la page publique d'un médecin. */
+export function stationsOf(doctor) {
+  const l = doctor?.stations;
+  return Array.isArray(l) ? l.filter((s) => s && s.name) : [];
+}
+
+/** Nom lisible d'un poste à partir de son identifiant. */
+export function stationName(list, id) {
+  if (!id) return '';
+  return (list || []).find((s) => s.id === id)?.name || '';
 }

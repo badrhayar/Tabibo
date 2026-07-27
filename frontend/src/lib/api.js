@@ -33,6 +33,7 @@ function mapDoctor(row) {
     prayerIds: row.prayer_ids || [],
     slotMinutes: row.slot_minutes || 30,
     services: Array.isArray(row.services) ? row.services : [],
+    stations: Array.isArray(row.stations) ? row.stations : [],
     avatar: row.avatar_url || '',
     lat: row.lat ?? null,
     lng: row.lng ?? null,
@@ -268,7 +269,7 @@ export function clampDuration(min) {
   return Math.max(15, Math.min(240, n));
 }
 
-export async function createAppointment({ patientId, doctorId, datetime, reason, notes, fee = null, relativeId = null, patientName = null, durationMinutes = 30 }) {
+export async function createAppointment({ patientId, doctorId, datetime, reason, notes, fee = null, relativeId = null, patientName = null, durationMinutes = 30, stationId = null }) {
   const { data, error } = await supabase
     .from('appointments')
     .insert({
@@ -282,6 +283,8 @@ export async function createAppointment({ patientId, doctorId, datetime, reason,
       // Booking for a relative: their name becomes the visit's patient name.
       relative_id: relativeId,
       patient_name: patientName,
+      // Poste de soins retenu à la réservation (facultatif).
+      station_id: stationId || null,
       // Expected price: caller may pass it; otherwise default to the doctor's fee.
       fee: fee != null ? Number(fee) || null : await doctorDefaultFee(doctorId),
     })
@@ -298,7 +301,7 @@ export async function createAppointment({ patientId, doctorId, datetime, reason,
  * (`patientId`) or a walk-in identified by name/phone (no account yet). These
  * persist in the DB so the booking calendar greys the slot out for patients.
  */
-export async function createWalkinAppointment({ doctorId, datetime, reason, notes, patientId = null, patientName = null, patientPhone = null, patientEmail = null, fee = null, durationMinutes = 30 }) {
+export async function createWalkinAppointment({ doctorId, datetime, reason, notes, patientId = null, patientName = null, patientPhone = null, patientEmail = null, fee = null, durationMinutes = 30, stationId = null }) {
   const { data, error } = await supabase
     .from('appointments')
     .insert({
@@ -312,6 +315,7 @@ export async function createWalkinAppointment({ doctorId, datetime, reason, note
       patient_phone: patientPhone || null,
       // Stored so an account-less patient still gets email reminders.
       patient_email: patientEmail || null,
+      station_id: stationId || null,
       status: 'pending',
       fee: fee != null ? Number(fee) || null : await doctorDefaultFee(doctorId),
     })
@@ -362,6 +366,8 @@ export function mapAppointment(row, nameById = {}) {
     patientName: row.patient_name || row.patient?.full_name || 'Patient',
     forName: row.patient_name || null,
     relativeId: row.relative_id || null,
+    // Poste de soins choisi à la réservation (facultatif).
+    bookedStationId: row.station_id || null,
     patientPhone: row.patient?.phone || row.patient_phone || '',
     patientSex: normSex(row.patient?.sex),
     patientAge: ageFromDob(row.patient?.dob),
@@ -1041,6 +1047,19 @@ export async function saveDoctorServices(doctorId, services) {
   const { error } = await supabase
     .from('doctors')
     .update({ services: clean })
+    .eq('id', doctorId);
+  if (error) throw error;
+  return clean;
+}
+
+/** Persist the practice's care stations (shared with the patient booking page). */
+export async function saveDoctorStations(doctorId, stations) {
+  const clean = (stations || [])
+    .filter((s) => (s.name || '').trim())
+    .map((s) => ({ id: String(s.id || '').trim() || `st_${Date.now()}`, name: String(s.name).trim(), kind: String(s.kind || 'other') }));
+  const { error } = await supabase
+    .from('doctors')
+    .update({ stations: clean })
     .eq('id', doctorId);
   if (error) throw error;
   return clean;
