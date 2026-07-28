@@ -65,6 +65,12 @@ export default function Contact() {
   const { go } = useApp();
   const { isMobile } = useViewport();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
+  // Le formulaire ouvre la messagerie du visiteur. Si aucune application n'est
+  // configurée (cas fréquent sur ordinateur), rien ne se passe visiblement et
+  // le message est perdu : on affiche donc toujours un rappel avec l'adresse et
+  // le texte, copiables en un clic.
+  const [sent, setSent] = useState(false);
+  const [copied, setCopied] = useState('');
   // Admin-editable contact info (falls back to the defaults above while loading).
   const [company, setCompany] = useState(COMPANY);
   useEffect(() => {
@@ -84,6 +90,11 @@ export default function Contact() {
     const subject = encodeURIComponent(`Contact Tabibo — ${form.name || 'Message'}`);
     const body = encodeURIComponent(`Nom : ${form.name}\nEmail : ${form.email}\n\n${form.message}`);
     window.location.href = `mailto:${company.email}?subject=${subject}&body=${body}`;
+    setSent(true);
+  };
+  const copy = async (what, text) => {
+    try { await navigator.clipboard.writeText(text); setCopied(what); setTimeout(() => setCopied(''), 2200); }
+    catch { setCopied(''); }
   };
 
   const legal = [
@@ -126,6 +137,24 @@ export default function Contact() {
 
           <form onSubmit={submit} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 18 : 22 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 14 }}>Envoyez-nous un message</div>
+            {sent && (
+              <div style={{ background: '#EAF7F0', border: '1px solid #CDEBDC', borderRadius: 12, padding: '13px 15px', marginBottom: 14 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0E7C52', marginBottom: 4 }}>Votre messagerie devrait s’être ouverte.</div>
+                <div style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.55 }}>
+                  Si ce n’est pas le cas, écrivez-nous directement à <strong style={{ color: DARK }}>{company.email}</strong> — votre texte est prêt à être collé.
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                  <button type="button" onClick={() => copy('mail', company.email)}
+                    style={{ background: '#fff', color: '#0E7C52', border: '1.5px solid #16A06A', borderRadius: 9, padding: '7px 13px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+                    {copied === 'mail' ? 'Adresse copiée ✓' : 'Copier l’adresse'}
+                  </button>
+                  <button type="button" onClick={() => copy('msg', `${form.name}\n${form.email}\n\n${form.message}`)}
+                    style={{ background: '#fff', color: '#0E7C52', border: '1.5px solid #16A06A', borderRadius: 9, padding: '7px 13px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+                    {copied === 'msg' ? 'Message copié ✓' : 'Copier mon message'}
+                  </button>
+                </div>
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <input required placeholder="Votre nom" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={input} />
               <input required type="email" placeholder="Votre email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={input} />

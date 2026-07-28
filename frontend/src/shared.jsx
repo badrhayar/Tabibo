@@ -7,7 +7,15 @@ export const TINTS = [
   ['#E4F2F4','#1B7E86'],
 ];
 
-export const tint = (i) => TINTS[i % TINTS.length];
+// Couleur d'avatar dérivée d'un rang. Robuste aux index absents (-1 quand
+// l'élément n'est pas encore dans la liste) : sans cela le tableau renvoie
+// `undefined` et la déstructuration `const [bg, fg] = tint(i)` fait tomber
+// tout l'écran.
+export const tint = (i) => {
+  const n = TINTS.length;
+  const k = Number.isFinite(i) ? ((Math.trunc(i) % n) + n) % n : 0;
+  return TINTS[k];
+};
 
 export const initials = (name) => {
   if (!name) return '?';
@@ -46,6 +54,9 @@ export function cityCoord(city) {
 // [lat,lng] for a doctor: real coords if present, else a STABLE position derived
 // from their city + id (so demo/mock doctors also appear on the map).
 export function doctorCoords(d) {
+  // Appelée pendant le rendu, parfois avant que le médecin soit chargé :
+  // aucun accès direct sans vérification, sinon l'écran entier tombe.
+  if (!d) return null;
   if (typeof d.lat === 'number' && typeof d.lng === 'number') return [d.lat, d.lng];
   const c = CITY_COORDS[d.city];
   if (!c) return null;

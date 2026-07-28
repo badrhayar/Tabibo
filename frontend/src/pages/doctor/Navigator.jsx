@@ -94,46 +94,67 @@ export default function Navigator({ state, setState, go }) {
     myAppointments: (state.myAppointments || []).map((a) => a.id === id ? fn(a) : a),
   });
 
+  // Le tableau réagit immédiatement (le secrétariat ne doit jamais attendre le
+  // réseau), mais si l'enregistrement échoue il faut le DIRE : sinon le parcours
+  // du patient paraît consigné alors que la base n'a rien reçu, et le médecin
+  // voit autre chose sur son propre écran. `sync` exécute l'écriture et remonte
+  // l'échec sous forme de message clair, à la place du ✓.
+  const sync = async (id, run, okToast) => {
+    let failed = false;
+    try { if (!isLocalId(id)) await run(); }
+    catch (_) { failed = true; }
+    setState({
+      toast: failed ? 'Non enregistré — le tableau est à jour ici, mais vérifiez la connexion.' : okToast,
+      toastShow: true,
+    });
+    return !failed;
+  };
+
   const arrive = async (a) => {
     setBusy(a.id);
     const ts = new Date().toISOString();
     patch(a.id, (x) => ({ ...x, arrivedAt: ts }));
-    try { if (!isLocalId(a.id)) await markArrived(a.id, true); } catch (_) { /* optimistic */ }
-    setState({ toast: `${a.patientName || 'Patient'} est en salle d’attente ✓`, toastShow: true });
+    await sync(a.id, () => markArrived(a.id, true), `${a.patientName || 'Patient'} est en salle d’attente ✓`);
     setBusy(null);
   };
   const enter = async (a, station) => {
     setBusy(a.id);
     const ts = new Date().toISOString();
-    patch(a.id, (x) => ({ ...x, inConsultAt: ts, arrivedAt: arrivedAt(x) || ts, stationId: station.id, practitioner: station.kind === 'doctor' ? station.name : (x.practitioner || me) }));
-    try { if (!isLocalId(a.id)) await markInConsultation(a.id, true); } catch (_) { /* optimistic */ }
-    setState({ toast: `${a.patientName || 'Patient'} → ${station.name} ✓`, toastShow: true });
+    patch(a.id, (x) => ({ ...x, inConsultAt: ts, arrivedAt: arrivedAt(x) || ts, stationId: station.id, bookedStationId: station.id, practitioner: station.kind === 'doctor' ? station.name : (x.practitioner || me) }));
+    // On enregistre l'entrée ET le poste : le rendez-vous doit dire où se
+    // trouve le patient, pas seulement qu'il est pris en charge.
+    await sync(a.id, async () => {
+      await markInConsultation(a.id, true);
+      await updateAppointment(a.id, { station_id: station.id });
+    }, `${a.patientName || 'Patient'} → ${station.name} ✓`);
     setBusy(null);
   };
   // Move an already-admitted patient to another station (labo, échographie…).
-  const moveStation = (a, station) => {
-    patch(a.id, (x) => ({ ...x, stationId: station.id, inConsultAt: inConsultAt(x) || new Date().toISOString() }));
+  // Le poste retenu suit le rendez-vous en base, comme celui choisi à la
+  // réservation : sans cela, un patient envoyé au laboratoire réapparaissait
+  // dans la colonne du médecin au premier rechargement.
+  const moveStation = async (a, station) => {
+    patch(a.id, (x) => ({ ...x, stationId: station.id, bookedStationId: station.id, inConsultAt: inConsultAt(x) || new Date().toISOString() }));
     setStationFor(null);
-    setState({ toast: `${a.patientName || 'Patient'} déplacé vers ${station.name} ✓`, toastShow: true });
+    await sync(a.id, () => updateAppointment(a.id, { station_id: station.id }), `${a.patientName || 'Patient'} déplacé vers ${station.name} ✓`);
   };
   const back = async (a) => {
     setBusy(a.id);
     patch(a.id, (x) => ({ ...x, inConsultAt: null }));
-    try { if (!isLocalId(a.id)) await markInConsultation(a.id, false); } catch (_) { /* optimistic */ }
+    try { if (!isLocalId(a.id)) await markInConsultation(a.id, false); }
+    catch (_) { setState({ toast: 'Non enregistré — vérifiez la connexion.', toastShow: true }); }
     setBusy(null);
   };
   const checkout = async (a) => {
     setBusy(a.id);
     patch(a.id, (x) => ({ ...x, status: 'completed', inConsultAt: null }));
-    try { if (!isLocalId(a.id)) await updateAppointmentStatus(a.id, 'completed'); } catch (_) { /* optimistic */ }
-    setState({ toast: `${a.patientName || 'Patient'} : visite terminée ✓`, toastShow: true });
+    await sync(a.id, () => updateAppointmentStatus(a.id, 'completed'), `${a.patientName || 'Patient'} : visite terminée ✓`);
     setBusy(null);
   };
   const saveNote = async (a, text, urgent) => {
     patch(a.id, (x) => ({ ...x, deskNote: text, deskUrgent: urgent }));
     setNoteFor(null);
-    try { if (!isLocalId(a.id)) await updateAppointment(a.id, { notes: text || null }); } catch (_) { /* note stays local */ }
-    setState({ toast: text ? 'Note transmise au médecin ✓' : 'Note supprimée', toastShow: true });
+    await sync(a.id, () => updateAppointment(a.id, { notes: text || null }), text ? 'Note transmise au médecin ✓' : 'Note supprimée');
   };
   const openFile = (a) => {
     const roster = state?.patients || [];
@@ -526,7 +547,8 @@ function WalkinModal({ state, setState, onClose, isMobile, practitioners, doctor
         });
         if (saved?.id) {
           row = { ...row, id: saved.id };
-          try { await markArrived(saved.id, true); } catch (_) { /* optimistic */ }
+          try { await markArrived(saved.id, true); }
+    catch (_) { setState({ toast: 'Arrivée non enregistrée côté serveur — vérifiez la connexion.', toastShow: true }); }
         }
       }
     } catch (e) {

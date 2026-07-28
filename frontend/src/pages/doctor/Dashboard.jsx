@@ -113,7 +113,12 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
     try {
       if (on && !hadArrived) await markArrived(a.id, true);
       await markInConsultation(a.id, on);
-    } catch (_) { /* optimistic; a refresh will reconcile */ }
+    } catch (_) {
+      // Le tableau bouge tout de suite, mais un déplacement non enregistré ne
+      // doit pas passer pour un succès : le médecin et le secrétariat verraient
+      // deux salles d'attente différentes.
+      setState({ toast: 'Déplacement non enregistré — vérifiez la connexion.', toastShow: true });
+    }
   };
   const todayAppts = allAppts.filter((a) => moDateKeyOf(a.datetime) === todayKey && a.status !== 'cancelled');
   const inConsultAtOf = (a) => a.inConsultAt || a.in_consultation_at || null;
@@ -349,7 +354,7 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
             )}
             {inbox.map((c, i) => {
               const [bg, fg] = tint(i);
-              const preview = isImageMessage(c.last.content) ? '📷 Photo' : c.last.content;
+              const isPhoto = isImageMessage(c.last.content);
               return (
                 <div key={c.id}
                   onClick={() => go('dchat')}
@@ -363,7 +368,9 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
                       <span style={{ fontSize: 14, fontWeight: 600, color: DARK }}>{c.patientName}</span>
                       <span style={{ fontSize: 11, color: MUTED, flexShrink: 0, marginLeft: 8 }}>{agoLabel(c.last.sent_at)}</span>
                     </div>
-                    <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{preview}</div>
+                    <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: 5 }}>
+                      {isPhoto ? (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Photo</>) : c.last.content}
+                    </div>
                   </div>
                 </div>
               );

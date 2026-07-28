@@ -323,7 +323,11 @@ export default function DoctorApp() {
     // final server-side check by email/phone, so no duplicate invites are sent to
     // someone who registered meanwhile. Needs an email or a phone to reach them.
     if (!state.naMatch?.userId && (na.email || na.phone)) {
-      inviteNewPatient({ name: na.name, phone: na.phone, email: na.email }).catch(() => {});
+      // Le rendez-vous est créé quoi qu'il arrive ; en revanche si l'invitation
+      // ne part pas, le médecin doit le savoir — sinon il croit le patient
+      // prévenu alors qu'aucun message n'a été envoyé.
+      inviteNewPatient({ name: na.name, phone: na.phone, email: na.email })
+        .catch(() => setState({ toast: 'Rendez-vous enregistré, mais l’invitation n’a pas pu être envoyée à ' + (na.name || 'ce patient') + '.', toastShow: true }));
     }
 
     // ── Persist to the database when signed in as a real doctor, so the slot is
@@ -378,7 +382,10 @@ export default function DoctorApp() {
     const np = state.newPatient;
     if (!np.name) return;
     const blank = { name:'',cin:'',phone:'',email:'',dob:'',sex:'Femme',address:'',city:'Casablanca',blood:'',allergies:'',chronic:'',insurance:'CNSS',amoNumber:'',notes:'' };
-    inviteNewPatient({ name: np.name, phone: np.phone, email: np.email }).catch(() => {});
+    // Même règle qu'à la création d'un rendez-vous : la fiche est enregistrée,
+    // mais un envoi d'invitation raté doit être annoncé, jamais masqué.
+    inviteNewPatient({ name: np.name, phone: np.phone, email: np.email })
+      .catch(() => setState({ toast: 'Fiche créée, mais l’invitation n’a pas pu être envoyée à ' + (np.name || 'ce patient') + '.', toastShow: true }));
     // Persist to the doctor's real roster when connected; fall back to local for demo mode.
     if (isSupabaseConfigured && state.myDoctor?.id) {
       try {

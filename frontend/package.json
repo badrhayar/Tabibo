@@ -11,7 +11,13 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "node scripts/e2e-check.mjs"
+    "test:e2e": "node scripts/e2e-check.mjs",
+    "test:headers": "node scripts/prod-headers-check.mjs",
+    "test:files": "node scripts/pdf-print-check.mjs",
+    "test:empty": "node scripts/empty-state-check.mjs",
+    "test:slow": "node scripts/late-directory-check.mjs",
+    "test:crawl": "node scripts/deep-crawl.mjs",
+    "test:all": "npm run test:e2e && npm run test:headers && npm run test:files && npm run test:empty && npm run test:slow"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

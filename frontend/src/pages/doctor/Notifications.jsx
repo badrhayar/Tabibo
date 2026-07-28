@@ -164,7 +164,7 @@ export default function Notifications({ state, setState, go, openNewAppt, openAd
         ))}
       </div>
 
-      {/* Tab 1: SMS Envoyés */}
+      {/* Onglet 1 : messages envoyés (WhatsApp + email) */}
       {activeTab === 0 && (
         <div>
           {/* Stats Row */}

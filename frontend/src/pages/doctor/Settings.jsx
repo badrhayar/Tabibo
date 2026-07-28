@@ -3,7 +3,7 @@ import PasswordInput from '../../components/PasswordInput';
 import { SPEC_INFO, SPEC_OPTS, CITY_OPTS, greenBtn, greenBtnBusy } from '../../shared.jsx';
 import LocationPicker from '../../components/LocationPicker';
 import { saveDoctorServices, updateDoctorFields, updateMyProfile, uploadAvatar, setMySlug } from '../../lib/api';
-import { signIn, updatePassword } from '../../lib/auth';
+import { signIn, updatePassword, authErrorMessage } from '../../lib/auth';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 
 const villes = CITY_OPTS.map((c) => (typeof c === 'string' ? c : c.label));
@@ -215,7 +215,8 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
       setPwMsg({ ok: true, text: 'Mot de passe modifié ✓' });
       setState({ toast: 'Mot de passe modifié ✓', toastShow: true });
     } catch (e) {
-      setPwMsg({ ok: false, text: e?.message || 'Échec de la modification.' });
+      // Traduit les réponses techniques de Supabase (anglais) en français.
+      setPwMsg({ ok: false, text: authErrorMessage(e).message || 'Échec de la modification.' });
     } finally { setPwBusy(false); }
   };
 

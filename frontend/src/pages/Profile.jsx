@@ -3,7 +3,7 @@ import BrandMark, { Wordmark } from '../components/BrandMark';
 import LangPill from '../components/LangPill';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { DOCTORS, SPEC_INFO, BOOK_DAYS, BOOK_SLOTS, genSlots, tint, initials, nextLabel, bioFor, doctorCoords, docDisplayName, greenBtn, greenBtnBusy } from '../shared.jsx';
+import { DOCTORS, SPEC_INFO, BOOK_DAYS, BOOK_SLOTS, genSlots, tint, initials, bioFor, doctorCoords, docDisplayName, greenBtn, greenBtnBusy } from '../shared.jsx';
 import DoctorLocationMap from '../components/DoctorLocationMap';
 import Icon from '../components/Icon';
 import { moroccoNow, slotToMinutes } from '../lib/time.js';
@@ -44,9 +44,17 @@ export default function Profile() {
   const doc = (state.selDocData && state.selDocData.id === selDoc)
     ? state.selDocData
     : (doctors.find((d) => d.id === selDoc) || doctors[0]);
-  // Empty directory (fresh launch) → nothing to show; back to search.
-  if (!doc) { go('search'); return null; }
-  const si  = SPEC_INFO[doc.spec] || {};
+  // Annuaire vide (tout premier chargement, réseau lent) → on repart sur la
+  // recherche. La redirection se fait dans un EFFET, jamais pendant le rendu :
+  // un `return` anticipé ici sauterait tous les hooks déclarés plus bas et
+  // React planterait au rendu suivant, dès que la liste des médecins arrive
+  // (« Rendered more hooks than during the previous render »).
+  // On n'attend pas indéfiniment, mais on ne renvoie le visiteur ailleurs
+  // qu'une fois l'annuaire REÇU : sinon un lien partagé ouvert sur un réseau
+  // lent se referme tout seul avant d'avoir montré le médecin.
+  const dirLoaded = state.doctorsLoaded;
+  useEffect(() => { if (dirLoaded && !doc) go('search'); }, [dirLoaded, !doc]); // eslint-disable-line react-hooks/exhaustive-deps
+  const si  = SPEC_INFO[doc?.spec] || {};
   const [avatarBg, avatarFg] = tint(doctors.indexOf(doc));
   const docLoc = doctorCoords(doc);
   const [showMap, setShowMap] = useState(false);
@@ -204,12 +212,12 @@ export default function Profile() {
     if (!weekAvail || weekAvail.length === 0) return BOOK_SLOTS;
     const dow = new Date(`${selectedDate}T12:00:00`).getDay();
     const { work, breaks } = dayRules(dow);
-    return genSlots(work, breaks, doc.slotMinutes || 30);
+    return genSlots(work, breaks, doc?.slotMinutes || 30);
   })();
 
   // Every slot a taken visit spans (a 45-min booking greys out 3 × 15-min slots,
   // not just its start) — derived from the day's booked intervals.
-  const bookedSlots = slotsOverlappingBooked(bookedIvals, daySlots, doc.slotMinutes || 30);
+  const bookedSlots = slotsOverlappingBooked(bookedIvals, daySlots, doc?.slotMinutes || 30);
 
   // Reason a slot is unavailable, or null if it's bookable for the selected date.
   const slotState = (slot) => {
@@ -249,6 +257,17 @@ export default function Profile() {
     // actually written to the database (for logged-in patients too).
     go('pinfo');
   };
+
+  // Tous les hooks ont été appelés : on peut sortir sans risque.
+  if (!doc) return (
+    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, color: MUTED, fontSize: 14 }}>
+        <span style={{ width: 26, height: 26, borderRadius: '50%', border: '2.5px solid #DCE9E2', borderTopColor: PRIMARY, animation: 'tbSpin .8s linear infinite' }} />
+        {tr('Chargement de la fiche…', 'Loading the profile…', 'جاري تحميل البطاقة…')}
+      </div>
+      <style>{'@keyframes tbSpin{to{transform:rotate(360deg)}}'}</style>
+    </div>
+  );
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>

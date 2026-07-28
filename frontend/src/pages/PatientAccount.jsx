@@ -8,7 +8,7 @@ import BrandMark, { Wordmark } from '../components/BrandMark';
 import { pushSupported, pushState, enablePush, disablePush } from '../lib/push';
 import QRCode from 'qrcode';
 import { fetchRelatives, addRelative, deleteRelative, downloadICS, createReview, getOrCreateConversation, findConversation, fetchMessages, sendMessage, subscribeToConversation, uploadAvatar, updateMyProfile, updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail, uploadChatImage, isImageMessage, uploadDocument, listDocuments, downloadDocument, fetchMyPrescriptions } from '../lib/api';
-import { buildPrescriptionPDF, pdfOpen, loadBrandLogo } from '../lib/pdf';
+import { buildPrescriptionPDF, pdfOpen, pdfFileName, loadBrandLogo } from '../lib/pdf';
 import ChatImage from '../components/ChatImage';
 import PhoneField from '../components/PhoneField';
 import Pager, { usePager } from '../components/Pager';
@@ -113,8 +113,15 @@ export default function PatientAccount() {
   };
 
   const handleDeleteRelative = async (id) => {
+    const removed = relatives.find((r) => r.id === id);
     setRelatives((l) => l.filter((r) => r.id !== id));
-    try { await deleteRelative(id); } catch (_) {}
+    // Si la suppression échoue côté serveur, on remet le proche dans la liste :
+    // sinon il « disparaît » puis réapparaît au rechargement, sans explication.
+    try { await deleteRelative(id); }
+    catch (_) {
+      if (removed) setRelatives((l) => (l.some((r) => r.id === id) ? l : [...l, removed]));
+      setState({ toast: 'Suppression non enregistrée — vérifiez votre connexion.', toastShow: true });
+    }
   };
   const { isMobile } = useViewport();
   const { patient, now, cancelDone, reviewOpen, reviewStars, reviewDoctor, reviewText, reviewDone, pdocs, pNewDoc } = state;
@@ -122,11 +129,6 @@ export default function PatientAccount() {
   const [patientMsgInput, setPatientMsgInput] = useState('');
   const composeRef = useRef(null);
   const chatImgRef = useRef(null);
-  const openMessagerie = () => {
-    composeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => composeRef.current?.focus(), 350);
-  };
-
   // Doctors this patient has already consulted (distinct), to choose a recipient.
   const visitedDocs = (() => {
     const m = new Map();
@@ -365,7 +367,7 @@ export default function PatientAccount() {
       patientName: p.patient_name || state.appUser?.full_name || '',
       dateLabel: new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }),
       items: Array.isArray(p.items) ? p.items : [], notes: p.notes || '', ref: p.ref || '', qr, logo,
-    }));
+    }), pdfFileName('ordonnance', p.patient_name || state.appUser?.full_name));
   };
 
   const sendMsg = async () => {
@@ -948,11 +950,16 @@ export default function PatientAccount() {
               placeholder={tr('Envoyer un message à votre médecin…', 'Send a message to your doctor…', 'أرسلوا رسالة إلى طبيبكم…')}
               style={{ flex:1, minWidth:0, background:BG, border:`1px solid ${BORDER_STRONG}`, borderRadius:20, padding:'9px 14px', fontSize:13, outline:'none' }}
             />
+            {/* Grisé tant qu'il n'y a rien à envoyer : un bouton actif qui ne
+                fait rien laisse croire que le message est parti. */}
             <button
               onClick={sendMsg}
-              style={{ width:38, height:38, borderRadius:'50%', background:G, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:15, flexShrink:0 }}
+              disabled={!patientMsgInput.trim()}
+              title={tr('Envoyer', 'Send', 'إرسال')}
+              aria-label={tr('Envoyer le message', 'Send the message', 'إرسال الرسالة')}
+              style={{ width:38, height:38, borderRadius:'50%', background:G, border:'none', cursor: patientMsgInput.trim() ? 'pointer' : 'default', opacity: patientMsgInput.trim() ? 1 : 0.45, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0, transition:'opacity .15s' }}
             >
-              ➤
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
             </button>
           </div>
         </div>

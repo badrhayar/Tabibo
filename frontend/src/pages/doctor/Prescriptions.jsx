@@ -4,7 +4,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { useApp } from '../../context/AppContext';
 import { docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
-import { buildPrescriptionPDF, pdfOpen, pdfDownload, loadBrandLogo } from '../../lib/pdf';
+import { buildPrescriptionPDF, pdfOpen, pdfDownload, pdfFileName, loadBrandLogo } from '../../lib/pdf';
 import {
   createPrescription,
   fetchPrescriptions,
@@ -118,15 +118,10 @@ export default function Prescriptions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.rxPrefill]);
 
-  if (!doctorId && !isDemo) {
-    return (
-      <div style={{ padding: isMobile ? 16 : 32, background: BG, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Segoe UI', sans-serif" }}>
-        <div style={{ background: '#fff', borderRadius: 16, border: `1px solid ${BORDER}`, padding: '40px 32px', textAlign: 'center', maxWidth: 420, color: MUTED, fontSize: 15 }}>
-          Disponible une fois votre compte médecin activé.
-        </div>
-      </div>
-    );
-  }
+  // Écran « compte pas encore activé » — rendu tout en bas, APRÈS l'appel de
+  // tous les hooks. Sortir ici en sauterait une partie et React planterait à
+  // l'instant où la fiche médecin finit de charger.
+  const notReady = !doctorId && !isDemo;
 
   // ── Item helpers ───────────────────────────────────────────────────────────
   const setItem = (i, field, val) => {
@@ -253,7 +248,7 @@ export default function Prescriptions() {
     const its = ensureReady(); if (!its) return;
     const ref = currentRef(its);
     const [qr, logo] = await Promise.all([makeQr(ref), loadBrandLogo()]);
-    pdfOpen(buildPrescriptionPDF({ ...buildDoctorDoc(its, patientName.trim(), notes.trim()), ref, qr, logo }));
+    pdfOpen(buildPrescriptionPDF({ ...buildDoctorDoc(its, patientName.trim(), notes.trim()), ref, qr, logo }), pdfFileName('ordonnance', patientName));
     persist(its, ref);                           // auto-save so nothing is lost
   };
   const downloadPDF = async () => {
@@ -276,7 +271,7 @@ export default function Prescriptions() {
   const openRecent = async (p) => {
     const its = Array.isArray(p.items) ? p.items : [];
     const [qr, logo] = await Promise.all([p.ref ? makeQr(p.ref) : Promise.resolve(''), loadBrandLogo()]);
-    pdfOpen(buildPrescriptionPDF({ ...buildDoctorDoc(its, p.patient_name || '', p.notes || ''), ref: p.ref || '', qr, logo }));
+    pdfOpen(buildPrescriptionPDF({ ...buildDoctorDoc(its, p.patient_name || '', p.notes || ''), ref: p.ref || '', qr, logo }), pdfFileName('ordonnance', p.patient_name));
   };
 
   // Send a saved ordonnance to the patient's Tabibo space (needs a linked account).
@@ -307,6 +302,14 @@ export default function Prescriptions() {
   };
 
   const dropRef = useRef(null);
+
+  if (notReady) return (
+    <div style={{ padding: isMobile ? 16 : 32, background: BG, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Segoe UI', sans-serif" }}>
+      <div style={{ background: '#fff', borderRadius: 16, border: `1px solid ${BORDER}`, padding: '40px 32px', textAlign: 'center', maxWidth: 420, color: MUTED, fontSize: 15 }}>
+        Disponible une fois votre compte médecin activé.
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ padding: isMobile ? 8 : 32, background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
@@ -476,7 +479,7 @@ export default function Prescriptions() {
             {/* WhatsApp hint */}
             {downloaded && (
               <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, background: `${PRIMARY}12`, border: `1px solid ${PRIMARY}33`, borderRadius: 10, padding: '10px 14px', fontSize: 13, color: DARK }}>
-                <span style={{ fontSize: 16 }}>💬</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>
                 Téléchargez puis joignez le PDF dans WhatsApp.
               </div>
             )}

@@ -39,23 +39,6 @@ const PLANS = {
   },
 };
 
-// Generate the monthly billing history up to the current Morocco month.
-function buildInvoices(plan, months = 6) {
-  const m = moroccoNow();
-  const out = [];
-  for (let i = 0; i < months; i++) {
-    let mo = m.month - i, yr = m.year;
-    while (mo < 0) { mo += 12; yr -= 1; }
-    out.push({
-      id: `TK-${yr}-${pad2(mo + 1)}-001`,
-      period: `${FR_MONTHS_SHORT[mo]} ${yr}`,
-      monthLabel: `${FR_MONTHS[mo]} ${yr}`,
-      date: `01/${pad2(mo + 1)}/${yr}`,
-      amount: plan.price,
-    });
-  }
-  return out;
-}
 
 export default function Subscription({ state, setState, go }) {
   const { isMobile } = useViewport();
@@ -89,9 +72,6 @@ export default function Subscription({ state, setState, go }) {
   const [payFor, setPayFor] = useState(null);   // plan key being paid
   const [payBusy, setPayBusy] = useState(false);
   const choosePlan = (key) => setPayFor(key);
-  const manage = () => {
-    plansRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
   const openInvoice = (row) => setState({ invoiceOpen: true, invoiceRow: row });
   const closeInvoice = () => setState({ invoiceOpen: false });
 

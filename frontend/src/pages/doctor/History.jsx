@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { updateAppointment, markAppointmentPaid, PAY_METHOD_FROM_FR } from '../../lib/api';
 import { greenBtn, greenBtnBusy } from '../../shared.jsx';
-import { buildReceiptPDF, pdfOpen } from '../../lib/pdf';
+import { buildReceiptPDF, pdfOpen, pdfFileName } from '../../lib/pdf';
 import { moroccoToUTCISO } from '../../lib/time.js';
 import Pager, { usePager } from '../../components/Pager';
 
@@ -379,7 +379,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         </div>
         <button
           onClick={() => { setSearchQ(''); setFilterService(''); setFilterPay(''); setFilterStatus(''); setFilterFrom(''); setFilterTo(''); }}
-          style={{ padding: '9px 20px', border: `1px solid ${BORDER_STRONG}`, background: '#fff', color: MUTED, border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-end' }}
+          style={{ padding: '9px 20px', background: '#fff', color: MUTED, border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-end' }}
         >
           Réinitialiser
         </button>
@@ -473,7 +473,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
                           doctorName: state.appUser?.full_name, specialty: state.myDoctor?.spec,
                           clinic: state.myDoctor?.clinic, city: state.myDoctor?.city, phone: state.appUser?.phone,
                           patientName: row.patient, dateLabel: row.date, service: row.service, amount: row.amount, method: row.pay,
-                        }))}
+                        }), pdfFileName('recu', row.patient))}
                         title="Reçu de paiement"
                         style={{ width: 32, height: 32, borderRadius: 8, border: `1.5px solid ${BORDER_STRONG}`, background: '#fff', color: PRIMARY, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       >

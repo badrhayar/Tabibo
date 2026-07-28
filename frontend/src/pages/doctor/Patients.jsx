@@ -168,10 +168,18 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
 
   const toggleArchive = (id) => {
     const cur = patientList.find(p => p.id === id);
+    const prev = cur?.statut;
     const next = cur && cur.statut === 'Archivé' ? 'Actif' : 'Archivé';
     setState({ patients: patientList.map(p => p.id === id ? { ...p, statut: next } : p) });
     setMenu(null);
-    if (isSupabaseConfigured) updatePatient(id, { statut: next }).catch(() => {});
+    // L'écran change tout de suite, mais si la base refuse l'enregistrement on
+    // revient à l'état précédent et on le dit : jamais un succès de façade.
+    if (isSupabaseConfigured) updatePatient(id, { statut: next }).catch(() => {
+      setState({
+        patients: (state.patients || []).map(p => p.id === id ? { ...p, statut: prev } : p),
+        toast: 'Modification non enregistrée — vérifiez votre connexion.', toastShow: true,
+      });
+    });
   };
 
   const filtered = patientList.filter(p => {
@@ -438,9 +446,14 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
             <button
               onClick={() => {
                 const p = menu.patient;
+                const prev = p.statut;
                 const next = p.statut === 'Bloqué' ? 'Actif' : 'Bloqué';
                 setState({ patients: (state.patients || []).map(x => x.id === p.id ? { ...x, statut: next } : x), toast: next === 'Bloqué' ? 'Réservation en ligne bloquée pour ce patient.' : 'Réservation en ligne autorisée.', toastShow: true });
-                if (isSupabaseConfigured) updatePatient(p.id, { statut: next }).catch(() => {});
+                // Échec d'enregistrement → on rétablit l'état réel et on prévient.
+                if (isSupabaseConfigured) updatePatient(p.id, { statut: next }).catch(() => setState({
+                  patients: (state.patients || []).map(x => x.id === p.id ? { ...x, statut: prev } : x),
+                  toast: 'Modification non enregistrée — vérifiez votre connexion.', toastShow: true,
+                }));
                 setMenu(null);
               }}
               title="Empêche ce patient de réserver en ligne (au cabinet reste possible)"

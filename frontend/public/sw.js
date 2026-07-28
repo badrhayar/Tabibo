@@ -2,7 +2,7 @@
    Tabibo service worker
    Bump CACHE_VERSION to force every device to refresh its cache on next visit.
    ───────────────────────────────────────────────────────────────────────────── */
-const CACHE_VERSION = "tabibo-v130";
+const CACHE_VERSION = "tabibo-v131";
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -37,7 +37,7 @@ const OFFLINE_HTML = `<!doctype html>
        display:flex;flex-direction:column;align-items:center;justify-content:center;
        text-align:center;padding:28px;box-sizing:border-box}
   .brand{font-size:26px;font-weight:800;color:#0F6E56;letter-spacing:-0.5px;margin-bottom:24px}
-  .icon{font-size:46px;margin-bottom:16px}
+  .icon{margin-bottom:18px;color:#0F6E56}
   p{font-size:16px;line-height:1.6;max-width:340px;margin:6px 0;color:#3A4A45}
   .ar{direction:rtl;font-family:'Noto Sans Arabic','Inter',sans-serif;font-size:16px}
   button{margin-top:24px;background:#0F6E56;color:#fff;border:none;border-radius:12px;
@@ -46,7 +46,7 @@ const OFFLINE_HTML = `<!doctype html>
 </head>
 <body>
   <div class="brand">Tabibo</div>
-  <div class="icon">📡</div>
+  <div class="icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg></div>
   <p>Vous êtes hors ligne. Veuillez vérifier votre connexion internet.</p>
   <p class="ar">أنت غير متصل بالإنترنت. يرجى التحقق من اتصالك.</p>
   <button onclick="location.reload()">Réessayer</button>

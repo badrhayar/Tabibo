@@ -190,8 +190,29 @@ export function buildReceiptPDF(d) {
 }
 
 export function pdfDownload(doc, filename) { doc.save(filename); }
+
+/** Nom de fichier lisible et sans accent : « ordonnance-fatima-zahra.pdf ». */
+export function pdfFileName(prefix, name) {
+  const slug = String(name || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return `${prefix}${slug ? '-' + slug : ''}.pdf`;
+}
 export function pdfDataUrl(doc) { return doc.output('datauristring'); }
-export function pdfOpen(doc) {
-  try { doc.output('dataurlnewwindow'); }
-  catch { window.open(doc.output('bloburl'), '_blank'); }
+// Ouvre le PDF dans un nouvel onglet.
+//
+// On n'utilise PAS `output('dataurlnewwindow')` : cette méthode encadre le
+// document dans une iframe en `data:`, que les navigateurs récents ET notre
+// propre en-tête de sécurité (frame-src) refusent — le PDF ne s'ouvrait donc
+// jamais en ligne, alors que tout marchait en local (où l'en-tête n'existe pas).
+// Une URL blob ouverte en navigation directe passe partout ; et si le
+// navigateur bloque la fenêtre (bloqueur de pop-ups, iOS), on retombe sur un
+// téléchargement classique : dans tous les cas le praticien obtient son fichier.
+export function pdfOpen(doc, filename = 'document-tabibo.pdf') {
+  let url = '';
+  try { url = doc.output('bloburl'); } catch { url = ''; }
+  let win = null;
+  if (url) { try { win = window.open(url, '_blank'); } catch { win = null; } }
+  if (!win) { try { doc.save(filename); } catch { /* rien de plus à tenter */ } }
+  return !!win;
 }

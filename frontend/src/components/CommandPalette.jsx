@@ -9,14 +9,35 @@ const BG = '#F4F8F5';
 const BORDER = '#EAEFEC';
 const MUTED = '#6B7B76';
 
-// Screens a doctor can jump to by name.
+// Tous les écrans du cabinet, avec les mots que le praticien tapera vraiment.
+// Cette liste doit rester alignée sur le rail de gauche (DoctorApp) : un écran
+// absent d'ici est un écran introuvable à la recherche.
 const NAV_TARGETS = [
-  ['Tableau de bord', 'doctor'], ['Calendrier', 'dcal'], ['Rendez-vous', 'dappts'],
-  ['Disponibilités', 'davail'], ['Patients', 'dpatients'], ['Ordonnances', 'dprescribe'],
-  ['Inviter mes patients', 'dshare'], ['Historique consultations', 'dhist'],
-  ['Documents', 'ddocs'], ['Messages', 'dchat'], ['SMS & Notifications', 'dnotif'],
-  ['Statistiques', 'dstats'], ['Abonnement', 'dabo'], ['Équipe', 'dstaff'], ['Paramètres', 'dsettings'],
+  ['Tableau de bord', 'doctor'], ['Accueil', 'doctor'],
+  ['Agenda', 'dcal'], ['Calendrier', 'dcal'],
+  ['Navigateur patients', 'dnav'], ['Salle d’attente', 'dnav'],
+  ['Tâches', 'dtasks'],
+  ['Rendez-vous', 'dappts'],
+  ['Liste des patients', 'dpatients'], ['Patients', 'dpatients'],
+  ['Dossier patient', 'dpfile'],
+  ['Ordonnances', 'dprescribe'],
+  ['Documents', 'ddocs'],
+  ['Demandes patients', 'dreq'],
+  ['Consultations', 'dhist'],
+  ['Inviter mes patients', 'dshare'],
+  ['Équipe', 'dstaff'],
+  ['Messagerie', 'dchat'], ['Messages', 'dchat'],
+  ['Facturation', 'dbill'],
+  ['Statistiques', 'dstats'],
+  ['Mon profil', 'dsettings'], ['Paramètres', 'dsettings'],
+  ['Disponibilités', 'davail'], ['Horaires', 'davail'],
+  ['Postes de soins', 'dstations'],
+  ['Abonnement', 'dabo'],
+  ['Rappels & Notifications', 'dnotif'], ['Rappels', 'dnotif'],
 ];
+// Écrans qu'un secrétariat ne doit pas atteindre — même raccourci clavier
+// compris. Miroir de STAFF_HIDDEN dans DoctorApp.
+const STAFF_HIDDEN = new Set(['dabo', 'dstaff', 'dprescribe', 'dbill']);
 
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -50,7 +71,13 @@ export default function CommandPalette({ state, setState, go, isMobile, dark = f
       .filter((a) => a.status !== 'cancelled' && (norm(a.patientName).includes(s) || norm(a.reason).includes(s)))
       .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
       .slice(0, 4);
-    const screens = NAV_TARGETS.filter(([label]) => norm(label).includes(s)).slice(0, 4);
+    const allowed = state?.isStaff ? NAV_TARGETS.filter(([, sc]) => !STAFF_HIDDEN.has(sc)) : NAV_TARGETS;
+    // Un même écran a plusieurs noms d'appel : on ne le propose qu'une fois.
+    const seen = new Set();
+    const screens = allowed.filter(([label, sc]) => {
+      if (!norm(label).includes(s) || seen.has(sc)) return false;
+      seen.add(sc); return true;
+    }).slice(0, 4);
     return { patients, appts, screens };
   }, [q, state.patients, state.manualAppts, state.myAppointments]);
 

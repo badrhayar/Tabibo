@@ -24,10 +24,19 @@ export function authErrorMessage(e) {
     return { code: 'email_exists', message: 'Cet email a déjà un compte Tabibo.' };
   if (/invalid login credentials/.test(low))
     return { code: 'bad_credentials', message: 'Email ou mot de passe incorrect.' };
+  // Deux réponses très fréquentes que Supabase renvoie en anglais : sans
+  // traduction, l'utilisateur lit un message technique dans une autre langue au
+  // pire moment — sa toute première connexion.
+  if (code === 'email_not_confirmed' || /email not confirmed|not confirmed/.test(low))
+    return { code: 'email_not_confirmed', message: 'Confirmez d’abord votre email : ouvrez le lien que nous vous avons envoyé, puis reconnectez-vous.' };
+  if (/unable to validate email|invalid format|email address.*invalid|invalid email/.test(low))
+    return { code: 'invalid_email', message: 'Adresse email invalide — vérifiez la saisie (exemple : nom@domaine.ma).' };
   if (/password.*(6|short|weak)/.test(low))
     return { code: 'weak_password', message: 'Le mot de passe doit contenir au moins 6 caractères.' };
   if (/captcha/.test(low))
     return { code: 'captcha', message: 'Vérification anti-robot échouée — réessayez.' };
+  if (/should be different|same as the old|new password.*different/.test(low))
+    return { code: 'same_password', message: 'Le nouveau mot de passe doit être différent de l’ancien.' };
   if (/rate limit|too many|429/.test(low))
     return { code: 'rate_limit', message: 'Trop de tentatives — patientez quelques minutes puis réessayez.' };
   if (/database error|unexpected_failure|saving new user/.test(low))

@@ -42,8 +42,15 @@ export default function BookingInfo() {
 
   const doctors = state.doctors?.length ? state.doctors : (isSupabaseConfigured ? [] : DOCTORS);
   const doc = doctors.find((d) => d.id === selDoc) || doctors[0];
-  // Empty directory (fresh launch) → nothing to book; back to search.
-  if (!doc) { go('search'); return null; }
+  // Annuaire vide (tout premier chargement) → rien à réserver, retour à la
+  // recherche. Comme sur la fiche médecin, la redirection passe par un effet :
+  // sortir ici sauterait les hooks déclarés plus bas et ferait planter React
+  // dès que la liste des médecins arrive.
+  // On n'attend pas indéfiniment, mais on ne renvoie le visiteur ailleurs
+  // qu'une fois l'annuaire REÇU : sinon un lien partagé ouvert sur un réseau
+  // lent se referme tout seul avant d'avoir montré le médecin.
+  const dirLoaded = state.doctorsLoaded;
+  useEffect(() => { if (dirLoaded && !doc) go('search'); }, [dirLoaded, !doc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Motif list = exactly the services this doctor offers (falls back to the
   // generic list only if the doctor hasn't defined any).
@@ -205,6 +212,17 @@ export default function BookingInfo() {
     marginBottom: 6,
     display: 'block',
   };
+
+  // Tous les hooks ont été appelés : on peut sortir sans risque.
+  if (!doc) return (
+    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, color: MUTED, fontSize: 14 }}>
+        <span style={{ width: 26, height: 26, borderRadius: '50%', border: '2.5px solid #DCE9E2', borderTopColor: PRIMARY, animation: 'tbSpin .8s linear infinite' }} />
+        {tr('Chargement de la fiche…', 'Loading the profile…', 'جاري تحميل البطاقة…')}
+      </div>
+      <style>{'@keyframes tbSpin{to{transform:rotate(360deg)}}'}</style>
+    </div>
+  );
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>

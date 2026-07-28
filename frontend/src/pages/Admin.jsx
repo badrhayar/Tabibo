@@ -105,7 +105,19 @@ export default function Admin() {
   reviewList.forEach((d) => { if (d.user?.id) docByUser[d.user.id] = d; });
 
   const refreshDetail = () => loadReview();
-  const blockToggle = async (doc) => { try { await adminSetBlocked(doc.id, !doc.blocked); loadReview(); } catch (e) { setState({ toast: e?.message || 'Erreur', toastShow: true }); } };
+  // Bloquer un médecin coupe l'accès à tout son cabinet et le retire de
+  // l'annuaire public : au même titre que l'arrêt d'abonnement, cela se
+  // confirme, et le résultat s'annonce.
+  const blockToggle = async (doc) => {
+    const who = doc.user?.full_name || 'ce médecin';
+    const next = !doc.blocked;
+    if (next && !window.confirm(`Bloquer ${who} ? Son espace sera inaccessible et sa fiche retirée de l'annuaire public.`)) return;
+    try {
+      await adminSetBlocked(doc.id, next);
+      loadReview();
+      setState({ toast: next ? `${who} est bloqué.` : `${who} a de nouveau accès à son cabinet.`, toastShow: true });
+    } catch (e) { setState({ toast: e?.message || 'Erreur', toastShow: true }); }
+  };
   const setSub = async (doc, status) => { try { await adminSetSubscription(doc.id, status); loadReview(); setState({ toast: status === 'active' ? 'Abonnement réactivé ✓' : 'Marqué comme expiré', toastShow: true }); } catch (e) { setState({ toast: e?.message || 'Erreur', toastShow: true }); } };
   // Confirm the transfer was received + extend the subscription one month (manual renewal).
   const renewSub = async (doc) => { try { await adminRenewSubscription(doc.id); loadReview(); setState({ toast: `Abonnement renouvelé (+1 mois) pour ${doc.user?.full_name || 'le médecin'} ✓`, toastShow: true }); } catch (e) { setState({ toast: e?.message || 'Erreur', toastShow: true }); } };

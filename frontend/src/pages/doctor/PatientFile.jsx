@@ -680,10 +680,15 @@ export default function PatientFile({ state, setState, go }) {
         const row = await createConsultationNote(doctorId, { patientKey: pkey, appointmentId: apptId, data });
         setNotes((l) => [row, ...l]);
       }
+      // La consultation elle-même est enregistrée. Les deux écritures qui
+      // suivent sont secondaires — mais si elles échouent, le cabinet doit le
+      // savoir : sinon le brouillon ressort ou le rendez-vous reste « confirmé »
+      // au prochain chargement, sans que personne ne comprenne pourquoi.
+      const partiel = [];
       // 2) clear the draft from the dossier record
       const cleared = { ...mh, _draft: null };
       setMh(cleared);
-      try { await persistMh(cleared); } catch (_) { /* non-blocking */ }
+      try { await persistMh(cleared); } catch (_) { partiel.push('le brouillon n’a pas pu être effacé'); }
       // 3) mark the linked appointment completed
       const apptId = state?.pfileApptId;
       if (apptId) {
@@ -691,13 +696,21 @@ export default function PatientFile({ state, setState, go }) {
           manualAppts: (state.manualAppts || []).map((a) => a.id === apptId ? { ...a, status: 'completed', inConsultAt: null } : a),
           myAppointments: (state.myAppointments || []).map((a) => a.id === apptId ? { ...a, status: 'completed', inConsultAt: null } : a),
         });
-        if (!isLocalId(apptId)) { try { await updateAppointmentStatus(apptId, 'completed'); } catch (_) {} }
+        if (!isLocalId(apptId)) {
+          try { await updateAppointmentStatus(apptId, 'completed'); }
+          catch (_) { partiel.push('le rendez-vous n’a pas pu être marqué terminé'); }
+        }
       }
       // 4) reset the live consultation
       setStartedAt(null); setElapsed(0);
       setObs({ modele: '', motif: '', interrogatoire: '', examen: '', conclusion: '', oral: '', rx: [] });
       setSection('histo');
-      setState({ toast: 'Consultation enregistrée dans l\'historique ✓', toastShow: true });
+      setState({
+        toast: partiel.length
+          ? 'Consultation enregistrée — mais ' + partiel.join(' et ') + '.'
+          : 'Consultation enregistrée dans l\'historique ✓',
+        toastShow: true,
+      });
     } catch (e) { setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true }); }
     finally { setObsSaving(false); }
   };

@@ -64,10 +64,16 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
   // doctor's real takt on the FIRST frame — no flash of the default 20-min
   // slots before the async fetch resolves. Source order: the doctor record
   // already in global state → a cached value → the default.
+  // Le cache est nominatif : sur un poste partagé, la durée de créneau d'un
+  // confrère ne doit jamais s'afficher — ni être réenregistrée — sous le
+  // compte d'un autre.
+  const slotCacheKey = `tabibo_slot_min_${state?.appUser?.id || state?.myDoctor?.id || ''}`;
   const [slotDuration, setSlotDuration] = useState(() => {
     const fromState = state?.myDoctor?.slot_minutes;
     if (SLOT_DURATIONS.includes(fromState)) return fromState;
-    try { const c = Number(localStorage.getItem('tabibo_slot_min')); if (SLOT_DURATIONS.includes(c)) return c; } catch { /* private mode */ }
+    const uid = state?.appUser?.id || state?.myDoctor?.id;
+    if (!uid) return 20;
+    try { const c = Number(localStorage.getItem(`tabibo_slot_min_${uid}`)); if (SLOT_DURATIONS.includes(c)) return c; } catch { /* private mode */ }
     return 20;
   });
   const [prayerTimes, setPrayerTimes] = useState(PRAYER_FALLBACK);
@@ -130,7 +136,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
         if (Array.isArray(doc.prayer_ids) && doc.prayer_ids.length) setPrayerSet(new Set(doc.prayer_ids));
         if (SLOT_DURATIONS.includes(doc.slot_minutes)) {
           setSlotDuration(doc.slot_minutes);
-          try { localStorage.setItem('tabibo_slot_min', String(doc.slot_minutes)); } catch { /* private mode */ }
+          try { localStorage.setItem(slotCacheKey, String(doc.slot_minutes)); } catch { /* private mode */ }
         }
         // working hours
         const rows = await fetchAvailability(doc.id);
@@ -258,7 +264,14 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
   const handleDeleteOff = async (row) => {
     setTimeOff((l) => l.filter((r) => r.id !== row.id));
     if (doctorId && !String(row.id).startsWith('local_')) {
-      try { await deleteTimeOff(row.id); } catch (_) { /* refetch on next visit */ }
+      // Une absence effacée à l'écran mais toujours en base, c'est un cabinet
+      // qui se croit ouvert pendant que les patients le voient fermé : on
+      // rétablit la ligne et on l'annonce.
+      try { await deleteTimeOff(row.id); }
+      catch (_) {
+        setTimeOff((l) => (l.some((r) => r.id === row.id) ? l : [...l, row]));
+        setState({ toast: 'Absence non supprimée — vérifiez la connexion puis réessayez.', toastShow: true });
+      }
     }
   };
 
@@ -598,7 +611,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
             {SLOT_DURATIONS.map((d) => {
               const active = slotDuration === d;
               return (
-                <button key={d} onClick={() => { setSlotDuration(d); try { localStorage.setItem('tabibo_slot_min', String(d)); } catch { /* private mode */ } }} style={{ padding: '6px 15px', borderRadius: 20, minHeight: 32, border: `1px solid ${active ? '#0F6E56' : BORDER}`, background: active ? '#0F6E56' : '#fff', color: active ? '#fff' : MUTED, fontWeight: 600, fontSize: 12.5, cursor: 'pointer' }}>{d} min</button>
+                <button key={d} onClick={() => { setSlotDuration(d); try { localStorage.setItem(slotCacheKey, String(d)); } catch { /* private mode */ } }} style={{ padding: '6px 15px', borderRadius: 20, minHeight: 32, border: `1px solid ${active ? '#0F6E56' : BORDER}`, background: active ? '#0F6E56' : '#fff', color: active ? '#fff' : MUTED, fontWeight: 600, fontSize: 12.5, cursor: 'pointer' }}>{d} min</button>
               );
             })}
           </div>

@@ -145,7 +145,7 @@ export default function Confirm() {
           </div>
         </div>
 
-        {/* SMS notice badge */}
+        {/* Bandeau de confirmation — email, ou WhatsApp pour une réservation invité */}
         <div style={{
           background: '#E8F7F1',
           border: '1px solid #A8DFC7',

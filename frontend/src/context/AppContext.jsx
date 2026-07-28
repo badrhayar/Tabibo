@@ -146,6 +146,11 @@ const initialState = {
   now: Date.now(),
   patients: DEMO_PATIENTS,
   doctors: [],
+  // Faux tant que l'annuaire n'a pas répondu. Sans ce drapeau, un annuaire
+  // encore vide est confondu avec un annuaire vide tout court — et les écrans
+  // qui dépendent d'un médecin renvoient le patient ailleurs avant l'arrivée
+  // des données (un lien partagé ouvert en 3G, typiquement).
+  doctorsLoaded: false,
 };
 
 function reducer(state, patch) {
@@ -194,12 +199,12 @@ export function AppProvider({ children }) {
       if (isSupabaseConfigured) {
         try {
           const docs = await fetchDoctors();
-          if (active && docs.length) { dispatch({ doctors: docs }); return; }
+          if (active && docs.length) { dispatch({ doctors: docs, doctorsLoaded: true }); return; }
         } catch (e) {
           console.warn('[Tabibo] Supabase fetchDoctors failed — falling back to mock data.', e);
         }
       }
-      if (active) dispatch({ doctors: MOCK_DOCTORS });
+      if (active) dispatch({ doctors: MOCK_DOCTORS, doctorsLoaded: true });
     })();
     return () => { active = false; };
   }, []);
@@ -258,10 +263,16 @@ export function AppProvider({ children }) {
                 try {
                   const { loadPendingDocs, clearPendingDocs } = await import('../lib/pendingDocs');
                   const files = await loadPendingDocs();
+                  let allSent = true;
                   for (const [docType, file] of Object.entries(files)) {
-                    try { await uploadCredential({ file, userId: u.id, doctorId: md.id, docType }); } catch (_) {}
+                    try { await uploadCredential({ file, userId: u.id, doctorId: md.id, docType }); }
+                    catch (_) { allSent = false; }
                   }
-                  clearPendingDocs();
+                  // On ne jette les fichiers mis de côté que s'ils sont TOUS
+                  // arrivés. Sinon on les garde : l'écran « dossier en cours
+                  // d'examen » permet de les renvoyer, et un envoi raté ne doit
+                  // pas laisser le médecin bloqué avec un dossier incomplet.
+                  if (allSent) clearPendingDocs();
                 } catch (_) { /* the pending screen offers re-upload */ }
                 notifyVerification({ type: 'new_registration', ...pd.notify });
                 localStorage.removeItem('tabibo_pending_dreg');

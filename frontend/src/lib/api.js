@@ -1162,10 +1162,11 @@ export async function deleteAppointment(id) {
   return true;
 }
 
-// Invite a walk-in patient to register via SMS + email with the appointment
-// details. Real delivery happens in a Supabase Edge Function named
-// `invite-patient` (Twilio for SMS, an email provider) — set it up and deploy it.
-// Until then this resolves quietly so the UI flow never breaks.
+// Invite un patient reçu au cabinet à créer son espace, avec les détails du
+// rendez-vous. L'envoi réel est fait par la fonction Edge `invite-patient`,
+// par WhatsApp et par email — jamais par SMS (choix produit).
+// Tant qu'elle n'est pas déployée, l'appel échoue en silence côté réseau ; les
+// écrans, eux, préviennent le cabinet que l'invitation n'est pas partie.
 export async function inviteNewPatient({ name, phone, email, appt = null }) {
   try {
     const { data, error } = await supabase.functions.invoke('invite-patient', {
@@ -1205,7 +1206,7 @@ export async function guestBookingEnabled() {
   return _guestEnabled;
 }
 
-/** Step 1: request the one-time code (sent by WhatsApp/SMS to the phone). */
+/** Étape 1 : demander le code à usage unique (envoyé par WhatsApp). */
 export async function guestBookingStart({ doctorId, datetime, name, phone, reason }) {
   const { data, error } = await supabase.functions.invoke('guest-booking', {
     body: { action: 'start', doctorId, datetime, name, phone, reason },
@@ -1216,7 +1217,7 @@ export async function guestBookingStart({ doctorId, datetime, name, phone, reaso
     throw new Error(msg);
   }
   if (!data?.ok) throw new Error(data?.error || 'Envoi du code impossible.');
-  return data;   // { sent: 'whatsapp'|'sms', phone }
+  return data;   // { sent: 'whatsapp', phone }
 }
 
 /** Step 2: verify the code → the appointment is created. */
