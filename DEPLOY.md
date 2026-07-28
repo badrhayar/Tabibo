@@ -70,6 +70,27 @@ n'a rien validé, aucun poste n'est proposé nulle part — plutôt que de propo
 au secrétariat des postes que le patient ne verrait jamais. L'éditeur affiche
 alors une configuration type, clairement marquée « pas encore enregistrée ».
 
+### Le vocabulaire visuel des écrans
+
+Une section d'écran = **une couleur, un bandeau, des sous-cartes**. Ces trois
+formes sont définies une seule fois, dans `frontend/src/components/SectionKit.jsx` :
+
+| Export | Rôle |
+|---|---|
+| `SEC` | La palette : une couleur par section (`consult`, `admin`, `ordo`, `accueil`, `reglages`…). |
+| `Hero` | Le bandeau de tête : pastille colorée, titre, sous-titre, repères chiffrés, action à droite. |
+| `Panel` | La sous-carte titrée, avec sa pastille de couleur. |
+| `Metric` | Une donnée chiffrée, en grand, avec sa lecture (« Surpoids », « Limite haute »). |
+| `Field` | Une ligne « intitulé → valeur », cliquable quand il y a une action (téléphone, courriel). |
+
+Un écran n'invente pas ses propres cadres : il importe ces formes. C'est ce qui
+fait que le dossier patient, l'ordonnancier, les documents, l'accueil et les
+paramètres se lisent de la même façon.
+
+Ces couleurs ne colorent que des **pastilles, des fonds très clairs et des
+chiffres**. Elles ne touchent jamais un bouton : le vert d'action reste
+`BTN_GREEN`, et `npm run test:green` continue de le vérifier.
+
 ### La règle du vert
 
 Toute action verte de Tabibo porte `BTN_GREEN`, défini une seule fois dans

@@ -4,6 +4,7 @@ import { moTime, moDateKeyOf, moroccoNow } from '../../lib/time';
 import { useViewport } from '../../hooks/useViewport';
 import { initials as initialsOf, tint, greenBtn, greenBtnBusy } from '../../shared.jsx';
 import { monthlyReport, ymOf } from '../../lib/metrics';
+import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -15,6 +16,14 @@ const pad = (n) => String(n).padStart(2, '0');
 const BORDER_STRONG = '#E4EEE9';
 const CARD_SHADOW = '0 1px 3px rgba(13,43,30,0.05), 0 10px 26px -16px rgba(13,43,30,0.18)';
 const GRAD = 'linear-gradient(135deg, #1AAE74 0%, #12875A 55%, #0B6A46 100%)';
+
+const DI2 = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const KIT = {
+  sun:   <svg {...DI2}><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>,
+  day:   <svg {...DI2}><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>,
+  cal:   <svg {...DI2}><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>,
+  chat:  <svg {...DI2}><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-5A8 8 0 1 1 21 12z"/></svg>,
+};
 
 // Compact "time ago" for the inbox preview.
 const agoLabel = (iso) => {
@@ -161,35 +170,31 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
   return (
     <div style={{ padding: isMobile ? 4 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: 26, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: DARK, letterSpacing: '-0.7px' }}>Tableau de bord</h1>
-          <p style={{ margin: '5px 0 0', color: MUTED, fontSize: 14 }}>{dateLabel} — Bonjour, {docLabel}</p>
-        </div>
-        {/* "Nouveau rendez-vous" lives in the global top bar (DoctorApp) — no duplicate here. */}
-      </div>
+      {/* Le bandeau du jour — les chiffres qui comptent avant tout le reste.
+          « Nouveau rendez-vous » vit dans la barre du haut : pas de doublon ici. */}
+      <Hero tint={SEC.accueil} icon={KIT.sun} isMobile={isMobile}
+        title="Tableau de bord"
+        sub={`${dateLabel} — Bonjour, ${docLabel}`}
+        chips={[
+          { value: `${seenToday}/${todayAppts.length}`, label: 'patients vus' },
+          waiting.length ? { value: waiting.length, label: 'en salle', color: '#B45309' } : null,
+          inConsultation.length ? { value: inConsultation.length, label: 'en consultation', color: '#0E7C52' } : null,
+          { value: remainingToday, label: 'à venir', color: SEC.profil.c },
+          { value: `${collectedToday.toLocaleString('fr-FR')}`, label: 'MAD encaissés', color: '#0E7C52' },
+          expectedToday !== collectedToday ? { value: `${expectedToday.toLocaleString('fr-FR')}`, label: 'MAD attendus' } : null,
+        ]} />
 
       {/* Ma journée — waiting room + live end-of-day summary */}
       {todayAppts.length > 0 && (
         <div style={{ background: '#fff', border: `1px solid ${BORDER_STRONG}`, borderRadius: 18, boxShadow: CARD_SHADOW, marginBottom: isMobile ? 16 : 26, overflow: 'hidden' }}>
-          <div style={{ padding: '16px 22px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 800, fontSize: 15.5, color: DARK, letterSpacing: '-0.3px' }}>Ma journée</span>
-            <div style={{ display: 'flex', gap: isMobile ? 10 : 22, flexWrap: 'wrap', alignItems: 'center' }}>
-              {[
-                ['Vus', `${seenToday}/${todayAppts.length}`, DARK],
-                ['En salle', String(waiting.length), waiting.length ? '#9A6510' : MUTED],
-                ['En consultation', String(inConsultation.length), inConsultation.length ? '#0E7C52' : MUTED],
-                ['À venir', String(remainingToday), DARK],
-                ['Encaissé', `${collectedToday.toLocaleString('fr-FR')} MAD`, '#0E7C52'],
-                ['Attendu', `${expectedToday.toLocaleString('fr-FR')} MAD`, MUTED],
-              ].map(([label, val, color]) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
-                  <span className="sa-num" style={{ fontSize: 17, fontWeight: 800, color, letterSpacing: '-0.5px' }}>{val}</span>
-                  <span style={{ fontSize: 11.5, color: MUTED, fontWeight: 600 }}>{label}</span>
-                </span>
-              ))}
-            </div>
+          <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', background: `linear-gradient(90deg, ${SEC.accueil.bg} 0%, #FFFFFF 55%)`, borderBottom: '1px solid #F1F6F3' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: SEC.accueil.c, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 4px 10px -6px ${SEC.accueil.c}` }}>{KIT.day}</span>
+              <span style={{ fontWeight: 800, fontSize: 15.5, color: DARK, letterSpacing: '-0.3px' }}>Ma journée</span>
+            </span>
+            <span style={{ fontSize: 12.5, color: MUTED }}>
+              Salle d’attente et consultations en cours
+            </span>
           </div>
           {/* En consultation — who is with the doctor right now */}
           {inConsultation.length > 0 && (
@@ -303,10 +308,13 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
 
         {/* Agenda */}
         <div style={{ flex: 1.2, background: '#fff', border: `1px solid ${BORDER_STRONG}`, borderRadius: 18, overflow: 'hidden', boxShadow: CARD_SHADOW }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: `1px solid ${BORDER_STRONG}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '15px 20px', borderBottom: `1px solid ${BORDER_STRONG}`, background: `linear-gradient(90deg, ${SEC.profil.bg} 0%, #FFFFFF 55%)`, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+              <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: SEC.profil.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${SEC.profil.c}` }}>{KIT.cal}</span>
             <div>
               <div style={{ fontWeight: 800, fontSize: 15.5, color: DARK, letterSpacing: '-0.3px' }}>Agenda du jour</div>
               <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2 }}>{apptCount === 0 ? 'Aucun rendez-vous aujourd’hui' : `${apptCount} rendez-vous aujourd’hui`}</div>
+            </div>
             </div>
             <button onClick={() => go('dcal')} style={{ background: '#fff', color: PRIMARY, border: `1px solid ${BORDER_STRONG}`, borderRadius: 8, padding: '5px 12px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>
               Voir le calendrier
@@ -343,8 +351,9 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
 
         {/* Messages — real inbox preview (latest conversations) */}
         <div style={{ flex: 1, background: '#fff', border: `1px solid ${BORDER_STRONG}`, borderRadius: 18, overflow: 'hidden', boxShadow: CARD_SHADOW, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '18px 22px', borderBottom: `1px solid ${BORDER_STRONG}`, fontWeight: 800, fontSize: 15.5, color: DARK, letterSpacing: '-0.3px' }}>
-            Derniers messages
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 20px', borderBottom: `1px solid ${BORDER_STRONG}`, background: `linear-gradient(90deg, ${SEC.histo.bg} 0%, #FFFFFF 55%)` }}>
+            <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: SEC.histo.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${SEC.histo.c}` }}>{KIT.chat}</span>
+            <span style={{ fontWeight: 800, fontSize: 15.5, color: DARK, letterSpacing: '-0.3px' }}>Derniers messages</span>
           </div>
           <div style={{ flex: 1 }}>
             {inbox.length === 0 && (

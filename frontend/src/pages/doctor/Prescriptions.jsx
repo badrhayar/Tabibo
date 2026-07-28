@@ -4,6 +4,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { useApp } from '../../context/AppContext';
 import { docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
+import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 import { buildPrescriptionPDF, pdfOpen, pdfDownload, pdfFileName, loadBrandLogo } from '../../lib/pdf';
 import {
   createPrescription,
@@ -23,6 +24,16 @@ const DARK = '#15314A';
 const BG = '#F5F9F7';
 const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
+
+const T = SEC.ordo;                       // l'ordonnancier a sa couleur : le violet
+const I = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const IC = {
+  rx:    <svg {...I}><path d="M4 3h9a4 4 0 0 1 0 8H4zM4 11l9 10M13 13l7 8M20 13l-7 8"/></svg>,
+  clock: <svg {...I}><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>,
+  user:  <svg {...I}><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.8-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg>,
+  pill:  <svg {...I}><rect x="2.6" y="8.8" width="18.8" height="6.4" rx="3.2" transform="rotate(-38 12 12)"/><path d="M8.9 8.2l6.2 7.6"/></svg>,
+  note:  <svg {...I}><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>,
+};
 
 const emptyRow = () => ({ drug: '', dosage: '', duration: '', instructions: '' });
 const todayLabel = () => new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -313,27 +324,29 @@ export default function Prescriptions() {
 
   return (
     <div style={{ padding: isMobile ? 8 : 32, background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: DARK }}>Ordonnances</h1>
-        <p style={{ margin: '6px 0 0', color: MUTED, fontSize: 14 }}>Rédigez et générez des ordonnances électroniques pour vos patients</p>
-      </div>
+      {/* Bandeau de l'ordonnancier */}
+      <Hero tint={T} icon={IC.rx} isMobile={isMobile}
+        title="Ordonnances"
+        sub="Rédigez, générez et envoyez des ordonnances électroniques — chacune vérifiable par son code."
+        chips={[
+          { value: items.filter((x) => x.drug.trim()).length, label: 'dans le brouillon' },
+          { value: recent.length, label: 'ordonnances récentes', color: SEC.profil.c },
+          { value: recent.filter((p) => p.sent_at).length, label: 'envoyées', color: '#0E7C52' },
+          { value: templates.length, label: templates.length > 1 ? 'modèles' : 'modèle', color: SEC.factures.c },
+        ]} />
 
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 16 : 24, alignItems: 'stretch' }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 16 : 20, alignItems: 'stretch' }}>
 
         {/* LEFT — Editor */}
-        <div style={{ flex: 1.6 }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: `1px solid ${BORDER}`, padding: 24 }}>
-
-            {/* Top row: title + template controls */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: DARK }}>Nouvelle ordonnance</h2>
+        <div style={{ flex: 1.6, minWidth: 0 }}>
+          <Panel tint={T} icon={IC.pill} title="Nouvelle ordonnance" sub="Un médicament par bloc." pad={20}
+            right={
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {/* Charger un modèle */}
                 <div style={{ position: 'relative' }} ref={dropRef}>
                   <button
                     onClick={() => setShowTplDrop(v => !v)}
-                    style={{ background: '#fff', border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '8px 14px', fontSize: 13, color: DARK, cursor: 'pointer', fontWeight: 500 }}
+                    style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 10, padding: '8px 13px', fontSize: 12.5, color: DARK, cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
                   >
                     Charger un modèle ▾
                   </button>
@@ -363,12 +376,12 @@ export default function Prescriptions() {
                 {/* Enregistrer comme modèle */}
                 <button
                   onClick={saveAsTemplate}
-                  style={{ background: '#fff', border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '8px 14px', fontSize: 13, color: DARK, cursor: 'pointer', fontWeight: 500 }}
+                  style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 10, padding: '8px 13px', fontSize: 12.5, color: DARK, cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
                 >
                   Enregistrer comme modèle
                 </button>
               </div>
-            </div>
+            }>
 
             {/* Patient typeahead */}
             <div style={{ marginBottom: 20 }}>
@@ -410,16 +423,17 @@ export default function Prescriptions() {
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: DARK, marginBottom: 10 }}>Médicaments</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {items.map((it, i) => (
-                  <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 14, background: BG }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: PRIMARY }}>Médicament {i + 1}</span>
+                  <div key={i} style={{ border: `1px solid ${it.drug.trim() ? T.c + '33' : '#EDF2EF'}`, borderInlineStart: `3px solid ${it.drug.trim() ? T.c : '#E3EBE7'}`, borderRadius: 13, padding: 14, background: it.drug.trim() ? `linear-gradient(120deg, ${T.bg}, #fff 70%)` : '#FBFDFC', transition: 'background .15s, border-color .15s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 11 }}>
+                      <span style={{ width: 26, height: 26, borderRadius: 9, background: '#fff', color: T.c, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0, boxShadow: `0 4px 10px -6px ${T.c}` }}>{i + 1}</span>
+                      <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: DARK }}>{it.drug.trim() || `Médicament ${i + 1}`}</span>
                       <button
                         onClick={() => removeRow(i)}
                         disabled={items.length === 1}
                         title="Retirer"
-                        style={{ border: `1.5px solid ${BORDER}`, background: '#fff', borderRadius: 8, width: 28, height: 28, color: items.length === 1 ? BORDER : '#D14343', cursor: items.length === 1 ? 'default' : 'pointer', fontSize: 16, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        style={{ border: 'none', background: '#fff', borderRadius: 8, width: 28, height: 28, color: items.length === 1 ? '#CFD9D5' : '#C2466A', cursor: items.length === 1 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}
                       >
-                        ×
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
                       </button>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
@@ -433,9 +447,10 @@ export default function Prescriptions() {
               </div>
               <button
                 onClick={addRow}
-                style={{ marginTop: 12, background: '#fff', border: `1.5px dashed ${PRIMARY}`, color: PRIMARY, borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 7, background: T.bg, border: `1px dashed ${T.c}66`, color: T.c, borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
               >
-                + Ajouter un médicament
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                Ajouter un médicament
               </button>
             </div>
 
@@ -483,17 +498,14 @@ export default function Prescriptions() {
                 Téléchargez puis joignez le PDF dans WhatsApp.
               </div>
             )}
-          </div>
+          </Panel>
         </div>
 
         {/* RIGHT — Recent prescriptions */}
-        <div style={{ flex: 1 }}>
-          <div style={{ background: '#fff', borderRadius: 16, border: `1px solid ${BORDER}`, padding: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: DARK }}>Ordonnances récentes</h2>
-              <span style={{ fontSize: 13, color: MUTED }}>{recent.length}</span>
-            </div>
-            <div style={{ borderRadius: 12, border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Panel tint={SEC.histo} icon={IC.clock} title="Ordonnances récentes" sub="Rouvrez le PDF, envoyez-le au patient, ou retirez-le." pad={0}
+            right={<span style={{ fontSize: 12, fontWeight: 800, color: SEC.histo.c, background: SEC.histo.bg, borderRadius: 99, padding: '3px 10px' }}>{recent.length}</span>}>
+            <div style={{ overflow: 'hidden' }}>
               {recent.length === 0 && (
                 <div style={{ padding: '28px 16px', textAlign: 'center', color: MUTED, fontSize: 13 }}>
                   Aucune ordonnance pour le moment.
@@ -544,8 +556,8 @@ export default function Prescriptions() {
                 </div>
               ))}
             </div>
-            <Pager pager={recentPager} compact={isMobile} />
-          </div>
+            <div style={{ padding: '0 14px 12px' }}><Pager pager={recentPager} compact={isMobile} /></div>
+          </Panel>
         </div>
       </div>
     </div>

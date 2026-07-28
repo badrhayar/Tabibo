@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import PasswordInput from '../../components/PasswordInput';
 import { SPEC_INFO, SPEC_OPTS, CITY_OPTS, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
+import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 import LocationPicker from '../../components/LocationPicker';
 import { saveDoctorServices, updateDoctorFields, updateMyProfile, uploadAvatar, setMySlug } from '../../lib/api';
 import { signIn, updatePassword, authErrorMessage } from '../../lib/auth';
@@ -14,6 +15,19 @@ const BG = '#F5F9F7';
 const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
 
+
+const SI = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const SIC = {
+  gear:  <svg {...SI}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>,
+  user:  <svg {...SI}><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.8 3.8-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg>,
+  pin:   <svg {...SI}><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>,
+  quote: <svg {...SI}><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg>,
+  lock:  <svg {...SI}><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>,
+  tag:   <svg {...SI}><path d="M3 12.5V4.5a1.5 1.5 0 0 1 1.5-1.5h8L21 11.5 12.5 20z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>,
+  shield:<svg {...SI}><path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.4"/></svg>,
+  bell:  <svg {...SI}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>,
+  link:  <svg {...SI}><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>,
+};
 
 function Toggle({ checked, onChange }) {
   return (
@@ -45,29 +59,13 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-function Card({ title, children }) {
+// Une carte de réglages = une sous-carte du vocabulaire commun, avec sa
+// pastille de couleur. Les paramètres se lisent alors comme le dossier patient.
+function Card({ title, sub, icon, tint = SEC.reglages, children }) {
   return (
-    <div style={{
-      background: '#fff',
-      border: `1px solid ${BORDER}`,
-      borderRadius: 14,
-      overflow: 'hidden',
-    }}>
-      {title && (
-        <div style={{
-          padding: '16px 24px',
-          borderBottom: `1px solid ${BORDER}`,
-          fontWeight: 700,
-          fontSize: 15,
-          color: DARK,
-        }}>
-          {title}
-        </div>
-      )}
-      <div style={{ padding: 24 }}>
-        {children}
-      </div>
-    </div>
+    <Panel tint={tint} icon={icon || SIC.gear} title={title} sub={sub} pad={22} style={{ marginBottom: 0 }}>
+      {children}
+    </Panel>
   );
 }
 
@@ -342,23 +340,26 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
   return (
     <div style={{ padding: isMobile ? '10px' : '32px', background: BG, minHeight: '100vh' }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>
-          Paramètres
-        </h1>
-        <button onClick={saveAll} style={{ ...greenBtn, width: isMobile ? '100%' : undefined }}>
-          Sauvegarder les modifications
-        </button>
-      </div>
+      <Hero tint={SEC.reglages} icon={SIC.gear} isMobile={isMobile}
+        title="Mon profil et mes paramètres"
+        sub="Votre identité, votre cabinet, vos tarifs et vos préférences — tout ce que vos patients voient, et tout ce que Tabibo doit savoir."
+        chips={[
+          { value: `${[form.prenom, form.nom, form.inpe, form.cnom, form.specialite, form.ville, form.telephone, form.adresse, form.bio].filter((v) => String(v || '').trim()).length}/9`,
+            label: 'champs du profil', color: SEC.profil.c },
+          { value: services.length, label: services.length > 1 ? 'services' : 'service', color: SEC.factures.c },
+          { value: Object.values(insurances).filter(Boolean).length, label: 'assurances acceptées', color: SEC.bio.c },
+        ]}
+        right={
+          <button onClick={saveAll} style={{ ...greenBtn, height: 38, borderRadius: 11, padding: '0 18px', fontSize: 12.5, fontWeight: 700, width: isMobile ? '100%' : undefined }}>
+            Sauvegarder les modifications
+          </button>
+        } />
 
       {/* Vanity booking link */}
       {myDoctor?.id && (
-        <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 16 : 22, marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: DARK, margin: '0 0 4px' }}>Lien de réservation personnalisé</h2>
-          <p style={{ fontSize: 13, color: MUTED, margin: '0 0 14px' }}>
-            Le lien que vos patients utilisent pour réserver. Choisissez un identifiant simple à partager.
-          </p>
+        <Panel tint={SEC.consult} icon={SIC.link} title="Lien de réservation personnalisé"
+          sub="Le lien que vos patients utilisent pour réserver. Choisissez un identifiant simple à partager."
+          pad={isMobile ? 16 : 20}>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontSize: 13.5, color: MUTED, whiteSpace: 'nowrap', direction: 'ltr' }}>{bookingOrigin}/</span>
             <input
@@ -377,7 +378,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
               {slugError}
             </div>
           )}
-        </div>
+        </Panel>
       )}
 
       {/* 2-column layout */}
@@ -387,7 +388,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
         <div style={{ flex: 1, minWidth: 300, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* Personal Info Card */}
-          <Card title="Informations personnelles">
+          <Card title="Informations personnelles" sub="Votre identité professionnelle, telle que le patient la voit." icon={SIC.user} tint={SEC.profil}>
             {/* Avatar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
               <div style={{
@@ -441,7 +442,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
           {/* Clinic location — drives the doctor's pin on the patient map.
               Address ⇆ pin stay in sync, the city updates itself, and the
               built-in button saves location + address + city in one click. */}
-          <Card title="Localisation du cabinet">
+          <Card title="Localisation du cabinet" sub="L’adresse et le point sur la carte." icon={SIC.pin} tint={SEC.admin}>
             <LocationPicker
               city={form.ville}
               value={form.loc}
@@ -460,7 +461,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
 
           {/* Biography Card — shown on the doctor's public profile, in 3 languages.
               Patients see the version matching their app language (fallback: French). */}
-          <Card title="Présentation (biographie)">
+          <Card title="Présentation" sub="Le texte affiché sur votre page publique." icon={SIC.quote} tint={SEC.histo}>
             {(() => {
               const LANGS = [
                 { code: 'fr', label: 'Français', key: 'bio',   ph: 'Parcours, spécialités, approche de soin… (visible par les patients sur votre profil)' },
@@ -518,7 +519,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
           </Card>
 
           {/* Security Card */}
-          <Card title="Sécurité">
+          <Card title="Sécurité" sub="Mot de passe et accès au compte." icon={SIC.lock} tint={SEC.antec}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <InputField
                 label="Mot de passe actuel"
@@ -566,7 +567,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
         <div style={{ flex: 1, minWidth: 300, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* Services & Tarifs Card */}
-          <Card title="Services & Tarifs">
+          <Card title="Services et tarifs" sub="Ce que vous proposez, et à quel prix." icon={SIC.tag} tint={SEC.factures}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {services.map((svc, idx) => (
                 <div key={idx} style={{
@@ -653,7 +654,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
           </Card>
 
           {/* Assurances Card */}
-          <Card title="Assurances acceptées">
+          <Card title="Assurances acceptées" sub="Les couvertures que vous prenez en charge." icon={SIC.shield} tint={SEC.bio}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { key: 'cnss', label: 'CNSS' },
@@ -682,7 +683,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
           </Card>
 
           {/* Notifications Card */}
-          <Card title="Préférences de notification">
+          <Card title="Préférences de notification" sub="Ce dont Tabibo vous prévient." icon={SIC.bell} tint={SEC.ttt}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { key: 'nouveauxRdv', label: 'Nouveaux RDV' },

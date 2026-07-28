@@ -4,12 +4,21 @@ import { uploadDocument, listDocuments, downloadDocument } from '../../lib/api';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
+import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
 const BG = '#F5F9F7';
 const BORDER = '#E8EFEB';
 const MUTED = '#6B7B76';
+
+const T = SEC.docs;                        // l'échange de documents a sa couleur : le bleu
+const I = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const IC = {
+  file: <svg {...I}><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>,
+  up:   <svg {...I}><path d="M12 19V5M5 12l7-7 7 7"/></svg>,
+  swap: <svg {...I}><path d="M7 4L3 8l4 4"/><path d="M3 8h13a4 4 0 0 1 0 8h-1"/><path d="M17 20l4-4-4-4"/></svg>,
+};
 
 const DI = { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' };
 const ImgIcon = () => <svg {...DI}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>;
@@ -87,19 +96,21 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
 
   return (
     <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: DARK }}>Documents médicaux</h1>
-        <p style={{ margin: '6px 0 0', color: MUTED, fontSize: 14 }}>Échangez des documents médicaux avec vos patients</p>
-      </div>
+      <Hero tint={T} icon={IC.swap} isMobile={isMobile}
+        title="Documents médicaux"
+        sub="Envoyez un document à un patient, retrouvez tout ce qui a été échangé."
+        chips={[
+          { value: docs.length, label: docs.length > 1 ? 'documents échangés' : 'document échangé' },
+          { value: docs.filter((d) => d.direction === 'received' || d.from_patient).length, label: 'reçus', color: SEC.histo.c },
+          { value: patientOpts.length, label: 'patients', color: '#0E7C52' },
+        ]} />
 
       {/* 2-column layout */}
       <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 16 : 24, alignItems: 'stretch' }}>
 
         {/* LEFT COL — Send a document */}
-        <div style={{ flex: 1 }}>
-          <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, padding: 24 }}>
-            <h2 style={{ margin: '0 0 20px', fontSize: 16, fontWeight: 700, color: DARK }}>Envoyer un document</h2>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Panel tint={T} icon={IC.up} title="Envoyer un document" sub="Le patient le retrouve dans son compte." pad={20}>
 
             {/* Patient selector */}
             <div style={{ marginBottom: 18 }}>
@@ -295,16 +306,13 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
             >
               {busy ? 'Envoi…' : 'Téléverser le document'}
             </button>
-          </div>
+          </Panel>
         </div>
 
         {/* RIGHT COL — Documents exchanged */}
-        <div style={{ flex: 1.3 }}>
-          <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, padding: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: DARK }}>Documents échangés</h2>
-              <span style={{ fontSize: 13, color: MUTED }}>{filteredDocs.length} document{filteredDocs.length !== 1 ? 's' : ''}</span>
-            </div>
+        <div style={{ flex: 1.3, minWidth: 0 }}>
+          <Panel tint={SEC.histo} icon={IC.file} title="Documents échangés" pad={16}
+            right={<span style={{ fontSize: 12, fontWeight: 800, color: SEC.histo.c, background: SEC.histo.bg, borderRadius: 99, padding: '3px 10px', whiteSpace: 'nowrap' }}>{filteredDocs.length} document{filteredDocs.length !== 1 ? 's' : ''}</span>}>
 
             {/* Filter tabs */}
             <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid ${BORDER}` }}>
@@ -395,7 +403,7 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
               ))}
             </div>
             <Pager pager={docsPager} compact={isMobile} />
-          </div>
+          </Panel>
         </div>
       </div>
     </div>

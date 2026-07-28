@@ -8,6 +8,7 @@ import { moroccoNow } from '../../lib/time';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, initials, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import PatientDocs, { fetchPatientDocs, loadDocMeta, docCat } from './PatientDocs';
+import { SEC, secOf, Hero, Panel, Metric, Field } from '../../components/SectionKit.jsx';
 import { loadInvoices, saveInvoices, makeInvoice, advance } from '../../lib/billing';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -80,115 +81,15 @@ function CardHead({ icon, title, sub, right }) {
   );
 }
 
-// ── La palette du dossier ───────────────────────────────────────────────────
-// Chaque section porte sa propre couleur. Le dossier cesse d'être un empilement
-// de cadres gris : l'œil reconnaît la section avant même d'avoir lu son titre,
-// exactement comme les colonnes du navigateur ou les pastilles de l'agenda.
-const SEC = {
-  consult:  { c: '#0E7C52', bg: '#E7F6EE' },
-  profil:   { c: '#0891B2', bg: '#E3F5FA' },
-  admin:    { c: '#3B6FB0', bg: '#E8F1FC' },
-  histo:    { c: '#6B57A6', bg: '#EFEAFB' },
-  antec:    { c: '#C2466A', bg: '#FCE7EE' },
-  ttt:      { c: '#B45309', bg: '#FDF1E0' },
-  suivi:    { c: '#0E7C52', bg: '#E7F6EE' },
-  bio:      { c: '#12875A', bg: '#E3F8EE' },
-  docs:     { c: '#3B6FB0', bg: '#E8F1FC' },
-  prev:     { c: '#0891B2', bg: '#E3F5FA' },
-  vaccin:   { c: '#6B57A6', bg: '#EFEAFB' },
-  factures: { c: '#C28A1B', bg: '#FEF3DC' },
-};
-const secOf = (id) => SEC[id] || SEC.consult;
-
-/** Bandeau de section : la couleur, l'icône, le titre, et les repères clés. */
-function Hero({ tint, icon, title, sub, chips = [], right, isMobile }) {
-  return (
-    <div style={{
-      position: 'relative', overflow: 'hidden', borderRadius: 20, marginBottom: 16,
-      padding: isMobile ? '16px 16px' : '20px 22px',
-      background: `linear-gradient(132deg, ${tint.bg} 0%, #FFFFFF 68%)`,
-      border: `1px solid ${tint.bg}`, boxShadow: SHADOW,
-    }}>
-      <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -46, top: -70, width: 200, height: 200, borderRadius: '50%', background: tint.c, opacity: 0.07 }} />
-      <span aria-hidden style={{ position: 'absolute', insetInlineEnd: 60, bottom: -80, width: 130, height: 130, borderRadius: '50%', background: tint.c, opacity: 0.05 }} />
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-        <span style={{ width: 48, height: 48, borderRadius: 15, background: '#fff', color: tint.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 8px 18px -10px ${tint.c}` }}>
-          <span style={{ display: 'flex', transform: 'scale(1.35)' }}>{icon}</span>
-        </span>
-        <div style={{ flex: 1, minWidth: 170 }}>
-          <div style={{ fontSize: isMobile ? 17 : 19, fontWeight: 800, color: DARK, letterSpacing: '-0.45px' }}>{title}</div>
-          {sub && <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2, lineHeight: 1.5 }}>{sub}</div>}
-        </div>
-        {right}
-      </div>
-      {chips.length > 0 && (
-        <div style={{ position: 'relative', display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 15 }}>
-          {chips.filter(Boolean).map((ch, i) => (
-            <span key={i} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, background: '#fff', border: `1px solid ${tint.bg}`, borderRadius: 11, padding: '7px 13px', boxShadow: '0 1px 2px rgba(16,42,32,0.04)' }}>
-              <span style={{ fontSize: 15, fontWeight: 800, color: ch.color || tint.c, letterSpacing: '-0.3px', fontVariantNumeric: 'tabular-nums' }}>{ch.value}</span>
-              <span style={{ fontSize: 11.5, color: MUTED, fontWeight: 600 }}>{ch.label}</span>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Sous-carte titrée : un bloc de la section, avec sa pastille de couleur. */
-function Panel({ tint, icon, title, sub, right, children, pad = 16 }) {
-  return (
-    <div style={{ background: '#fff', border: '1px solid #EAF1ED', borderRadius: 16, boxShadow: SHADOW, marginBottom: 14, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 16px', borderBottom: '1px solid #F1F6F3', background: `linear-gradient(90deg, ${tint.bg} 0%, #FFFFFF 55%)`, flexWrap: 'wrap' }}>
-        <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: tint.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${tint.c}` }}>{icon}</span>
-        <div style={{ flex: 1, minWidth: 120 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: DARK, letterSpacing: '-0.2px' }}>{title}</div>
-          {sub && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 1 }}>{sub}</div>}
-        </div>
-        {right}
-      </div>
-      <div style={{ padding: pad }}>{children}</div>
-    </div>
-  );
-}
-
-/** Une donnée chiffrée, en grand. */
-function Metric({ tint, label, value, unit, note, noteColor }) {
-  const has = value != null && value !== '' && value !== '—';
-  return (
-    <div style={{ background: '#fff', border: '1px solid #EAF1ED', borderRadius: 15, padding: '13px 15px', boxShadow: SHADOW, minWidth: 0 }}>
-      <div style={{ fontSize: 11.5, fontWeight: 700, color: MUTED }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 5 }}>
-        <span style={{ fontSize: 23, fontWeight: 800, color: has ? DARK : '#C3D0CA', letterSpacing: '-0.7px', fontVariantNumeric: 'tabular-nums' }}>{has ? value : '—'}</span>
-        {has && unit && <span style={{ fontSize: 11.5, color: MUTED, fontWeight: 600 }}>{unit}</span>}
-      </div>
-      {note && <div style={{ marginTop: 7, display: 'inline-flex', background: (noteColor || tint.c) + '18', color: noteColor || tint.c, borderRadius: 8, padding: '3px 9px', fontSize: 11, fontWeight: 700 }}>{note}</div>}
-    </div>
-  );
-}
-
-/** Une ligne « intitulé → valeur », avec l'action qui va avec quand il y en a une. */
-function Field({ label, value, href, tint }) {
-  const has = value && value !== '—';
-  const body = has ? value : <span style={{ color: '#B7C2BD', fontWeight: 500 }}>Non renseigné</span>;
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid #F2F6F4', minWidth: 0 }}>
-      <span style={{ minWidth: 118, fontSize: 12, color: MUTED, flexShrink: 0 }}>{label}</span>
-      {has && href
-        ? <a href={href} style={{ fontSize: 13.5, fontWeight: 700, color: tint.c, textDecoration: 'none', wordBreak: 'break-word' }}>{value}</a>
-        : <span style={{ fontSize: 13.5, fontWeight: 700, color: DARK, wordBreak: 'break-word' }}>{body}</span>}
-    </div>
-  );
-}
-
 // ── Right action rail building blocks (module scope: their open/closed state
 //    must survive a re-render of the dossier). ─────────────────────────────
-function RailGroup({ title, children, defaultOpen = true }) {
+function RailGroup({ title, icon, tint = { c: '#0F6E56', bg: '#E9F5F0' }, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, marginBottom: 12, overflow: 'hidden', boxShadow: SHADOW }}>
       <button onClick={() => setOpen((o) => !o)}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '12px 14px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '11px 14px', border: 'none', background: `linear-gradient(90deg, ${tint.bg} 0%, #FFFFFF 62%)`, cursor: 'pointer', fontFamily: 'inherit' }}>
+        {icon && <span style={{ width: 28, height: 28, borderRadius: 9, background: '#fff', color: tint.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${tint.c}` }}>{icon}</span>}
         <span style={{ flex: 1, textAlign: 'start', fontSize: 13.5, fontWeight: 700, color: DARK, letterSpacing: '-0.2px' }}>{title}</span>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
           style={{ transform: open ? 'none' : 'rotate(-90deg)', transition: 'transform .15s' }}><path d="M6 9l6 6 6-6" /></svg>
@@ -1096,83 +997,103 @@ export default function PatientFile({ state, setState, go }) {
   };
 
   // ── Section contents ───────────────────────────────────────────────────────
-  const renderConsult = () => (
-    <>
-      {/* Assistant de consultation */}
-      <div style={card}>
-        <CardHead icon={IC.spark} title="Assistant de consultation" sub="Chronométrez la consultation et générez une synthèse."
+  const renderConsult = () => {
+    const t = SEC.consult;
+    const words = (h) => stripHtml(h).split(/\s+/).filter(Boolean).length;
+    const written = words(obs.interrogatoire) + words(obs.examen) + words(obs.conclusion);
+    return (
+      <>
+        <Hero tint={t} icon={IC.steth} isMobile={isMobile}
+          title="Consultation en cours"
+          sub={`${civ} ${patient.name}${linkedAppt ? ` · ${linkedAppt.service || 'Consultation'}` : ''}${obs.motif ? ` · ${obs.motif}` : ''}`}
+          chips={[
+            { value: written, label: written > 1 ? 'mots rédigés' : 'mot rédigé', color: SEC.profil.c },
+            { value: (obs.rx || []).length, label: (obs.rx || []).length > 1 ? 'médicaments' : 'médicament', color: SEC.ordo.c },
+            age != null ? { value: age, label: 'ans' } : null,
+            (mh.allergies || []).length ? { value: (mh.allergies || []).length, label: (mh.allergies || []).length > 1 ? 'allergies' : 'allergie', color: '#C2263F' } : null,
+          ]}
           right={
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-              {[['Paramètres', IC.gear], ['Dictée', IC.mic]].map(([t, ic]) => (
-                <span key={t} title={t} style={{ width: 28, height: 28, borderRadius: 8, border: '1px solid #E2EAE6', background: '#fff', color: MUTED, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ic}</span>
-              ))}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <button onClick={() => { if (!timerOn) beginConsult(); }} title={timerOn ? 'Consultation en cours' : 'Commencer la consultation'}
-                style={{ display: 'flex', alignItems: 'center', gap: 7, height: 28, border: `1px solid ${timerOn ? '#BFE0D4' : '#E2EAE6'}`, background: timerOn ? '#E9F5F0' : '#fff', color: timerOn ? TEAL : DARK, borderRadius: 15, padding: '0 12px', fontSize: 12, fontWeight: 600, cursor: timerOn ? 'default' : 'pointer', fontVariantNumeric: 'tabular-nums' }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: timerOn ? '#16A06A' : '#C9D6D1', animation: timerOn ? 'pfPulse 1.6s infinite' : 'none' }} />
+                style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, border: `1px solid ${timerOn ? '#BFE0D4' : '#E2EAE6'}`, background: '#fff', color: timerOn ? TEAL : DARK, borderRadius: 11, padding: '0 14px', fontSize: 12.5, fontWeight: 700, cursor: timerOn ? 'default' : 'pointer', fontVariantNumeric: 'tabular-nums', fontFamily: 'inherit' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: timerOn ? '#16A06A' : '#C9D6D1', animation: timerOn ? 'pfPulse 1.6s infinite' : 'none' }} />
                 {timerLbl}
               </button>
-              <button onClick={() => setIaOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, height: 28, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '0 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
+              <button onClick={() => setIaOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '0 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', boxShadow: `0 8px 18px -10px ${t.c}`, fontFamily: 'inherit' }}>
                 {IC.spark} Générer la synthèse
               </button>
             </div>
           } />
-        <label style={lbl}>Informations non mentionnées à l'oral</label>
-        <textarea value={obs.oral} onChange={(e) => setObs((o) => ({ ...o, oral: e.target.value }))} rows={2} placeholder="Contexte, éléments à ne pas oublier…" style={{ ...inp, resize: 'vertical' }} />
-      </div>
 
-      {/* Observation médicale */}
-      <div style={card}>
-        <CardHead icon={IC.steth} title="Observation médicale" sub="Interrogatoire, examen clinique et données de suivi." />
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
-          <div><label style={lbl}>Nom du modèle</label><input value={obs.modele} onChange={(e) => setObs((o) => ({ ...o, modele: e.target.value }))} style={inp} /></div>
-          <div><label style={lbl}>Motif</label><input value={obs.motif} onChange={(e) => setObs((o) => ({ ...o, motif: e.target.value }))} placeholder="Entrez le motif" style={inp} /></div>
-        </div>
-        <label style={lbl}>Interrogatoire</label>
-        <RichText value={obs.interrogatoire} onChange={(v) => setObs((o) => ({ ...o, interrogatoire: v }))} placeholder="Entrez les réponses de votre interrogatoire : symptômes, anamnèse…" />
-        <div style={{ height: 14 }} />
-        <label style={lbl}>Examen</label>
-        <RichText value={obs.examen} onChange={(v) => setObs((o) => ({ ...o, examen: v }))} placeholder="Entrez les résultats de l'examen" />
-        <div style={{ height: 14 }} />
-        <button onClick={() => setSuiviOpen((v) => !v)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: DARK, padding: 0, marginBottom: suiviOpen ? 10 : 0 }}>
-          <span style={{ transform: suiviOpen ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>▸</span> Données de suivi
-        </button>
-        {suiviOpen && renderSuiviFields()}
-      </div>
+        {/* Assistant de consultation */}
+        <Panel tint={SEC.profil} icon={IC.spark} title="Assistant de consultation" sub="Ce que vous voulez retenir sans l'avoir dicté."
+          right={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              {[['Paramètres', IC.gear], ['Dictée', IC.mic]].map(([lab, ic]) => (
+                <span key={lab} title={lab} style={{ width: 30, height: 30, borderRadius: 10, border: '1px solid #E2EAE6', background: '#fff', color: MUTED, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ic}</span>
+              ))}
+            </div>
+          }>
+          <label style={lbl}>Informations non mentionnées à l'oral</label>
+          <textarea value={obs.oral} onChange={(e) => setObs((o) => ({ ...o, oral: e.target.value }))} rows={2} placeholder="Contexte, éléments à ne pas oublier…" style={{ ...inp, resize: 'vertical' }} />
+        </Panel>
 
-      {/* Ordonnance de la consultation — placée AVANT la conclusion : les
-          médicaments prescrits lors de cette visite, joints au compte-rendu. */}
-      <div style={card}>
-        <CardHead icon={IC.rx} title="Ordonnance de la consultation" sub="Les médicaments prescrits lors de cette visite — joints au compte-rendu."
+        {/* Observation médicale */}
+        <Panel tint={t} icon={IC.steth} title="Observation médicale" sub="Interrogatoire, examen clinique et données de suivi.">
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div><label style={lbl}>Nom du modèle</label><input value={obs.modele} onChange={(e) => setObs((o) => ({ ...o, modele: e.target.value }))} style={inp} /></div>
+            <div><label style={lbl}>Motif</label><input value={obs.motif} onChange={(e) => setObs((o) => ({ ...o, motif: e.target.value }))} placeholder="Entrez le motif" style={inp} /></div>
+          </div>
+          <label style={lbl}>Interrogatoire</label>
+          <RichText value={obs.interrogatoire} onChange={(v) => setObs((o) => ({ ...o, interrogatoire: v }))} placeholder="Entrez les réponses de votre interrogatoire : symptômes, anamnèse…" />
+          <div style={{ height: 14 }} />
+          <label style={lbl}>Examen</label>
+          <RichText value={obs.examen} onChange={(v) => setObs((o) => ({ ...o, examen: v }))} placeholder="Entrez les résultats de l'examen" />
+          <div style={{ height: 14 }} />
+          <button onClick={() => setSuiviOpen((v) => !v)}
+            style={{ display: 'flex', alignItems: 'center', gap: 9, background: suiviOpen ? SEC.suivi.bg : '#F7FAF8', border: `1px solid ${suiviOpen ? SEC.suivi.c + '33' : '#EDF2EF'}`, borderRadius: 11, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, color: DARK, padding: '9px 13px', marginBottom: suiviOpen ? 12 : 0, fontFamily: 'inherit', width: '100%', textAlign: 'start' }}>
+            <span style={{ width: 24, height: 24, borderRadius: 8, background: '#fff', color: SEC.suivi.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{IC.chart}</span>
+            <span style={{ flex: 1 }}>Données de suivi</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"
+              style={{ transform: suiviOpen ? 'none' : 'rotate(-90deg)', transition: 'transform .15s' }}><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+          {suiviOpen && renderSuiviFields()}
+        </Panel>
+
+        {/* Ordonnance de la consultation — placée AVANT la conclusion : les
+            médicaments prescrits lors de cette visite, joints au compte-rendu. */}
+        <Panel tint={SEC.ordo} icon={IC.rx} title="Ordonnance de la consultation" sub="Les médicaments prescrits lors de cette visite — joints au compte-rendu."
           right={
             <button onClick={rxGo} title="Éditer une ordonnance imprimable complète"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: SEC.ordo.bg, border: 'none', color: SEC.ordo.c, borderRadius: 9, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
               {IC.print} Ordonnance imprimable
             </button>
-          } />
-        <MedList items={obs.rx || []} onChange={(rx) => setObs((o) => ({ ...o, rx }))} />
-        {(obs.rx || []).length === 0 && (
-          <div style={{ fontSize: 12, color: MUTED, marginTop: 10 }}>Ajoutez chaque médicament prescrit ; il apparaîtra dans l'historique du patient avec le compte-rendu.</div>
-        )}
-      </div>
+          }>
+          <MedList items={obs.rx || []} onChange={(rx) => setObs((o) => ({ ...o, rx }))} />
+          {(obs.rx || []).length === 0 && (
+            <div style={{ fontSize: 12, color: MUTED, marginTop: 10 }}>Ajoutez chaque médicament prescrit ; il apparaîtra dans l'historique du patient avec le compte-rendu.</div>
+          )}
+        </Panel>
 
-      {/* Conclusion — clôt la consultation. Enregistrer = brouillon ; Terminer = historique. */}
-      <div style={card}>
-        <CardHead icon={IC.file} title="Conclusion" sub="Votre synthèse de la consultation."
+        {/* Conclusion — clôt la consultation. Enregistrer = brouillon ; Terminer = historique. */}
+        <Panel tint={SEC.histo} icon={IC.file} title="Conclusion" sub="Votre synthèse de la consultation."
           right={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
+              {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0E7C52' }}>{savedMsg}</span>}
               <button onClick={saveDraft} disabled={obsSaving} title="Enregistrer un brouillon — vous pourrez y revenir plus tard"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 9, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: obsSaving ? 0.7 : 1, fontFamily: 'inherit' }}>
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', opacity: obsSaving ? 0.7 : 1, fontFamily: 'inherit' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
                 {obsSaving ? 'Enregistrement…' : 'Enregistrer'}
               </button>
             </div>
-          } />
-        <RichText value={obs.conclusion} onChange={(v) => setObs((o) => ({ ...o, conclusion: v }))} placeholder="Entrez votre conclusion" minHeight={72} />
-        <div style={{ fontSize: 11.5, color: MUTED, marginTop: 12 }}>« Enregistrer » sauvegarde un brouillon ; « Terminer la consultation » (barre du bas) l'ajoute à l'historique du patient.</div>
-      </div>
-    </>
-  );
+          }>
+          <RichText value={obs.conclusion} onChange={(v) => setObs((o) => ({ ...o, conclusion: v }))} placeholder="Entrez votre conclusion" minHeight={72} />
+          <div style={{ fontSize: 11.5, color: MUTED, marginTop: 12 }}>« Enregistrer » sauvegarde un brouillon ; « Terminer la consultation » (barre du bas) l'ajoute à l'historique du patient.</div>
+        </Panel>
+      </>
+    );
+  };
 
   // ── Right action rail — the dossier's cockpit, grouped like a real EMR:
   //    navigateur (poste de soins), documents à produire, facturation,
@@ -1185,13 +1106,13 @@ export default function PatientFile({ state, setState, go }) {
     return (
       <div style={{ position: isMobile ? 'static' : 'sticky', top: 12 }}>
         {/* Navigateur patient — where this patient physically is */}
-        <RailGroup title="Navigateur patient">
+        <RailGroup title="Navigateur patient" icon={IC.steth} tint={SEC.consult}>
           <RailItem icon={IC.steth} label="Changer de poste de soins" sub="Labo, échographie, salle de soins…" onClick={() => go('dnav')} />
           <RailItem icon={IC.clock} label="Suivre la visite" sub="Salle d’attente → sortie" onClick={() => go('dnav')} />
         </RailGroup>
 
         {/* Documents à produire */}
-        <RailGroup title="Documents">
+        <RailGroup title="Documents" icon={IC.file} tint={SEC.docs}>
           <RailItem icon={IC.rx} label="Ordonnance pharmacie" onClick={rxGo} tint="#EFEAFB" color="#6B57A6" />
           <RailItem icon={IC.bio} label="Ordonnance de biologie" onClick={bioGo} tint="#E8F1FC" color="#3B6FB0" />
           <RailItem icon={IC.mail} label="Courrier médical" onClick={courrierGo} tint="#FEF4DD" color="#9A6510" />
@@ -1199,7 +1120,7 @@ export default function PatientFile({ state, setState, go }) {
         </RailGroup>
 
         {/* Facturation */}
-        <RailGroup title="Facturation">
+        <RailGroup title="Facturation" icon={IC.receipt} tint={SEC.factures}>
           <RailItem icon={IC.receipt} label={linkedAppt?.paid ? 'Consultation encaissée ✓' : 'Encaisser la consultation'}
             sub={linkedAppt ? `${(linkedAppt.fee || 0).toLocaleString('fr-FR')} MAD` : 'Depuis un rendez-vous lié'}
             tint="#FEF3DC" color="#C28A1B"
@@ -1214,7 +1135,7 @@ export default function PatientFile({ state, setState, go }) {
         </RailGroup>
 
         {/* Prochains rendez-vous */}
-        <RailGroup title="Rendez-vous">
+        <RailGroup title="Rendez-vous" icon={IC.clock} tint={SEC.histo}>
           {nextAppts.length === 0 && (
             <div style={{ fontSize: 12, color: MUTED, padding: '4px 10px 8px' }}>Aucun rendez-vous à venir.</div>
           )}
