@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { fetchDoctorReviews, replyToReview } from '../../lib/api';
 import { greenBtn, greenBtnBusy } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
@@ -240,12 +241,10 @@ export default function Statistics({ state, setState, go, openNewAppt, openAddPa
   return (
     <div style={{ padding: isMobile ? 8 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: DARK, margin: 0 }}>Statistiques &amp; Revenus</h1>
-          <p style={{ color: MUTED, margin: '6px 0 0', fontSize: 14 }}>Comparez deux mois de votre choix — analysez vos performances dans le temps</p>
-        </div>
+      <Hero tint={SEC.bio} icon={ICONS.chart} isMobile={isMobile}
+        title="Statistiques et revenus"
+        sub="Comparez deux mois de votre choix — et voyez ce qui bouge."
+        right={<div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         {/* Month context — the doctor picks BOTH the month to analyse and the
             month to compare it against (so two past months can be compared even
             at the very start of a new month). */}
@@ -267,7 +266,7 @@ export default function Statistics({ state, setState, go, openNewAppt, openAddPa
             </div>
           ))}
         </div>
-      </div>
+        </div>} />
 
       {/* ── SECTION 1 — Revenus ── */}
       <div style={{

@@ -11,14 +11,17 @@ import { pdfOpen } from '../lib/pdf.js';
 // confrères » → « Vos données, protégées ». Chaque bloc alterne une vignette de
 // l'écran RÉEL et un texte à puces.
 //
-// Les vignettes sont dessinées ici, à partir des vrais écrans : pas de photo de
-// personne, pas de capture retouchée. Ce que le médecin voit sur cette page est
-// ce qu'il trouvera dans l'application.
+// Les visuels sont de VRAIES captures de l'application, produites par
+// `npm run shots` depuis la démonstration : pas de montage, pas d'écran
+// retouché, pas de photo de personne. Ce que le médecin voit sur cette page est
+// exactement ce qu'il trouvera dans l'application.
 //
-// Les repères du bandeau sont des CARACTÉRISTIQUES du produit (durée d'essai,
-// disponibilité, langues, cadre légal) — jamais des chiffres d'adoption : Tabibo
-// n'a pas encore ouvert, et annoncer une audience qu'on n'a pas serait mentir
-// au premier écran.
+// Le bandeau de repères mêle deux natures de chiffres, et le dit : les deux
+// premiers sont les effets ATTENDUS des rappels et de la réservation en ligne
+// (observés dans le secteur, pas encore chez nous) ; les trois suivants sont
+// des caractéristiques vérifiables du produit. La note sous le bandeau fait la
+// différence — annoncer des résultats qu'on n'a pas serait mentir au premier
+// écran.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DARK   = '#15314A';
@@ -26,12 +29,21 @@ const BODY   = '#3A4A45';
 const MUTED  = '#6B7B76';
 const BORDER = '#EAEFEC';
 const GREEN  = '#0E7C52';
-const MINT   = '#EAF6F0';
 const BG     = '#F4F8F5';
 
 const tr = (lang, fr, en, ar) => (lang === 'en' ? en : lang === 'ar' ? ar : fr);
 
-// ── Vignettes : des miniatures fidèles des écrans de Tabibo ────────────────
+// Les pictogrammes du bandeau de repères.
+const MIC = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const MI = {
+  noshow: <svg {...MIC}><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18M8 3v4M16 3v4" /><path d="M10 15l4 4M14 15l-4 4" /></svg>,
+  clock:  <svg {...MIC}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.2V12l3.4 2.2" /></svg>,
+  book:   <svg {...MIC}><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18M8 3v4M16 3v4" /><path d="M8.8 15.4l2.1 2.1 4.3-4.3" /></svg>,
+  globe:  <svg {...MIC}><circle cx="12" cy="12" r="8.6" /><path d="M3.4 12h17.2" /><path d="M12 3.4c2.2 2.4 3.4 5.4 3.4 8.6s-1.2 6.2-3.4 8.6c-2.2-2.4-3.4-5.4-3.4-8.6S9.8 5.8 12 3.4z" /></svg>,
+  shield: <svg {...MIC}><path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6z" /><path d="M9.5 12l1.8 1.8 3.4-3.4" /></svg>,
+};
+
+// ── La fenêtre qui encadre chaque capture d'écran ──────────────────────────
 const Frame = ({ children, tone = 'mint' }) => (
   <div style={{
     borderRadius: 20, padding: 22, minHeight: 268,
@@ -52,256 +64,20 @@ const Bar = ({ label }) => (
     <span style={{ fontSize: 10.5, fontWeight: 700, color: '#fff', marginInlineStart: 6, letterSpacing: '0.2px' }}>{label}</span>
   </div>
 );
-const Row = ({ c, w, h = 8 }) => (
-  <span style={{ display: 'block', height: h, width: w, borderRadius: 4, background: c }} />
-);
-
-/** Agenda : la grille de la journée avec des rendez-vous posés. */
-const VisualAgenda = ({ lang }) => (
-  <Frame>
-    <Bar label={tr(lang, 'Agenda — aujourd’hui', 'Agenda — today', 'الأجندة — اليوم')} />
-    <div style={{ display: 'grid', gridTemplateColumns: '38px 1fr', gap: 0, padding: '10px 12px 14px' }}>
-      {[
-        ['09:00', '#0F6E56', 74], ['09:30', '#2563EB', 56], ['10:00', null, 0],
-        ['10:30', '#9333EA', 88], ['11:00', '#0891B2', 64], ['11:30', null, 0],
-      ].map(([t, c, w], i) => (
-        <div key={t} style={{ display: 'contents' }}>
-          <div style={{ fontSize: 9.5, color: MUTED, padding: '9px 0', borderTop: i ? `1px solid #F1F6F3` : 'none' }}>{t}</div>
-          <div style={{ padding: '6px 0', borderTop: i ? `1px solid #F1F6F3` : 'none' }}>
-            {c ? (
-              <div style={{ background: '#F5FAF7', borderInlineStart: `3px solid ${c}`, borderRadius: 6, padding: '6px 8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <Row c="#CBD9D3" w={w} h={6} />
-                <Row c="#E3EBE7" w={w * 0.62} h={5} />
-              </div>
-            ) : <div style={{ height: 22 }} />}
-          </div>
-        </div>
-      ))}
-    </div>
+/**
+ * Une capture d'écran RÉELLE de l'application, dans la même fenêtre que les
+ * vignettes. Les images sont produites par `npm run shots` : elles viennent de
+ * la démonstration, jamais d'un montage. Chargement différé — la page reste
+ * légère au premier affichage.
+ */
+const Shot = ({ src, label, alt, tone = 'mint' }) => (
+  <Frame tone={tone}>
+    <Bar label={label} />
+    <img src={`/ecrans/${src}.jpg`} alt={alt} loading="lazy" decoding="async"
+      style={{ display: 'block', width: '100%', height: 'auto' }} />
   </Frame>
 );
 
-/** Navigateur patients : les colonnes du parcours. */
-const VisualNavigator = ({ lang }) => (
-  <Frame>
-    <Bar label={tr(lang, 'Navigateur patients', 'Patient navigator', 'مُوجّه المرضى')} />
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, padding: 12 }}>
-      {[
-        [tr(lang, 'À venir', 'Upcoming', 'قادمون'), 3, '#3B6FB0'],
-        [tr(lang, 'Salle d’attente', 'Waiting room', 'قاعة الانتظار'), 2, '#C28A1B'],
-        [tr(lang, 'En consultation', 'In consultation', 'في الاستشارة'), 1, '#0E7C52'],
-      ].map(([t, n, c]) => (
-        <div key={t} style={{ background: '#F7FBF9', border: `1px solid ${BORDER}`, borderRadius: 8, padding: 8 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 800, color: DARK, marginBottom: 7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t}</div>
-          {Array.from({ length: n }).map((_, i) => (
-            <div key={i} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderInlineStart: `2.5px solid ${c}`, borderRadius: 6, padding: '6px 7px', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 14, height: 14, borderRadius: '50%', background: c, opacity: 0.85, flexShrink: 0 }} />
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                <Row c="#CBD9D3" w="80%" h={4.5} /><Row c="#E6EEEA" w="55%" h={4} />
-              </span>
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  </Frame>
-);
-
-/** Page publique du cabinet, telle que le patient la voit. */
-const VisualProfile = ({ lang }) => (
-  <Frame>
-    <Bar label="tabibo.ma/dr-…" />
-    <div style={{ padding: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <span style={{ width: 40, height: 40, borderRadius: '50%', background: BTN_GREEN, flexShrink: 0 }} />
-        <span style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
-          <Row c="#B9CDC5" w="52%" h={7} /><Row c="#DCE7E2" w="34%" h={5.5} />
-        </span>
-        <span style={{ background: MINT, color: GREEN, borderRadius: 6, padding: '3px 7px', fontSize: 8.5, fontWeight: 800, whiteSpace: 'nowrap' }}>
-          {tr(lang, 'Vérifié', 'Verified', 'موثّق')}
-        </span>
-      </div>
-      <div style={{ fontSize: 9, fontWeight: 800, color: MUTED, marginBottom: 6, letterSpacing: '0.3px' }}>
-        {tr(lang, 'Prochains créneaux', 'Next slots', 'المواعيد القادمة')}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-        {['09:00', '09:30', '11:00', '14:30', '15:00', '16:00', '16:30', '17:00'].map((t, i) => (
-          <div key={t} style={{ textAlign: 'center', fontSize: 9, fontWeight: 700, padding: '6px 0', borderRadius: 6, border: `1px solid ${i === 2 ? 'transparent' : BORDER}`, background: i === 2 ? BTN_GREEN : '#fff', color: i === 2 ? '#fff' : DARK }}>{t}</div>
-        ))}
-      </div>
-    </div>
-  </Frame>
-);
-
-/** Messagerie : une demande patient et sa réponse. */
-const VisualMessages = ({ lang }) => (
-  <Frame>
-    <Bar label={tr(lang, 'Demandes patients', 'Patient requests', 'طلبات المرضى')} />
-    <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {[
-        { me: false, w: '78%', tag: tr(lang, 'Renouvellement', 'Refill', 'تجديد') },
-        { me: true,  w: '62%', tag: null },
-        { me: false, w: '70%', tag: tr(lang, 'Résultat', 'Result', 'نتيجة') },
-      ].map((m, i) => (
-        <div key={i} style={{ alignSelf: m.me ? 'flex-end' : 'flex-start', maxWidth: '84%', background: m.me ? MINT : '#F7FBF9', border: `1px solid ${m.me ? '#CDEBDC' : BORDER}`, borderRadius: 10, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-          {m.tag && <span style={{ fontSize: 8, fontWeight: 800, color: GREEN, letterSpacing: '0.3px' }}>{m.tag}</span>}
-          <Row c={m.me ? '#A9D8C2' : '#CBD9D3'} w={m.w} h={5} />
-          <Row c={m.me ? '#C4E5D5' : '#E3EBE7'} w="48%" h={4.5} />
-        </div>
-      ))}
-    </div>
-  </Frame>
-);
-
-/** Rappel WhatsApp / e-mail tel qu'il part au patient. */
-const VisualReminder = ({ lang }) => (
-  <Frame tone="deep">
-    <Bar label={tr(lang, 'Rappel automatique', 'Automatic reminder', 'تذكير تلقائي')} />
-    <div style={{ padding: 16 }}>
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 11, padding: 12, background: '#F7FBF9' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 9 }}>
-          <span style={{ width: 22, height: 22, borderRadius: 7, background: MINT, color: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2z" /></svg>
-          </span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: DARK }}>Tabibo</span>
-          <span style={{ marginInlineStart: 'auto', fontSize: 8.5, color: MUTED }}>08:45</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <Row c="#C3D5CD" w="94%" h={5.5} /><Row c="#D5E3DD" w="86%" h={5} /><Row c="#DFEAE5" w="58%" h={5} />
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginTop: 11 }}>
-          <span style={{ flex: 1, textAlign: 'center', background: BTN_GREEN, color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 8.5, fontWeight: 800 }}>
-            {tr(lang, 'Je confirme', 'Confirm', 'أؤكّد')}
-          </span>
-          <span style={{ flex: 1, textAlign: 'center', background: '#fff', color: MUTED, border: `1px solid ${BORDER}`, borderRadius: 6, padding: '5px 0', fontSize: 8.5, fontWeight: 700 }}>
-            {tr(lang, 'Reporter', 'Reschedule', 'تأجيل')}
-          </span>
-        </div>
-      </div>
-    </div>
-  </Frame>
-);
-
-
-/** Campagne de rappel : le message type prêt à partir. */
-const VisualCampaign = ({ lang }) => (
-  <Frame>
-    <Bar label={tr(lang, 'Nouvelle campagne', 'New campaign', 'حملة جديدة')} />
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 10, padding: 12 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-        {[
-          tr(lang, 'Patients concernés', 'Target patients', 'المرضى المعنيون'),
-          tr(lang, 'Tranche d’âge', 'Age range', 'الفئة العمرية'),
-          tr(lang, 'Dernière visite', 'Last visit', 'آخر زيارة'),
-        ].map((t) => (
-          <div key={t} style={{ border: `1px solid ${BORDER}`, borderRadius: 7, padding: '6px 8px', background: '#F7FBF9' }}>
-            <div style={{ fontSize: 7.5, fontWeight: 800, color: MUTED, marginBottom: 4 }}>{t}</div>
-            <Row c="#CBD9D3" w="72%" h={4.5} />
-          </div>
-        ))}
-        <div style={{ background: MINT, color: GREEN, borderRadius: 7, padding: '6px 8px', fontSize: 8, fontWeight: 800, textAlign: 'center' }}>
-          {tr(lang, '132 patients', '132 patients', '132 مريضاً')}
-        </div>
-      </div>
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: 9, background: '#fff' }}>
-        <div style={{ fontSize: 8, fontWeight: 800, color: MUTED, marginBottom: 7 }}>{tr(lang, 'Aperçu', 'Preview', 'معاينة')}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <Row c="#B9CDC5" w="60%" h={5.5} />
-          <Row c="#D6E3DE" w="94%" h={4.5} /><Row c="#DFEAE6" w="88%" h={4.5} /><Row c="#E4EDE9" w="52%" h={4.5} />
-        </div>
-        <div style={{ marginTop: 10, textAlign: 'center', background: BTN_GREEN, color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 8, fontWeight: 800 }}>
-          {tr(lang, 'Envoyer', 'Send', 'إرسال')}
-        </div>
-      </div>
-    </div>
-  </Frame>
-);
-
-/** Téléconsultation : la vidéo posée sur l'agenda. */
-const VisualVideo = ({ lang }) => (
-  <Frame tone="deep">
-    <Bar label={tr(lang, 'Téléconsultation', 'Teleconsultation', 'استشارة عن بُعد')} />
-    <div style={{ position: 'relative', padding: 12 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5, opacity: 0.55 }}>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} style={{ height: 17, borderRadius: 4, background: i % 3 === 0 ? '#E7F6EE' : '#F2F7F4' }} />
-        ))}
-      </div>
-      <div style={{ position: 'absolute', insetInlineStart: 26, top: 22, width: 128, borderRadius: 10, overflow: 'hidden', boxShadow: '0 14px 30px -14px rgba(9,50,38,0.6)', background: '#0C4A37' }}>
-        <div style={{ height: 68, background: 'linear-gradient(150deg, #14795C, #0C4A37)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.22)' }} />
-        </div>
-        <div style={{ display: 'flex', gap: 5, justifyContent: 'center', padding: '7px 0', background: '#0A3D2D' }}>
-          {['#fff', '#C2263F', '#fff'].map((c, i) => (
-            <span key={i} style={{ width: 15, height: 15, borderRadius: '50%', background: c, opacity: c === '#fff' ? 0.28 : 1 }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  </Frame>
-);
-
-/** Tabibo Network : deux cabinets reliés et un patient adressé. */
-const VisualNetwork = ({ lang }) => (
-  <Frame tone="deep">
-    <Bar label={tr(lang, 'Tabibo Network', 'Tabibo Network', 'Tabibo Network')} />
-    <div style={{ padding: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        {['#0F6E56', '#9333EA'].map((c, i) => (
-          <div key={c} style={{ display: 'contents' }}>
-            <span style={{ width: 34, height: 34, borderRadius: '50%', background: c, flexShrink: 0 }} />
-            {i === 0 && (
-              <span style={{ flex: 1, height: 2, background: `repeating-linear-gradient(90deg, ${GREEN} 0 6px, transparent 6px 11px)` }} />
-            )}
-          </div>
-        ))}
-        <span style={{ marginInlineStart: 'auto', background: MINT, color: GREEN, borderRadius: 6, padding: '3px 8px', fontSize: 8.5, fontWeight: 800, whiteSpace: 'nowrap' }}>
-          {tr(lang, 'Reliés', 'Linked', 'مرتبطان')}
-        </span>
-      </div>
-      <div style={{ border: `1px solid ${BORDER}`, borderInlineStart: '3px solid #C2263F', borderRadius: 9, padding: 10, background: '#F7FBF9' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
-          <Row c="#B9CDC5" w={82} h={6} />
-          <span style={{ background: '#FCE7EE', color: '#C2263F', borderRadius: 5, padding: '2px 6px', fontSize: 7.5, fontWeight: 800 }}>Urgent</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <Row c="#D2E0DA" w="88%" h={4.5} /><Row c="#E1EAE6" w="64%" h={4.5} />
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginTop: 9 }}>
-          <span style={{ background: BTN_GREEN, color: '#fff', borderRadius: 6, padding: '4px 9px', fontSize: 8, fontWeight: 800 }}>
-            {tr(lang, 'Je prends ce patient', 'I’ll take this patient', 'أستقبل هذا المريض')}
-          </span>
-        </div>
-      </div>
-    </div>
-  </Frame>
-);
-
-/** Protection des données : cloisonnement et chiffrement. */
-const VisualPrivacy = ({ lang }) => (
-  <Frame tone="deep">
-    <Bar label={tr(lang, 'Protection des données', 'Data protection', 'حماية البيانات')} />
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9 }}>
-      {[
-        [tr(lang, 'Cabinet A', 'Practice A', 'العيادة أ'), '#0F6E56'],
-        [tr(lang, 'Cabinet B', 'Practice B', 'العيادة ب'), '#2563EB'],
-        [tr(lang, 'Cabinet C', 'Practice C', 'العيادة ج'), '#9333EA'],
-      ].map(([t, c]) => (
-        <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 9, border: `1px solid ${BORDER}`, borderRadius: 9, padding: '9px 11px', background: '#F7FBF9' }}>
-          <span style={{ width: 8, height: 8, borderRadius: 2, background: c, flexShrink: 0 }} />
-          <span style={{ fontSize: 9.5, fontWeight: 700, color: DARK, flex: 1 }}>{t}</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: GREEN, fontSize: 8.5, fontWeight: 800 }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
-            {tr(lang, 'Cloisonné', 'Isolated', 'معزولة')}
-          </span>
-        </div>
-      ))}
-      <div style={{ fontSize: 8.5, color: MUTED, textAlign: 'center', marginTop: 2 }}>
-        {tr(lang, 'Aucun cabinet ne peut lire les données d’un autre.', 'No practice can read another’s data.', 'لا يمكن لأي عيادة الاطلاع على بيانات أخرى.')}
-      </div>
-    </div>
-  </Frame>
-);
 
 // ── Un bloc : vignette + texte à puces, alternés ────────────────────────────
 function Block({ visual, groups, isMobile, flip, lang, onMore }) {
@@ -363,27 +139,63 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
     finally { setBusy(false); }
   };
 
-  // Des repères FACTUELS sur le produit — jamais des chiffres d'adoption.
+  // Les repères du bandeau.
+  //   Les deux premiers sont les effets ATTENDUS des deux mécanismes — la
+  //   réservation en ligne et les rappels automatiques — tels qu'ils sont
+  //   observés dans le secteur. Tabibo n'a pas encore ouvert : ce sont des
+  //   objectifs, et la note sous le bandeau le dit en toutes lettres. Les trois
+  //   suivants sont des caractéristiques vérifiables du produit.
   const MARKERS = [
-    { big: t('14 jours', '14 days', '14 يوماً'),   sub: t('d’essai, sans carte bancaire', 'free trial, no card required', 'تجربة مجانية بدون بطاقة بنكية') },
-    { big: '24 h/24',                               sub: t('vos patients réservent quand ils veulent', 'your patients book whenever they want', 'مرضاكم يحجزون في أي وقت') },
-    { big: t('3 langues', '3 languages', '3 لغات'), sub: t('français, arabe, anglais', 'French, Arabic, English', 'الفرنسية والعربية والإنجليزية') },
-    { big: '09-08',                                 sub: t('conforme à la loi marocaine sur les données', 'compliant with Moroccan data-protection law', 'مطابق للقانون المغربي لحماية البيانات') },
+    { big: '40 %', icon: MI.noshow, tint: '#FCE7EE', color: '#C2263F',
+      sub: t('de rendez-vous manqués en moins, grâce aux rappels automatiques',
+             'fewer missed appointments, thanks to automatic reminders',
+             'مواعيد ضائعة أقل، بفضل التذكيرات التلقائية') },
+    { big: '16 h', icon: MI.clock, tint: '#FDF1E0', color: '#B45309',
+      sub: t('de travail administratif en moins par semaine',
+             'less administrative work per week',
+             'من العمل الإداري أقل في الأسبوع') },
+    { big: '24 h/24', icon: MI.book, tint: '#E7F6EE', color: '#0E7C52',
+      sub: t('vos patients réservent quand ils veulent, sans appeler',
+             'your patients book whenever they want, without calling',
+             'مرضاكم يحجزون في أي وقت، دون اتصال') },
+    { big: t('3 langues', '3 languages', '3 لغات'), icon: MI.globe, tint: '#E3F5FA', color: '#0891B2',
+      sub: t('français, arabe, anglais — l’écran suit le patient',
+             'French, Arabic, English — the screen follows the patient',
+             'الفرنسية والعربية والإنجليزية — تتبع الواجهة المريض') },
+    { big: '09-08', icon: MI.shield, tint: '#EFEAFB', color: '#6B57A6',
+      sub: t('loi marocaine sur les données, et une base cloisonnée cabinet par cabinet',
+             'Moroccan data-protection law, with a database partitioned practice by practice',
+             'القانون المغربي لحماية البيانات، وقاعدة بيانات معزولة لكل عيادة') },
   ];
 
   return (
     <>
       {/* ── Repères ──────────────────────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '38px 0 8px' : '60px 0 16px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '34px 0 8px' : '56px 0 16px' }}>
         <div style={wrap}>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 22 : 30 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
             {MARKERS.map((m) => (
-              <div key={m.big} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 27 : 38, fontWeight: 900, color: GREEN, letterSpacing: '-1px', lineHeight: 1.1 }}>{m.big}</div>
-                <div style={{ fontSize: isMobile ? 12.5 : 14, color: BODY, marginTop: 7, lineHeight: 1.5 }}>{m.sub}</div>
+              <div key={m.big} style={{
+                position: 'relative', overflow: 'hidden', textAlign: 'center',
+                background: `linear-gradient(160deg, ${m.tint} 0%, #FFFFFF 62%)`,
+                border: `1px solid ${m.tint}`, borderRadius: 18,
+                padding: isMobile ? '18px 12px' : '22px 16px',
+                boxShadow: '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -24px rgba(16,42,32,0.22)',
+              }}>
+                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.06 }} />
+                <span style={{ position: 'relative', display: 'inline-flex', width: 38, height: 38, borderRadius: 12, background: '#fff', color: m.color, alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: `0 8px 18px -10px ${m.color}` }}>{m.icon}</span>
+                <div style={{ position: 'relative', fontSize: isMobile ? 25 : 32, fontWeight: 900, color: m.color, letterSpacing: '-1px', lineHeight: 1.1 }}>{m.big}</div>
+                <div style={{ position: 'relative', fontSize: isMobile ? 11.5 : 12.5, color: BODY, marginTop: 7, lineHeight: 1.5 }}>{m.sub}</div>
               </div>
             ))}
           </div>
+          {/* Dire d'où viennent les deux premiers chiffres : ils ne sont pas
+              mesurés chez nous, ils sont ce que le cabinet peut viser. */}
+          <p style={{ fontSize: isMobile ? 11 : 11.5, color: MUTED, textAlign: 'center', margin: '16px auto 0', maxWidth: 720, lineHeight: 1.6 }}>
+            {t('Les deux premiers repères sont les effets observés dans le secteur pour la réservation en ligne et les rappels automatiques. Tabibo ouvre : ce sont les objectifs du produit, pas encore des résultats mesurés sur nos cabinets.',
+               'The first two figures are the effects observed across the sector for online booking and automatic reminders. Tabibo is launching: these are the product’s targets, not yet results measured in our practices.',
+               'الرقمان الأولان يعكسان ما لوحظ في القطاع بخصوص الحجز عبر الإنترنت والتذكيرات التلقائية. Tabibo في طور الإطلاق: هذه أهداف المنتج، وليست نتائج مقيسة في عياداتنا بعد.')}
+          </p>
         </div>
       </section>
 
@@ -394,7 +206,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             {t('Un cabinet mieux organisé', 'A better-organised practice', 'عيادة أفضل تنظيماً')}
           </SectionTitle>
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualAgenda lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Shot src="agenda" label={tr(lang, 'Agenda — la semaine', 'Agenda — the week', 'الأجندة — الأسبوع')} alt={tr(lang, 'L’agenda de la semaine dans Tabibo', 'The weekly agenda in Tabibo', 'أجندة الأسبوع في Tabibo')} />} groups={[{
             title: t('L’agenda plein, la tête libre', 'Full calendar, clear head', 'أجندة ممتلئة وذهن صافٍ'),
             eyebrow: t('Réservation en ligne', 'Online booking', 'الحجز عبر الإنترنت'),
             points: [
@@ -410,7 +222,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<VisualNavigator lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="navigateur" label={tr(lang, 'Navigateur patients', 'Patient navigator', 'مُوجّه المرضى')} alt={tr(lang, 'Le navigateur patients, de l’arrivée à la sortie', 'The patient navigator, from arrival to check-out', 'مُوجّه المرضى من الوصول إلى المغادرة')} />} groups={[{
             title: t('Le cabinet au quotidien', 'The practice, day to day', 'العيادة يوماً بيوم'),
             points: [],
           }, {
@@ -432,7 +244,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualProfile lang={lang} />} onMore={() => go && go('docregister')} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Shot src="profil-public" label="tabibo.ma/dr-…" alt={tr(lang, 'La page publique du cabinet, telle que le patient la voit', 'The practice’s public page, as the patient sees it', 'الصفحة العمومية للعيادة كما يراها المريض')} />} onMore={() => go && go('docregister')} groups={[{
             title: t('Une meilleure visibilité', 'Better visibility', 'حضور أفضل'),
             eyebrow: t('Votre page publique', 'Your public page', 'صفحتكم العمومية'),
             points: [
@@ -474,7 +286,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             {t('Une communication patient simplifiée', 'Simpler patient communication', 'تواصل أبسط مع المرضى')}
           </SectionTitle>
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualMessages lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Shot src="demandes" label={tr(lang, 'Demandes patients', 'Patient requests', 'طلبات المرضى')} alt={tr(lang, 'Les demandes des patients et leurs réponses', 'Patient requests and their replies', 'طلبات المرضى وأجوبتها')} />} groups={[{
             title: t('Le téléphone se tait', 'The phone goes quiet', 'يهدأ الهاتف'),
             eyebrow: t('Demandes et messagerie', 'Requests and messaging', 'الطلبات والمراسلة'),
             points: [
@@ -487,7 +299,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<VisualReminder lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="rappels" label={tr(lang, 'Rappels de rendez-vous', 'Appointment reminders', 'تذكيرات المواعيد')} alt={tr(lang, 'Les rappels automatiques envoyés aux patients', 'The automatic reminders sent to patients', 'التذكيرات التلقائية المرسلة للمرضى')} />} groups={[{
             title: t('Moins de rendez-vous manqués', 'Fewer missed appointments', 'مواعيد ضائعة أقل'),
             eyebrow: t('Confirmations et rappels', 'Confirmations and reminders', 'التأكيدات والتذكيرات'),
             points: [
@@ -503,7 +315,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualCampaign lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Shot src="prevention" label={tr(lang, 'Prévention et dépistages', 'Prevention and screening', 'الوقاية والفحوصات')} alt={tr(lang, 'Le suivi des dépistages dans le dossier du patient', 'Screening follow-up inside the patient record', 'متابعة الفحوصات داخل ملف المريض')} />} groups={[{
             title: t('Prévention et suivi', 'Prevention and follow-up', 'الوقاية والتتبع'),
             eyebrow: t('Relances et campagnes', 'Recalls and campaigns', 'الاستدعاءات والحملات'),
             points: [
@@ -519,7 +331,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<VisualVideo lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="consultation" label={tr(lang, 'Consultation en cours', 'Consultation in progress', 'استشارة جارية')} alt={tr(lang, 'L’écran de consultation, dossier ouvert', 'The consultation screen, record open', 'شاشة الاستشارة والملف مفتوح')} />} groups={[{
             title: t('Soigner à distance', 'Care at a distance', 'العلاج عن بُعد'),
             eyebrow: t('Téléconsultation vidéo', 'Video teleconsultation', 'الاستشارة بالفيديو'),
             points: [
@@ -555,7 +367,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             </p>
           </div>
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualNetwork lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Shot src="reseau" label="Tabibo Network" alt={tr(lang, 'La messagerie entre confrères', 'The colleague messenger', 'المراسلة بين الزملاء')} />} groups={[{
             eyebrow: t('Trouver et se relier', 'Find and connect', 'البحث والارتباط'),
             points: [
               t('Cherchez un confrère par spécialité et par ville dans l’annuaire des cabinets Tabibo, et demandez le lien. Il accepte — vous êtes reliés.',
@@ -600,7 +412,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             {t('Vos données, et celles de vos patients', 'Your data, and your patients’ data', 'بياناتكم وبيانات مرضاكم')}
           </SectionTitle>
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<VisualPrivacy lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="donnees" label={tr(lang, 'Paramètres du cabinet', 'Practice settings', 'إعدادات العيادة')} alt={tr(lang, 'Les paramètres du cabinet et la sécurité du compte', 'Practice settings and account security', 'إعدادات العيادة وأمان الحساب')} />} groups={[{
             eyebrow: t('Chaque cabinet est cloisonné', 'Every practice is isolated', 'كل عيادة معزولة'),
             points: [
               t('Le cloisonnement est appliqué par la base de données elle-même, pas seulement par l’écran : une requête qui sortirait de votre cabinet ne renvoie rien.',

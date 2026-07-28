@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { moroccoNow } from '../../lib/time';
 import {
@@ -190,12 +191,10 @@ export default function Billing({ state, setState, go }) {
   return (
     <div style={{ background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       {/* En-tête + onglets */}
-      <div style={{ background: '#fff', borderBottom: `1px solid ${BORDER}`, padding: isMobile ? '16px 14px 0' : '24px 32px 0' }}>
-        <h1 style={{ fontSize: isMobile ? 22 : 27, fontWeight: 800, color: DARK, margin: 0, letterSpacing: '-0.6px' }}>Facturation</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 5, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 13.5, color: MUTED }}>{cabinet}</span>
-          <span style={{ background: '#E9F5F0', color: TEAL, borderRadius: 20, padding: '3px 11px', fontSize: 12, fontWeight: 600 }}>N° de facturation : {billNo}</span>
-        </div>
+      <div style={{ background: '#fff', borderBottom: `1px solid ${BORDER}`, padding: isMobile ? '14px 14px 0' : '20px 32px 0' }}>
+        <Hero tint={SEC.factures} icon={ICONS.euro} isMobile={isMobile}
+          title="Facturation"
+          sub={`${cabinet} · N° de facturation ${billNo}`} />
         <div style={{ display: 'flex', gap: isMobile ? 14 : 22, marginTop: 16, overflowX: 'auto' }}>
           {TABS.map((t) => {
             const on = tab === t.key;

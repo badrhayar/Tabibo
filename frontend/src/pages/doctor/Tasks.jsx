@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { autoTasks, loadManualTasks, saveManualTasks, TASK_CATS, catOf, EMPTY_TASK } from '../../lib/tasks';
 import { moroccoNow } from '../../lib/time';
 import { DEMO_PATIENTS, initials as initialsOf, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
@@ -164,6 +165,7 @@ export default function Tasks({ state, setState, go }) {
   autoRows.forEach((r) => { const a = apptById(r.auto.apptId); if (a) r.patientName = a.patientName || ''; });
 
   const rows = [...autoRows, ...manual];
+  const openRows = rows.filter((t) => !t.done);   // ce que le bandeau compte
 
   // ── Filtering + sorting ────────────────────────────────────────────────────
   const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -228,9 +230,15 @@ export default function Tasks({ state, setState, go }) {
 .tasks tbody tr:hover{background:#F7FBF9}`}</style>
 
       {/* ── Page head ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 16 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: DARK, letterSpacing: '-0.4px' }}>Tâches</h1>
-        <div style={{ flex: 1 }} />
+      <Hero tint={SEC.ttt} icon={ICONS.check} isMobile={isMobile}
+        title="Tâches"
+        sub="Ce qu’il reste à faire au cabinet : appels à passer, rendez-vous à confirmer, patients à rappeler."
+        chips={[
+          { value: openRows.length, label: openRows.length > 1 ? 'tâches ouvertes' : 'tâche ouverte' },
+          { value: openRows.filter((t) => t.flagged).length, label: 'signalées', color: '#C2263F' },
+          { value: openRows.filter((t) => t.due && t.due <= todayISO).length, label: 'pour aujourd’hui', color: '#0E7C52' },
+        ]}
+        right={<div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
         <button onClick={() => { setFStatus('done'); setTab('all'); }}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'none', border: 'none', color: TEAL, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
           {IC.hist} Voir les tâches terminées
@@ -239,7 +247,7 @@ export default function Tasks({ state, setState, go }) {
           style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'none', border: 'none', color: TEAL, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
           {IC.help} Besoin d’aide
         </button>
-      </div>
+        </div>} />
 
       {/* ── Search + tabs ── */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { fetchConversations, fetchMessages, sendMessage, getOrCreateConversation, deleteConversation, subscribeToConversation, subscribeToInbox, uploadChatImage, isImageMessage } from '../../lib/api';
 import { greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
+import { SEC, ICONS } from '../../components/SectionKit.jsx';
 import ChatImage from '../../components/ChatImage';
 
 const PRIMARY = '#16A06A';
@@ -255,8 +256,11 @@ export default function Chat({ state, setState }) {
     <div style={{ display: 'flex', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
       {/* Left Panel */}
       <div style={{ width: isMobile ? '100%' : 300, flexShrink: 0, borderRight: `1px solid ${BORDER_STRONG}`, background: '#fff', display: (isMobile && activeId) ? 'none' : 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BORDER_STRONG}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: HEADER_BG }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: DARK }}>Messages</span>
+        <div style={{ padding: '14px 18px', borderBottom: `1px solid ${BORDER_STRONG}`, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', background: `linear-gradient(90deg, ${SEC.histo.bg} 0%, #FFFFFF 60%)` }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: SEC.histo.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${SEC.histo.c}` }}>{ICONS.chat}</span>
+            <span style={{ fontSize: 16, fontWeight: 800, color: DARK }}>Messages</span>
+          </span>
           {!isDemo && (
             <button onClick={() => setShowNew(true)} title="Nouvelle conversation" style={{ ...greenBtn }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>

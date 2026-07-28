@@ -17,6 +17,28 @@ const DARK = '#15314A';
 const MUTED = '#6B7B76';
 export const KIT_SHADOW = '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -22px rgba(16,42,32,0.20)';
 
+// Les pictogrammes des bandeaux. Un seul jeu, un seul trait, une seule taille —
+// pour que deux écrans n'aient jamais deux calendriers différents.
+const KI = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+export const ICONS = {
+  calendar: <svg {...KI}><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>,
+  clock:    <svg {...KI}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.2V12l3.4 2.2" /></svg>,
+  users:    <svg {...KI}><circle cx="9.5" cy="8" r="3.4" /><path d="M2.6 20c.7-3.6 3.5-5.5 6.9-5.5s6.2 1.9 6.9 5.5" /><circle cx="18" cy="9" r="2.4" /><path d="M17 14.2c2.4.2 4.1 1.8 4.5 4.3" /></svg>,
+  navigator:<svg {...KI}><circle cx="9.4" cy="7.6" r="3.4" /><path d="M2.8 19.5c.6-3.3 3.2-5 6.6-5 1.1 0 2.1.2 3 .5" /><circle cx="17.5" cy="17" r="4.6" /><path d="M15.5 17.2l1.4 1.4 2.6-2.6" /></svg>,
+  check:    <svg {...KI}><circle cx="12" cy="12" r="8.6" /><path d="M8.4 12.2l2.5 2.5 4.7-5" /></svg>,
+  chat:     <svg {...KI}><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-5A8 8 0 1 1 21 12z" /></svg>,
+  bell:     <svg {...KI}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>,
+  euro:     <svg {...KI}><path d="M17 6.5A6.5 6.5 0 1 0 17 17.5" /><path d="M4.5 10.5h8M4.5 13.5h8" /></svg>,
+  chart:    <svg {...KI}><path d="M4 4v16h16" /><path d="M8 16v-5M12 16V8M16 16v-3" /></svg>,
+  team:     <svg {...KI}><circle cx="12" cy="7.6" r="3.4" /><path d="M5.5 19.5c.6-3.3 3.2-5 6.5-5s5.9 1.7 6.5 5" /><circle cx="4.5" cy="9.6" r="2.4" /><circle cx="19.5" cy="9.6" r="2.4" /></svg>,
+  share:    <svg {...KI}><circle cx="18" cy="5.5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="18.5" r="2.6" /><path d="M8.3 10.8l7.4-4M8.3 13.2l7.4 4" /></svg>,
+  station:  <svg {...KI}><circle cx="12" cy="12" r="3.4" /><path d="M12 2.6v2.4M12 19v2.4M2.6 12H5M19 12h2.4M5.4 5.4l1.7 1.7M16.9 16.9l1.7 1.7M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7" /></svg>,
+  card:     <svg {...KI}><rect x="2.5" y="5" width="19" height="14" rx="2.5" /><path d="M2.5 9.5h19" /></svg>,
+  inbox:    <svg {...KI}><path d="M3 13h5l1.6 3h4.8L16 13h5" /><path d="M4.6 5.4L3 13v4.5A2.5 2.5 0 0 0 5.5 20h13a2.5 2.5 0 0 0 2.5-2.5V13l-1.6-7.6A2 2 0 0 0 17.5 4h-11a2 2 0 0 0-1.9 1.4z" /></svg>,
+  rx:       <svg {...KI}><path d="M4 3h9a4 4 0 0 1 0 8H4zM4 11l9 10M13 13l7 8M20 13l-7 8" /></svg>,
+  file:     <svg {...KI}><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /></svg>,
+};
+
 /** La palette : une entrée par section d'écran. */
 export const SEC = {
   // Dossier patient

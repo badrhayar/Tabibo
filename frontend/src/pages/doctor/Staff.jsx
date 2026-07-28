@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BTN_GREEN } from '../../shared.jsx';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useApp } from '../../context/AppContext';
 import { fetchStaff, inviteStaff, setStaffActive, removeStaff } from '../../lib/api';
 
@@ -249,11 +250,9 @@ export default function Staff() {
   return (
     <div style={{ padding: 32, background: BG, minHeight: '100vh' }}>
 
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>
-          Mon équipe
-        </h1>
-      </div>
+      <Hero tint={SEC.admin} icon={ICONS.team}
+        title="Mon équipe"
+        sub="Le secrétariat de votre cabinet : qui a accès, et à quoi." />
 
       <div style={{
         maxWidth: 720,

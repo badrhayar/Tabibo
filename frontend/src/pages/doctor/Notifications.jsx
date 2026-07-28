@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchReminderLog, fetchReminderSettings, saveReminderSettings } from '../../lib/api';
 import Pager, { usePager } from '../../components/Pager';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -138,11 +139,9 @@ export default function Notifications({ state, setState, go, openNewAppt, openAd
 
   return (
     <div style={{ padding: isMobile ? 8 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>Rappels & Notifications</h1>
-        <p style={{ color: MUTED, margin: '6px 0 0', fontSize: 14 }}>Messages automatiques envoyés à vos patients par WhatsApp et par email</p>
-      </div>
+      <Hero tint={SEC.ttt} icon={ICONS.bell} isMobile={isMobile}
+        title="Rappels et notifications"
+        sub="Les messages automatiques envoyés à vos patients, par WhatsApp et par courriel." />
 
       {/* Tab Bar */}
       <div style={{ display: 'flex', gap: 0, borderBottom: `2px solid ${BORDER}`, marginBottom: 28 }}>

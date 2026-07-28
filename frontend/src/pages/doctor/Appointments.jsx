@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { initials, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import Icon from '../../components/Icon';
 import { updateAppointmentStatus, updateAppointment, markAppointmentPaid, markArrived, markInConsultation, sendApptWhatsApp, notifyApptEmail, ringPatient, STATUS_FR, PAY_METHOD_FR } from '../../lib/api';
@@ -387,13 +388,15 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
 
   return (
     <div style={{ padding: isMobile ? '8px 6px' : '28px 32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
-      {/* Header — stacks on mobile so the title never wraps mid-word */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', gap: isMobile ? 12 : 0, marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: DARK }}>Rendez-vous</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 14, color: MUTED }}>Gérez vos consultations et plannings</p>
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+      <Hero tint={SEC.profil} icon={ICONS.calendar} isMobile={isMobile}
+          title="Rendez-vous"
+          sub="Tous vos rendez-vous, filtrables — confirmez, déplacez, encaissez."
+          chips={[
+            { value: rows.length, label: 'au total' },
+            { value: rows.filter((a) => a.status === 'En attente').length, label: 'à confirmer', color: '#B45309' },
+            { value: rows.filter((a) => a.status === 'Confirmé').length, label: 'confirmés', color: '#0E7C52' },
+          ]}
+          right={<div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button
             onClick={printDaySheet}
             title="Imprimer la feuille de journée (liste du jour)"
@@ -407,8 +410,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
             Imprimer la journée
           </button>
           {/* "Nouveau RDV" lives in the global top bar (DoctorApp) — no duplicate here. */}
-        </div>
-      </div>
+          </div>} />
 
       {/* Search + Filters */}
       <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER_STRONG}`, padding: '16px 20px', marginBottom: 20, boxShadow: CARD_SHADOW }}>

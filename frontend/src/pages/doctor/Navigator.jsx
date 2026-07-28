@@ -4,6 +4,7 @@ import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time
 import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
 import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations } from '../../lib/api';
 import { activeStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigateur patients — the front-desk board for the whole day.
@@ -268,14 +269,16 @@ export default function Navigator({ state, setState, go }) {
     <div className="nav" style={{ padding: isMobile ? 12 : 26, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <style>{`.nav input:focus,.nav select:focus,.nav textarea:focus{border-color:${TEAL} !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}`}</style>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 18 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: DARK, letterSpacing: '-0.4px' }}>Navigateur patients</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: MUTED }}>
-            Suivez chaque patient de son arrivée à sa sortie — et laissez une note au médecin.
-          </p>
-        </div>
-        <div style={{ flex: 1 }} />
+      <Hero tint={SEC.consult} icon={ICONS.navigator} isMobile={isMobile}
+        title="Navigateur patients"
+        sub="Suivez chaque patient de son arrivée à sa sortie — et laissez une note au médecin."
+        chips={[
+          { value: upcoming.length, label: 'à venir', color: SEC.profil.c },
+          { value: waiting.length, label: 'en salle d’attente', color: waiting.length ? '#B45309' : undefined },
+          { value: inConsult.length, label: 'à un poste', color: '#0E7C52' },
+          { value: stations.length, label: stations.length > 1 ? 'postes de soins' : 'poste de soins', color: SEC.histo.c },
+        ]}
+        right={<div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
         <button onClick={() => setWalkOpen(true)}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
           {IC.plus} Walk-in
@@ -288,7 +291,7 @@ export default function Navigator({ state, setState, go }) {
           style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#fff', color: DARK, border: `1px solid ${BORDER}`, borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           {IC.gear} Postes de soins
         </button>
-      </div>
+        </div>} />
 
       {/* Un tableau de bord se lit en rangée : toutes les colonnes s'arrêtent à
           la même hauteur, sinon le regard décroche. */}

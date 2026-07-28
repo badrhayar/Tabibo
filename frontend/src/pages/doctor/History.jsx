@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { updateAppointment, markAppointmentPaid, PAY_METHOD_FROM_FR } from '../../lib/api';
 import { greenBtn, greenBtnBusy } from '../../shared.jsx';
 import { buildReceiptPDF, pdfOpen, pdfFileName } from '../../lib/pdf';
@@ -287,17 +288,18 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         </div>
       )}
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK }}>Consultations</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: MUTED }}>Journal de tous vos rendez-vous — date, statut et paiement. Le détail médical d'un patient se trouve dans son dossier &gt; Historique.</p>
-        </div>
-        <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', minHeight: 30, border: `1px solid ${BORDER_STRONG}`, borderRadius: 8, background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+      <Hero tint={SEC.histo} icon={ICONS.clock} isMobile={isMobile}
+          title="Consultations"
+          sub="Le journal de tous vos rendez-vous — date, statut et paiement. Le détail médical d’un patient se trouve dans son dossier."
+          chips={[
+            { value: filtered.length, label: filtered.length > 1 ? 'consultations' : 'consultation' },
+            { value: filtered.filter((c) => c.status === 'Payé').length, label: 'encaissées', color: '#0E7C52' },
+            { value: `${filtered.filter((c) => c.status === 'Payé').reduce((s2, c) => s2 + (c.amount || 0), 0).toLocaleString('fr-FR')}`, label: 'MAD', color: SEC.factures.c },
+          ]}
+          right={<button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '6px 14px', minHeight: 30, border: `1px solid ${BORDER_STRONG}`, borderRadius: 8, background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
           Exporter CSV
-        </button>
-      </div>
+        </button>} />
 
       {/* Summary cards — computed from live data */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 22 }}>

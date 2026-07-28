@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BTN_GREEN } from '../../shared.jsx';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { STATION_KINDS, kindOf, loadStations, saveStations, defaultStations } from '../../lib/stations';
 import { saveDoctorStations } from '../../lib/api';
@@ -98,14 +99,10 @@ export default function Stations({ state, setState, go }) {
 
   return (
     <div style={{ padding: isMobile ? 14 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ marginBottom: 22 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK, letterSpacing: '-0.3px' }}>Postes de soins</h1>
-        <p style={{ margin: '4px 0 0', fontSize: 13.5, color: MUTED, maxWidth: 760, lineHeight: 1.6 }}>
-          Décrivez les postes de votre cabinet : l'accueil, chaque praticien, la salle de soins, le laboratoire, l'imagerie…
-          Ils deviennent les colonnes du navigateur patients, et le poste peut être choisi dès la prise de rendez-vous —
-          par vous comme par le patient. Ce choix reste facultatif.
-        </p>
-      </div>
+      <Hero tint={SEC.histo} icon={ICONS.station} isMobile={isMobile}
+        title="Postes de soins"
+        sub="L’accueil, chaque praticien, la salle de soins, le laboratoire… Ils deviennent les colonnes du navigateur, et le patient peut choisir son poste dès la réservation."
+        chips={[{ value: list.length, label: list.length > 1 ? 'postes définis' : 'poste défini' }]} />
 
       {/* `stretch` : les deux colonnes s'arrêtent à la même ligne, sinon la carte
           d'aide flotte plus haut ou plus bas que la liste des postes. */}

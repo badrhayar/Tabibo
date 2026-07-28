@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { SPEC_INFO, subscriptionState, renewalInfo, paymentRef, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow } from '../../lib/time.js';
 import { fetchDoctorPayments, declarePayment, doctorRequestActivation, notifyVerification } from '../../lib/api';
@@ -173,10 +174,10 @@ export default function Subscription({ state, setState, go }) {
 
   return (
     <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', margin: '0 0 22px' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>Abonnement</h1>
-        <span style={{ background: subPill.bg, color: subPill.c, borderRadius: 20, padding: '5px 13px', fontSize: 13, fontWeight: 700 }}>{subPill.t}</span>
-      </div>
+      <Hero tint={SEC.factures} icon={ICONS.card} isMobile={isMobile}
+        title="Abonnement"
+        sub="Votre formule, vos paiements et vos factures."
+        right={<span style={{ background: subPill.bg, color: subPill.c, borderRadius: 20, padding: '7px 15px', fontSize: 13, fontWeight: 800 }}>{subPill.t}</span>} />
 
       {/* Mes paiements — declare a transfer */}
       {pays.length > 0 && (

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { SPEC_OPTS, CITY_OPTS, SPEC_INFO, docDisplayName, initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
 import {
   fetchColleagues, fetchMyLinks, requestLink, respondLink, removeLink,
@@ -686,17 +687,15 @@ export default function Network({ state, setState, go }) {
 
   return (
     <div style={{ padding: isMobile ? 10 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-      {/* En-tête */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, flexWrap: 'wrap' }}>
-          <h1 style={{ margin: 0, fontSize: isMobile ? 22 : 26, fontWeight: 800, color: DARK, letterSpacing: '-0.3px' }}>Tabibo Network</h1>
-          <span style={{ background: '#E7F6EE', color: '#0E7C52', borderRadius: 99, padding: '4px 11px', fontSize: 11.5, fontWeight: 800 }}>Le réseau des confrères</span>
-        </div>
-        <p style={{ margin: '7px 0 0', fontSize: 13.5, color: MUTED, lineHeight: 1.6, maxWidth: 780 }}>
-          Reliez votre cabinet à ceux de vos confrères, parlez-leur directement, adressez-leur un patient en trois champs, et suivez ce qu’il devient.
-          <strong style={{ color: DARK }}> Aucune pièce du dossier ne circule d’elle-même</strong> : un adressage porte un nom, un téléphone et un motif — vous seul décidez d’envoyer un document.
-        </p>
-      </div>
+      <Hero tint={SEC.consult} icon={ICONS.team} isMobile={isMobile}
+        title="Tabibo Network"
+        sub="Reliez votre cabinet à ceux de vos confrères, parlez-leur directement, adressez-leur un patient en trois champs. Aucune pièce du dossier ne circule d’elle-même : vous seul décidez d’envoyer un document."
+        chips={[
+          { value: accepted.length, label: accepted.length > 1 ? 'confrères reliés' : 'confrère relié' },
+          { value: unreadTotal, label: 'messages non lus', color: unreadTotal ? '#C2263F' : undefined },
+          { value: newInRefs, label: 'adressages à traiter', color: newInRefs ? '#B45309' : undefined },
+        ]}
+        right={<span style={{ background: '#E7F6EE', color: '#0E7C52', borderRadius: 99, padding: '6px 13px', fontSize: 11.5, fontWeight: 800 }}>Le réseau des confrères</span>} />
 
       {/* Onglets */}
       <div style={{ display: 'flex', gap: 7, marginBottom: 18, flexWrap: 'wrap' }}>

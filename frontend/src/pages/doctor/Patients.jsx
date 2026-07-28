@@ -6,6 +6,7 @@ import { updatePatient, fetchPrescriptions } from '../../lib/api';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import Icon from '../../components/Icon';
 import Pager, { usePager } from '../../components/Pager';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { moroccoNow } from '../../lib/time.js';
 
 // Whole years between a birth date and today (for the age shown from the DOB).
@@ -203,37 +204,15 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
 
   return (
     <div style={{ padding: isMobile ? '8px 6px' : '28px 32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: DARK }}>Mes Patients</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 14, color: MUTED }}>Annuaire complet de vos patients</p>
-        </div>
-        <button onClick={openAddPatient} style={{ ...greenBtn }}>
-          <span style={{ fontSize: 14, lineHeight: 1 }}>+</span> Ajouter un patient
-        </button>
-      </div>
-
-      {/* Stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 16, marginBottom: 20 }}>
-        {STATS.map(stat => (
-          <div key={stat.label} style={{
-            background: '#fff', borderRadius: 12, border: `1px solid ${BORDER_STRONG}`,
-            borderTop: `3px solid ${PRIMARY}`,
-            padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14,
-            boxShadow: CARD_SHADOW,
-          }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 12, background: stat.color,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}><stat.Icon c={PRIMARY} /></div>
-            <div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: DARK, lineHeight: 1 }}>{stat.value}</div>
-              <div style={{ fontSize: 13, color: MUTED, marginTop: 3 }}>{stat.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Hero tint={SEC.profil} icon={ICONS.users} isMobile={isMobile}
+        title="Mes patients"
+        sub="L’annuaire complet de votre patientèle — fiche, rendez-vous et ordonnance à portée de clic."
+        chips={STATS.map((s2) => ({ value: s2.value, label: s2.label.replace(/^Total /, '').toLowerCase() }))}
+        right={
+          <button onClick={openAddPatient} style={{ ...greenBtn, height: 38, borderRadius: 11, padding: '0 16px', fontSize: 12.5, fontWeight: 700 }}>
+            <span style={{ fontSize: 14, lineHeight: 1 }}>+</span> Ajouter un patient
+          </button>
+        } />
 
       {/* Search + Filters */}
       <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER_STRONG}`, padding: '16px 20px', marginBottom: 20, boxShadow: CARD_SHADOW }}>

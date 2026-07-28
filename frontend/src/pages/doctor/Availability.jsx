@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import {
   fetchMyDoctor, fetchAvailability, saveAvailability,
   fetchBlockedSlots, saveBlockedSlotsForDate, fetchBookedSlots, slotsOverlappingBooked, saveDoctorPlanning,
@@ -335,13 +336,9 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
 
   return (
     <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 22, padding: isMobile ? '0 4px' : 0 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 26, fontWeight: 800, color: DARK }}>Disponibilités</h1>
-          <p style={{ margin: '4px 0 0', color: MUTED, fontSize: 13.5 }}>Horaires, créneaux, prière et limites de rendez-vous.</p>
-        </div>
-      </div>
+      <Hero tint={SEC.consult} icon={ICONS.clock} isMobile={isMobile}
+        title="Disponibilités"
+        sub="Horaires, durée des créneaux, pauses de prière et plafond de rendez-vous — vous gardez la main." />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 

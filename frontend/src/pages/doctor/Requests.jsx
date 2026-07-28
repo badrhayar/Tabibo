@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
+import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { moroccoNow } from '../../lib/time';
 import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
 
@@ -114,12 +115,14 @@ export default function Requests({ state, setState, go }) {
       <style>{`.reqs input:focus,.reqs select:focus,.reqs textarea:focus{border-color:${TEAL} !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}
 .reqs tbody tr:hover{background:#F7FBF9;cursor:pointer}`}</style>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: DARK, letterSpacing: '-0.4px' }}>Demandes des patients</h1>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: MUTED }}>Renouvellements, résultats, certificats — répondez en quelques secondes.</p>
-        </div>
-      </div>
+      <Hero tint={SEC.admin} icon={ICONS.inbox} isMobile={isMobile}
+        title="Demandes des patients"
+        sub="Renouvellements, résultats, certificats — répondez en quelques secondes."
+        chips={[
+          { value: list.filter((r) => !r.closed).length, label: 'en attente', color: '#B45309' },
+          { value: list.filter((r) => r.closed).length, label: 'traitées', color: '#0E7C52' },
+          { value: list.length, label: 'au total', color: SEC.histo.c },
+        ]} />
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>

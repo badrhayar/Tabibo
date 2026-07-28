@@ -21,7 +21,8 @@
     "test:green": "node scripts/green-audit.mjs",
     "test:layout": "node scripts/layout-audit.mjs",
     "test:stations": "node scripts/stations-sync-check.mjs",
-    "test:caps": "node scripts/caps-audit.mjs"
+    "test:caps": "node scripts/caps-audit.mjs",
+    "shots": "node scripts/marketing-shots.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

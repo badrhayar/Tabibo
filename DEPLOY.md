@@ -106,6 +106,26 @@ Les verts profonds des rails, en-têtes et bandeaux sont des **surfaces**, pas
 des actions — ils ne sont pas concernés. `npm run test:green` fait respecter la
 règle et échoue à la première entorse.
 
+### Les visuels de la page « pour les médecins »
+
+La page de présentation ne montre pas des dessins : elle montre l'application.
+Les images de `frontend/public/ecrans/` sont produites par
+
+```bash
+npm run shots
+```
+
+qui ouvre la démonstration, va sur chaque écran, masque le bandeau de
+démonstration et photographie la zone de contenu. **À relancer après toute
+refonte visuelle**, sinon la page de vente montre l'ancienne interface.
+
+Le bandeau de repères mêle deux natures de chiffres, et le dit sous le bandeau :
+« 40 % » et « 16 h » sont les effets observés **dans le secteur** pour la
+réservation en ligne et les rappels automatiques — des objectifs, pas des
+résultats mesurés sur nos cabinets. Les trois autres (24 h/24, 3 langues, 09-08)
+sont des caractéristiques vérifiables. Si un jour vos propres chiffres existent,
+remplacez les deux premiers **et retirez la note**.
+
 ### La règle des capitales
 
 Aucun libellé de Tabibo n'est écrit tout en capitales : un mot garde sa
