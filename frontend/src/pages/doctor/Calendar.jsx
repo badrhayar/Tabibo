@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { fetchTimeOff, addTimeOff, updateAppointment, sendApptWhatsApp, notifyApptEmail } from '../../lib/api';
 import { moroccoNow, moroccoToUTCISO } from '../../lib/time';
@@ -533,7 +534,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
                 title={busy ? 'Des rendez-vous ce jour' : 'Aucun rendez-vous'}
                 style={{ position: 'relative', height: 26, borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                   fontSize: 11.5, fontWeight: isSel || isToday ? 800 : 500,
-                  background: isSel ? TEAL : inWeek ? '#E9F5F0' : 'transparent',
+                  background: isSel ? BTN_GREEN : inWeek ? '#E9F5F0' : 'transparent',
                   color: isSel ? '#fff' : isToday ? TEAL : DARK, transition: 'background .12s' }}>
                 {d}
                 {busy && !isSel && <span style={{ position: 'absolute', bottom: 3, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: TEAL }} />}
@@ -566,7 +567,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
   const CheckRow = ({ label, checked, indeterminate, onChange, bold, dot }) => (
     <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', cursor: 'pointer', fontSize: 12.5, color: DARK, fontWeight: bold ? 700 : 500 }}>
       <input type="checkbox" checked={checked} ref={(el) => { if (el) el.indeterminate = !!indeterminate; }}
-        onChange={onChange} style={{ accentColor: TEAL, width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }} />
+        onChange={onChange} style={{ accentColor: BTN_GREEN_SOLID, width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }} />
       {dot && <span style={{ width: 9, height: 9, borderRadius: 3, background: dot.bg, border: `2px solid ${dot.color}`, flexShrink: 0 }} />}
       <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
     </label>
@@ -576,7 +577,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     <>
       <button onClick={openNewAppt}
         style={{ width: '100%', marginBottom: 12, padding: '12px 14px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-          background: 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)', color: '#fff', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+          background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
         + Nouveau rendez-vous
       </button>
 
@@ -665,7 +666,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
         {/* View tabs */}
         <div style={{ display: 'flex', background: '#fff', border: `1px solid ${GRID}`, borderRadius: 10, overflow: 'hidden' }}>
           {['Liste', 'Journée', 'Semaine'].map((v, i) => (
-            <button key={v} onClick={() => setView(v)} style={{ padding: '6px 14px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none', borderRight: i < 2 ? `1px solid ${GRID}` : 'none', background: view === v ? TEAL : 'transparent', color: view === v ? '#fff' : MUTED, transition: 'all .15s' }}>{v}</button>
+            <button key={v} onClick={() => setView(v)} style={{ padding: '6px 14px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none', borderRight: i < 2 ? `1px solid ${GRID}` : 'none', background: view === v ? BTN_GREEN : 'transparent', color: view === v ? '#fff' : MUTED, transition: 'all .15s' }}>{v}</button>
           ))}
         </div>
       </div>

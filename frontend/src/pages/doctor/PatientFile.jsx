@@ -6,7 +6,7 @@ import {
 } from '../../lib/api';
 import { moroccoNow } from '../../lib/time';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
-import { DEMO_PATIENTS, initials } from '../../shared.jsx';
+import { DEMO_PATIENTS, initials, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import PatientDocs, { fetchPatientDocs, loadDocMeta, docCat } from './PatientDocs';
 import { loadInvoices, saveInvoices, makeInvoice, advance } from '../../lib/billing';
 
@@ -335,7 +335,7 @@ function AntecedentBlock({ title, items, none, onChange, placeholder }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
         <span style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px' }}>{title}</span>
         <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: none ? TEAL : MUTED, fontWeight: 600, cursor: 'pointer' }}>
-          <input type="checkbox" checked={none} onChange={(e) => onChange({ none: e.target.checked })} style={{ accentColor: TEAL }} />
+          <input type="checkbox" checked={none} onChange={(e) => onChange({ none: e.target.checked })} style={{ accentColor: BTN_GREEN_SOLID }} />
           Pas d'antécédent
         </label>
       </div>
@@ -978,7 +978,7 @@ export default function PatientFile({ state, setState, go }) {
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: timerOn ? '#16A06A' : '#C9D6D1', animation: timerOn ? 'pfPulse 1.6s infinite' : 'none' }} />
                 {timerLbl}
               </button>
-              <button onClick={() => setIaOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, height: 28, background: TEAL, color: '#fff', border: 'none', borderRadius: 8, padding: '0 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
+              <button onClick={() => setIaOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, height: 28, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '0 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
                 {IC.spark} Générer la synthèse
               </button>
             </div>
@@ -1112,7 +1112,7 @@ export default function PatientFile({ state, setState, go }) {
         right={
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
-            <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>
+            <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>
           </div>
         } />
       <AntecedentBlock title="Antécédents médicaux" items={mh.medicaux} none={mh.noMedicaux} placeholder="Ex. Diabète de type 2"
@@ -1164,7 +1164,7 @@ export default function PatientFile({ state, setState, go }) {
   const renderTtt = () => (
     <div style={card}>
       <CardHead icon={IC.pill} title="Traitements en cours" sub="Traitements de fond et ponctuels du patient."
-        right={<button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>} />
+        right={<button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>} />
       <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
         <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 10 }}>Traitements de fond</div>
         <ItemList items={mh.tttFond} placeholder="Ex. METFORMINE 850 mg — 2/j"
@@ -1466,7 +1466,7 @@ export default function PatientFile({ state, setState, go }) {
           </div>
           <textarea value={mh.profilNote || ''} onChange={(e) => patchMh({ profilNote: e.target.value })} rows={3} placeholder="Ajoutez une note personnelle pour vous souvenir de ce patient (contexte, préférences, points d'attention…)" style={{ ...inp, resize: 'vertical' }} />
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-            <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 15px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer la note'}</button>
+            <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 15px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer la note'}</button>
           </div>
         </div>
       </div>
@@ -1570,7 +1570,7 @@ export default function PatientFile({ state, setState, go }) {
         <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', margin: '2px 0 12px' }}>
           {BIO_CATALOG.map((c) => (
             <button key={c.key} onClick={() => setBioTab(c.key)}
-              style={{ padding: '5px 13px', borderRadius: 18, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: `1px solid ${bioTab === c.key ? TEAL : '#DCE6E1'}`, background: bioTab === c.key ? TEAL : '#fff', color: bioTab === c.key ? '#fff' : MUTED, transition: 'all .12s', fontFamily: 'inherit' }}>
+              style={{ padding: '5px 13px', borderRadius: 18, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: `1px solid ${bioTab === c.key ? TEAL : '#DCE6E1'}`, background: bioTab === c.key ? BTN_GREEN : '#fff', color: bioTab === c.key ? '#fff' : MUTED, transition: 'all .12s', fontFamily: 'inherit' }}>
               {c.label}
             </button>
           ))}
@@ -1593,10 +1593,10 @@ export default function PatientFile({ state, setState, go }) {
     histo: renderHisto,
     antec: renderAntec,
     ttt: renderTtt,
-    suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.chart, sub: 'Taille, poids, IMC et pression artérielle.' }),
+    suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.chart, sub: 'Taille, poids, IMC et pression artérielle.' }),
     bio: renderBioTool,
     docs: () => <PatientDocs state={state} setState={setState} patient={patient} pkey={pkey} isMobile={isMobile} card={card} CardHead={CardHead} IC_FILE={IC.file} />,
-    prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.shield, sub: 'Dépistages, rappels et conseils de prévention.' }),
+    prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.shield, sub: 'Dépistages, rappels et conseils de prévention.' }),
     vaccin: () => renderSimple('Carnet de vaccination', <><ItemList items={mh.vaccins || []} placeholder="Ex. Tétanos — rappel 03/2024"
       onAdd={(v) => { const next = { ...mh, vaccins: [...(mh.vaccins || []), v] }; setMh(next); saveMh(next); }}
       onRemove={(i) => { const next = { ...mh, vaccins: (mh.vaccins || []).filter((_, k) => k !== i) }; setMh(next); saveMh(next); }} /></>, { icon: IC.vaccin, sub: 'Vaccins effectués et rappels à prévoir.' }),
@@ -1703,21 +1703,21 @@ export default function PatientFile({ state, setState, go }) {
         <div style={{ flex: 1 }} />
         {!timerOn ? (
           <button onClick={beginConsult}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 9, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)', fontFamily: 'inherit' }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)', fontFamily: 'inherit' }}>
             {IC.play} Commencer la consultation
           </button>
         ) : (
           <>
             <button onClick={cancelConsult}
               style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #D8E2DD', background: '#fff', color: DARK, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
-            <button onClick={finishConsult} disabled={obsSaving} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 1px 2px rgba(12,74,55,0.16)', opacity: obsSaving ? 0.7 : 1 }}>
+            <button onClick={finishConsult} disabled={obsSaving} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 1px 2px rgba(12,74,55,0.16)', opacity: obsSaving ? 0.7 : 1 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
               Terminer la consultation
             </button>
             <button onClick={() => { if (linkedAppt && !linkedAppt.paid) { setPayAmount(String(linkedAppt.fee || '')); setPayOpen(true); } }}
               disabled={!linkedAppt || linkedAppt.paid}
               title={!linkedAppt ? 'Aucun rendez-vous lié — ouvrez le dossier depuis un rendez-vous pour facturer' : linkedAppt.paid ? 'Déjà encaissé' : 'Encaisser la consultation'}
-              style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: (!linkedAppt || linkedAppt.paid) ? '#C9D6D1' : TEAL, color: '#fff', fontSize: 12, fontWeight: 600, cursor: (!linkedAppt || linkedAppt.paid) ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+              style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: (!linkedAppt || linkedAppt.paid) ? '#C9D6D1' : BTN_GREEN, color: '#fff', fontSize: 12, fontWeight: 600, cursor: (!linkedAppt || linkedAppt.paid) ? 'default' : 'pointer', fontFamily: 'inherit' }}>
               {linkedAppt?.paid ? 'Encaissé ✓' : 'Facturer'}
             </button>
           </>
@@ -1760,7 +1760,7 @@ export default function PatientFile({ state, setState, go }) {
                 onKeyDown={(e) => e.key === 'Enter' && save()} style={{ ...inp, marginBottom: 18 }} />
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setBioAdd(null)} style={{ padding: '7px 13px', borderRadius: 8, border: '1px solid #D8E2DD', background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
-                <button onClick={save} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button>
+                <button onClick={save} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button>
               </div>
             </div>
           </div>
@@ -1774,7 +1774,7 @@ export default function PatientFile({ state, setState, go }) {
             <div style={{ width: 52, height: 52, borderRadius: 14, background: '#E9F5F0', color: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>{IC.spark}</div>
             <div style={{ fontSize: 15.5, fontWeight: 600, color: DARK, letterSpacing: '-0.2px', marginBottom: 8 }}>Synthèse par IA</div>
             <p style={{ fontSize: 13.5, color: MUTED, lineHeight: 1.6, margin: '0 0 16px' }}>Fonctionnalité IA disponible prochainement — la synthèse automatique de vos consultations arrive dans une prochaine mise à jour.</p>
-            <button onClick={() => setIaOpen(false)} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Compris</button>
+            <button onClick={() => setIaOpen(false)} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Compris</button>
           </div>
         </div>
       )}
@@ -1792,7 +1792,7 @@ export default function PatientFile({ state, setState, go }) {
             </select>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setPayOpen(false)} style={{ padding: '7px 13px', borderRadius: 8, border: '1px solid #D8E2DD', background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
-              <button onClick={doPay} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Encaisser</button>
+              <button onClick={doPay} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Encaisser</button>
             </div>
           </div>
         </div>
@@ -1832,7 +1832,7 @@ export default function PatientFile({ state, setState, go }) {
               {printable && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 22px', borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
                   <button onClick={() => setDetail(null)} style={{ padding: '8px 15px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Fermer</button>
-                  <button onClick={() => printDetail(detail)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 10, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>{IC.print} Imprimer le compte-rendu</button>
+                  <button onClick={() => printDetail(detail)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 10, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>{IC.print} Imprimer le compte-rendu</button>
                 </div>
               )}
             </div>

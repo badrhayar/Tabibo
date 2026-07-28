@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { moroccoNow } from '../../lib/time';
-import { initials as initialsOf } from '../../shared.jsx';
+import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Demandes des patients — the cabinet's structured request inbox.
@@ -239,7 +239,7 @@ function RequestDrawer({ r, me, isMobile, onClose, onReply, onToggleClosed }) {
             <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px' }}>{c.label}</span>
             <button onClick={() => onToggleClosed(r)}
               title={r.closed ? 'Rouvrir la demande' : 'Marquer comme traitée'}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, borderRadius: 20, padding: '3px 10px', cursor: 'pointer', border: 'none', fontFamily: 'inherit', color: r.closed ? '#0E7C52' : '#9A6510', background: r.closed ? '#E7F6EE' : '#FEF4DD' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, borderRadius: 20, padding: '3px 10px', cursor: 'pointer', border: 'none', fontFamily: 'inherit', color: r.closed ? '#0E7C52' : '#9A6510', background: r.closed ? '#E7F6EE' : '#FEF4DD'}}>
               {r.closed ? 'Traitée' : 'Ouverte'} ✕
             </button>
             <div style={{ flex: 1 }} />
@@ -313,7 +313,7 @@ function RequestDrawer({ r, me, isMobile, onClose, onReply, onToggleClosed }) {
               Enregistrer le brouillon
             </button>
             <button onClick={() => onReply(r, body)} disabled={!body.trim()}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 11, border: 'none', background: body.trim() ? `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)` : '#C9D6D1', color: '#fff', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.2px', textTransform: 'uppercase', cursor: body.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 11, border: 'none', background: body.trim() ? BTN_GREEN : '#C9D6D1', color: '#fff', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.2px', textTransform: 'uppercase', cursor: body.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
               {IC.send} Envoyer
             </button>
           </div>

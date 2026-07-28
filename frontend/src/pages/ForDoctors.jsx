@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { I18N, CITY_OPTS, DEMO_PATIENTS } from '../shared.jsx';
+import { I18N, CITY_OPTS, DEMO_PATIENTS, BTN_GREEN } from '../shared.jsx';
 import { moroccoNow, moroccoToUTCISO } from '../lib/time.js';
 import { fetchCompanyContact } from '../lib/api';
+import { PLAN_DEF, planFeatures, featureLabel, renderLabel } from '../lib/plans.js';
 import Icon from '../components/Icon';
 import MarketingHeader from '../components/MarketingHeader';
 import SecurityTrust from '../components/SecurityTrust';
@@ -365,7 +366,7 @@ export default function ForDoctors() {
             <button
               onClick={() => go('docregister')}
               style={{
-                background: PRIMARY, color: '#fff', border: 'none',
+                background: BTN_GREEN, color: '#fff', border: 'none',
                 borderRadius: 10, padding: '13px 20px',
                 fontSize: 15, fontWeight: 700, cursor: 'pointer', textAlign: 'center', whiteSpace: 'nowrap',
                 boxShadow: '0 4px 20px rgba(22,160,106,0.30)',
@@ -569,58 +570,65 @@ export default function ForDoctors() {
           <p style={{ textAlign: 'center', color: MUTED, fontSize: 15, marginBottom: 32 }}>
             {lang === 'ar' ? '14 يوماً مجاناً — بدون بطاقة بنكية، بدون التزام.' : lang === 'en' ? '14 days free — no card, no commitment.' : '14 jours gratuits — sans carte bancaire, sans engagement.'}
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 18 }}>
-            {[
-              {
-                name: 'Pro', price: 399, popular: true, available: true,
-                tag: lang === 'ar' ? 'العيادة الرقمية الكاملة' : lang === 'en' ? 'The complete digital practice' : 'Le cabinet numérique complet',
-                feats: lang === 'ar'
-                  ? ['ملف المريض الرقمي', 'إدارة الوثائق', 'الفوترة ونظرة مالية شاملة', 'مواعيد غير محدودة', 'أجندة وتذكيرات بالبريد وواتساب (500/شهر)', 'مراسلة المرضى', 'مطابقة القانون 09-08 (CNDP)']
-                  : lang === 'en'
-                  ? ['Digital patient record', 'Document management', 'Billing and financial overview', 'Unlimited appointments', 'Agenda & email / WhatsApp reminders (500/month)', 'Patient messaging', 'Law 09-08 (CNDP) compliance']
-                  : ['Dossier patient numérique', 'Gestion documentaire', 'Facturation et aperçu financier', 'Rendez-vous illimités', 'Agenda & rappels e-mail / WhatsApp (500 / mois)', 'Messagerie patients', 'Conformité loi 09-08 (CNDP)'],
-              },
-              {
-                name: 'Premium', price: null, popular: false, available: false,
-                tag: lang === 'ar' ? 'الذكاء الاصطناعي والفيديو' : lang === 'en' ? 'Artificial intelligence and video' : "L'intelligence artificielle et la vidéo",
-                feats: lang === 'ar'
-                  ? ['كل ما في Pro', 'مساعد هاتفي بالذكاء الاصطناعي', 'مساعد استشارة بالذكاء الاصطناعي', 'مساعد فوترة بالذكاء الاصطناعي', 'الاستشارة عن بُعد بالفيديو', 'تذكيرات غير محدودة']
-                  : lang === 'en'
-                  ? ['Everything in Pro', 'AI phone assistant', 'AI consultation assistant', 'AI billing assistant', 'Video teleconsultation', 'Unlimited reminders']
-                  : ['Tout ce qui est inclus dans Pro', 'Assistant téléphonique IA', 'Assistant de consultation IA', 'Assistant de facturation IA', 'Téléconsultation vidéo', 'Rappels e-mail / WhatsApp illimités'],
-              },
-            ].map((p) => (
-              <div key={p.name} style={{ background: '#fff', border: p.popular ? `2px solid ${PRIMARY}` : `1px solid ${BORDER}`, borderRadius: 18, padding: '26px 26px 22px', position: 'relative' }}>
-                {p.available && <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: PRIMARY, color: '#fff', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px' }}>{lang === 'ar' ? 'الصيغة الوحيدة المتاحة' : lang === 'en' ? 'Only plan available' : 'Seule formule disponible'}</span>}
-                {!p.available && <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: '#FEF3DC', color: '#8A6210', border: '1px solid #F0DCAE', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px' }}>{lang === 'ar' ? 'قريباً' : lang === 'en' ? 'Coming soon' : 'Bientôt disponible'}</span>}
-                <div style={{ fontSize: 16, fontWeight: 800, color: DARK }}>{p.name}</div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 2 }}>{p.tag}</div>
-                <div style={{ margin: '10px 0 16px', minHeight: 46 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 18, alignItems: 'stretch' }}>
+            {['pro', 'premium'].map((key) => {
+              const p = PLAN_DEF[key];
+              const feats = planFeatures(key);
+              const name = p.name;
+              return (
+              /* Les deux cartes sont bâties sur la MÊME structure : même
+                 épaisseur de bordure, même hauteur de bloc prix, même nombre de
+                 lignes, et le bouton poussé en bas par la liste. Résultat :
+                 badges, prix, listes et boutons se répondent au pixel. */
+              <div key={key} style={{ background: '#fff', border: `2px solid ${p.available ? PRIMARY : BORDER}`, borderRadius: 18, padding: '26px 26px 22px', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                <span style={{ position: 'absolute', top: -12, insetInlineStart: 24, background: p.available ? PRIMARY : '#FEF3DC', color: p.available ? '#fff' : '#8A6210', border: p.available ? '1px solid transparent' : '1px solid #F0DCAE', fontSize: 11.5, fontWeight: 800, borderRadius: 99, padding: '4px 12px', lineHeight: 1.45 }}>
+                  {p.available
+                    ? (lang === 'ar' ? 'الصيغة الوحيدة المتاحة' : lang === 'en' ? 'Only plan available' : 'Seule formule disponible')
+                    : (lang === 'ar' ? 'قريباً' : lang === 'en' ? 'Coming soon' : 'Bientôt disponible')}
+                </span>
+                <div style={{ fontSize: 16, fontWeight: 800, color: DARK, lineHeight: 1.35 }}>{name}</div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 2, minHeight: 19, lineHeight: 1.45 }}>
+                  {lang === 'ar' ? (key === 'pro' ? 'العيادة الرقمية الكاملة' : 'الذكاء الاصطناعي والفيديو')
+                   : lang === 'en' ? (key === 'pro' ? 'The complete digital practice' : 'Artificial intelligence and video')
+                   : p.tagline}
+                </div>
+                {/* Bloc prix de hauteur fixe, contenu centré : le « 399 » et la
+                    mention « tarif annoncé » partagent exactement la même bande. */}
+                <div style={{ margin: '12px 0 18px', height: 48, display: 'flex', alignItems: 'center' }}>
                   {p.price != null ? (
-                    <>
-                      <span style={{ fontSize: 38, fontWeight: 900, color: DARK, letterSpacing: '-1px' }}>{p.price}</span>
-                      <span style={{ fontSize: 14, color: MUTED, fontWeight: 600 }}> MAD / {lang === 'ar' ? 'شهر' : lang === 'en' ? 'month' : 'mois'}</span>
-                    </>
+                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
+                      <span style={{ fontSize: 38, fontWeight: 900, color: DARK, letterSpacing: '-1px', lineHeight: 1 }}>{p.price}</span>
+                      <span style={{ fontSize: 14, color: MUTED, fontWeight: 600 }}>MAD / {lang === 'ar' ? 'شهر' : lang === 'en' ? 'month' : 'mois'}</span>
+                    </span>
                   ) : (
-                    <span style={{ fontSize: 15, color: MUTED, fontWeight: 600 }}>{lang === 'ar' ? 'يُعلن السعر عند الإطلاق' : lang === 'en' ? 'Price announced at launch' : "Tarif annoncé à l'ouverture"}</span>
+                    <span style={{ fontSize: 15, color: MUTED, fontWeight: 600 }}>
+                      {lang === 'ar' ? 'يُعلن السعر عند الإطلاق' : lang === 'en' ? 'Price announced at launch' : "Tarif annoncé à l'ouverture"}
+                    </span>
                   )}
                 </div>
-                <ul style={{ listStyle: 'none', margin: '0 0 20px', padding: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
-                  {p.feats.map((f) => (
-                    <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13.5, color: BODY }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={p.available ? PRIMARY : '#5B45A0'} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><path d="M20 6L9 17l-5-5"/></svg>
-                      {f}
+                <ul style={{ listStyle: 'none', margin: '0 0 20px', padding: 0, display: 'flex', flexDirection: 'column', gap: 9, flex: 1 }}>
+                  {feats.map((f) => (
+                    <li key={f.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13.5, color: BODY, lineHeight: 1.45 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={p.available ? PRIMARY : '#5B45A0'} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 3 }}><path d="M20 6L9 17l-5-5"/></svg>
+                      <span style={{ fontWeight: f.key === 'toutpro' ? 700 : 400 }}>
+                        {renderLabel(featureLabel(f, lang)).map((frag) => (
+                          frag.acronym
+                            ? <span key={frag.key} style={{ letterSpacing: '0.09em' }}>{frag.text}</span>
+                            : <span key={frag.key}>{frag.text}</span>
+                        ))}
+                      </span>
                     </li>
                   ))}
                 </ul>
                 <button onClick={() => p.available && go('docregister')} disabled={!p.available}
-                  style={{ width: '100%', background: p.available ? PRIMARY : '#EAF6F0', color: p.available ? '#fff' : '#0E7C52', border: p.available ? 'none' : '1px solid #C3E8D8', borderRadius: 10, padding: '12px 0', fontSize: 14.5, fontWeight: 700, cursor: p.available ? 'pointer' : 'default' }}>
+                  style={{ width: '100%', background: p.available ? BTN_GREEN : '#EAF6F0', color: p.available ? '#fff' : '#0E7C52', border: p.available ? '2px solid transparent' : '2px solid #C3E8D8', borderRadius: 10, height: 46, fontSize: 14.5, fontWeight: 700, cursor: p.available ? 'pointer' : 'default', fontFamily: 'inherit' }}>
                   {p.available
                     ? (lang === 'ar' ? 'ابدأ التجربة المجانية' : lang === 'en' ? 'Start free trial' : 'Commencer l\'essai gratuit')
                     : (lang === 'ar' ? 'قريباً' : lang === 'en' ? 'Coming soon' : 'Bientôt disponible')}
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
           <p style={{ textAlign: 'center', color: MUTED, fontSize: 12.5, marginTop: 18 }}>
             {lang === 'ar' ? 'الدفع الشهري بالتحويل البنكي. يمكنك الإيقاف في أي وقت.' : lang === 'en' ? 'Monthly payment by bank transfer. Stop anytime.' : 'Règlement mensuel par virement bancaire. Arrêtez quand vous voulez.'}
@@ -686,7 +694,7 @@ export default function ForDoctors() {
             <button
               onClick={() => go('docregister')}
               style={{
-                background: PRIMARY, color: '#fff', border: 'none',
+                background: BTN_GREEN, color: '#fff', border: 'none',
                 borderRadius: 10, padding: '14px 18px', whiteSpace: 'nowrap', textAlign: 'center', width: isMobile ? '100%' : undefined, flex: isMobile ? undefined : 1,
                 fontSize: 16, fontWeight: 700, cursor: 'pointer',
                 boxShadow: '0 4px 20px rgba(22,160,106,0.35)',

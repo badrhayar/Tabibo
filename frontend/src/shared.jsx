@@ -349,10 +349,22 @@ export const kmOf = (d) => {
 // Premium deep-green family — the same surface as the app's rails/top bar, so
 // every primary button across the app reads as one system. Buttons are FLAT
 // and compact (Doctolib-like): small, thin, semibold — never big or heavy.
-export const GREEN_GRAD = 'linear-gradient(135deg, #148662 0%, #0F6E56 48%, #0C4A37 100%)';
+// ─────────────────────────────────────────────────────────────────────────────
+// LE vert des actions — référence unique de toute l'application.
+// C'est exactement le dégradé du bouton « Rechercher » de la page d'accueil.
+// Tout bouton, tout interrupteur vert de Tabibo porte cette valeur et aucune
+// autre : un second vert, même proche, se voit immédiatement à l'écran.
+// Les verts profonds des rails et en-têtes ne sont PAS concernés — ce sont des
+// surfaces, pas des actions.
+export const BTN_GREEN = 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)';
+// Même vert là où un dégradé est impossible : `accentColor` d'une case à cocher
+// native, ombres portées, teintes calculées. On prend l'arrêt central.
+export const BTN_GREEN_SOLID = '#12875A';
+// Ancien nom, conservé pour ne rien casser : il pointe sur la même référence.
+export const GREEN_GRAD = BTN_GREEN;
 export const greenBtn = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-  background: '#0F6E56', color: '#fff', border: 'none', borderRadius: 8,
+  background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8,
   padding: '6px 13px', minHeight: 30, fontSize: 12.5, fontWeight: 600, lineHeight: 1.3,
   letterSpacing: '0.1px', fontFamily: 'Inter, sans-serif',
   cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box', width: 'auto',

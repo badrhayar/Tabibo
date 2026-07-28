@@ -8,6 +8,7 @@
 // tab so the consultation still works.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef, useState } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 
 const GREEN = '#16A06A';
 const DARK = '#15314A';
@@ -106,7 +107,7 @@ export default function TeleconsultRoom({ room, displayName, onClose }) {
           type="button"
           onClick={() => onClose?.()}
           style={{
-            background: GREEN,
+            background: BTN_GREEN,
             color: '#fff',
             border: 'none',
             borderRadius: 8,

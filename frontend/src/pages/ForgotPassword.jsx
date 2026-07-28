@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { resetPasswordRequest } from '../lib/auth';
+import { BTN_GREEN } from '../shared.jsx';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -75,4 +76,4 @@ export default function ForgotPassword() {
   );
 }
 
-const btn = { width: '100%', padding: '13px', background: PRIMARY, color: '#fff', border: 'none', borderRadius: 11, fontSize: 15, fontWeight: 600, cursor: 'pointer' };
+const btn = { width: '100%', padding: '13px', background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, fontSize: 15, fontWeight: 600, cursor: 'pointer' };

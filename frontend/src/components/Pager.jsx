@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared pagination for every long list in the app (patient + doctor).
@@ -77,7 +78,7 @@ export default function Pager({ pager, lang = 'fr', compact = false, style }) {
     display: 'inline-flex', alignItems: 'center', gap: 6,
     padding: '6px 13px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
     border: `1px solid ${primary && on ? '#0F6E56' : '#D5E5DD'}`,
-    background: primary && on ? '#0F6E56' : '#fff',
+    background: primary && on ? BTN_GREEN : '#fff',
     color: primary && on ? '#fff' : on ? '#15314A' : '#B9C6C0',
     cursor: on ? 'pointer' : 'default',
   });

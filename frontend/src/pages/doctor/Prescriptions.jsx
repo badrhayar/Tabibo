@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import QRCode from 'qrcode';
 import { useViewport } from '../../hooks/useViewport';
 import { useApp } from '../../context/AppContext';
-import { docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD } from '../../shared.jsx';
+import { docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
 import { buildPrescriptionPDF, pdfOpen, pdfDownload, pdfFileName, loadBrandLogo } from '../../lib/pdf';
 import {
@@ -528,7 +528,7 @@ export default function Prescriptions() {
                       onClick={() => sendToPatient(p)}
                       disabled={sendBusyId === p.id || !!p.sent_at}
                       title={p.patient_id ? 'Envoyer au patient' : 'Patient non lié à un compte'}
-                      style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 30, borderRadius: 8, border: 'none', background: p.sent_at ? '#EDF3F0' : '#0F6E56', color: p.sent_at ? MUTED : '#fff', fontSize: 12.5, fontWeight: 600, cursor: (sendBusyId === p.id || p.sent_at) ? 'default' : 'pointer', opacity: sendBusyId === p.id ? 0.7 : 1 }}
+                      style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 30, borderRadius: 8, border: 'none', background: p.sent_at ? '#EDF3F0' : BTN_GREEN, color: p.sent_at ? MUTED : '#fff', fontSize: 12.5, fontWeight: 600, cursor: (sendBusyId === p.id || p.sent_at) ? 'default' : 'pointer', opacity: sendBusyId === p.id ? 0.7 : 1 }}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                       {p.sent_at ? 'Envoyée' : (sendBusyId === p.id ? 'Envoi…' : 'Envoyer au patient')}

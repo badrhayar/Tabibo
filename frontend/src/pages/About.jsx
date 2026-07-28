@@ -1,6 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { I18N, CITY_OPTS } from '../shared.jsx';
+import { I18N, CITY_OPTS, BTN_GREEN } from '../shared.jsx';
 import Icon from '../components/Icon';
 import MarketingHeader from '../components/MarketingHeader';
 import MarketingFooter from '../components/MarketingFooter';
@@ -156,7 +156,7 @@ export default function About() {
           <button
             onClick={() => go('pregister')}
             style={{
-              background: PRIMARY, color: '#fff', border: 'none',
+              background: BTN_GREEN, color: '#fff', border: 'none',
               borderRadius: 10, padding: '14px 32px',
               fontSize: 16, fontWeight: 700, cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(22,160,106,0.35)',

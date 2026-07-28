@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
 import { fetchCompanyContact } from '../lib/api';
@@ -159,7 +160,7 @@ export default function Contact() {
               <input required placeholder="Votre nom" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={input} />
               <input required type="email" placeholder="Votre email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={input} />
               <textarea required placeholder="Votre message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={5} style={{ ...input, resize: 'vertical' }} />
-              <button type="submit" style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 11, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Envoyer</button>
+              <button type="submit" style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Envoyer</button>
             </div>
           </form>
         </div>

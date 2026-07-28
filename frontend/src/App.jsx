@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { useViewport } from './hooks/useViewport';
-import { subscriptionState, docDisplayName } from './shared.jsx';
+import { subscriptionState, docDisplayName, BTN_GREEN } from './shared.jsx';
 import { subscribeToIncomingCalls } from './lib/api';
 import PWAInstall from './components/PWAInstall';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -148,7 +148,7 @@ function AppShell() {
             <div style={{ fontSize: 12.5, color: '#6B7B76', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{docDisplayName(incomingCall.doctorName, incomingCall.spec)} souhaite démarrer l’appel</div>
           </div>
           <button onClick={() => setIncomingCall(null)} style={{ background: '#F3F4F6', border: 'none', borderRadius: 9, padding: '9px 12px', fontSize: 12.5, fontWeight: 700, color: '#6B7280', cursor: 'pointer', flexShrink: 0 }}>Ignorer</button>
-          <button onClick={() => { setState({ teleRoom: incomingCall.room }); setIncomingCall(null); }} style={{ background: 'linear-gradient(135deg,#1AAE74,#12875A)', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 12.5, fontWeight: 700, color: '#fff', cursor: 'pointer', flexShrink: 0 }}>Rejoindre</button>
+          <button onClick={() => { setState({ teleRoom: incomingCall.room }); setIncomingCall(null); }} style={{ background: BTN_GREEN, border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 12.5, fontWeight: 700, color: '#fff', cursor: 'pointer', flexShrink: 0 }}>Rejoindre</button>
         </div>
       )}
 

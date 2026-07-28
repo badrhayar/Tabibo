@@ -46,8 +46,25 @@ npm run test:all
 | `npm run test:files` | Les sorties fichier sous CSP réelle : ordonnance en PDF (URL blob, nouvel onglet) et feuille d'impression. |
 | `npm run test:empty` | Les 40 écrans d'un cabinet **sans aucune donnée**, en français sur ordinateur et téléphone, et en arabe (droite-à-gauche). Aucun écran blanc, aucun débordement. |
 | `npm run test:slow` | Réseau lent : l'annuaire répond après 1,8 s. Un lien de médecin partagé doit patienter puis s'afficher — jamais planter ni renvoyer le visiteur ailleurs. |
+| `npm run test:green` | **Un seul vert d'action.** Relève tout bouton ou interrupteur dont le fond n'est pas exactement `BTN_GREEN` (le dégradé du bouton « Rechercher »). Doit rendre 0. |
+| `npm run test:layout` | **Tournée de présentation.** Cartes voisines de hauteurs différentes, boutons mal alignés, texte tronqué. `W=390` pour le contrôle téléphone. Doit rendre 0. |
 
 `npm run test:crawl` (long, ~40 min) va plus loin : il clique **chaque bouton de chaque écran** dans la démonstration et signale les erreurs et les contrôles sans effet.
+
+### La règle du vert
+
+Toute action verte de Tabibo porte `BTN_GREEN`, défini une seule fois dans
+`frontend/src/shared.jsx` :
+
+```js
+export const BTN_GREEN = 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)';
+export const BTN_GREEN_SOLID = '#12875A';   // là où un dégradé est impossible (accentColor)
+```
+
+N'écrivez jamais une couleur verte en dur sur un bouton : importez le jeton.
+Les verts profonds des rails, en-têtes et bandeaux sont des **surfaces**, pas
+des actions — ils ne sont pas concernés. `npm run test:green` fait respecter la
+règle et échoue à la première entorse.
 
 > Rappel : la migration `supabase/migrations/20260801120000_care_stations.sql`
 > doit être appliquée avant que les postes de soins soient visibles aux patients.

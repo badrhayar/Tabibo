@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { I18N, initials, SPEC_OPTS, SPEC_INFO, CITY_OPTS, DOCTORS } from '../shared.jsx';
+import { I18N, initials, SPEC_OPTS, SPEC_INFO, CITY_OPTS, DOCTORS, BTN_GREEN } from '../shared.jsx';
 import Icon from '../components/Icon';
 import AuthChoice from '../components/AuthChoice';
 import SecurityTrust from '../components/SecurityTrust';
@@ -201,7 +201,7 @@ export default function Landing() {
           {isMobile && (
             <div style={{ marginInlineStart: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
               {loggedIn && (
-                <button onClick={() => go('paccount')} aria-label="Compte" style={{ width: 40, height: 40, borderRadius: '50%', background: GRAD, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
+                <button onClick={() => go('paccount')} aria-label="Compte" style={{ width: 40, height: 40, borderRadius: '50%', background: BTN_GREEN, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
                   {initials(loggedInName)}
                 </button>
               )}
@@ -251,12 +251,12 @@ export default function Landing() {
                 {isDoctorUser && (
                   <button onClick={() => goMobile('doctor')} style={{ background: '#E7F6EE', color: '#0E7C52', border: '1px solid #CDE7DA', borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700 }}>{tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}</button>
                 )}
-                <button onClick={() => goMobile('paccount')} style={{ background: GRAD, border: 'none', borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#fff' }}>{isDoctorUser ? tr('Mon espace patient', 'My patient space', 'فضائي كمريض') : tr('Mon espace', 'My space', 'فضائي')}</button>
+                <button onClick={() => goMobile('paccount')} style={{ background: BTN_GREEN, border: 'none', borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#fff' }}>{isDoctorUser ? tr('Mon espace patient', 'My patient space', 'فضائي كمريض') : tr('Mon espace', 'My space', 'فضائي')}</button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
                 <button onClick={() => goMobile('plogin')} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700, color: DARK }}>{t.btnLogin}</button>
-                <button onClick={() => goMobile('pregister')} style={{ background: GRAD, border: 'none', borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#fff' }}>{t.btnRegister}</button>
+                <button onClick={() => goMobile('pregister')} style={{ background: BTN_GREEN, border: 'none', borderRadius: 11, padding: '13px', minHeight: 48, cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#fff' }}>{t.btnRegister}</button>
               </div>
             )}
 
@@ -322,7 +322,7 @@ export default function Landing() {
                   </span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA8A2" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M6 9l6 6 6-6" /></svg>
                 </button>
-                <button onClick={runSearch} style={{ background: GRAD, color: '#fff', border: 'none', padding: isMobile ? '14px 20px' : '14px 26px', fontSize: 16, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', margin: isMobile ? 0 : 7, borderRadius: 12, minHeight: 48, boxShadow: '0 8px 18px -6px rgba(22,160,106,0.6)' }}>
+                <button onClick={runSearch} style={{ background: BTN_GREEN, color: '#fff', border: 'none', padding: isMobile ? '14px 20px' : '14px 26px', fontSize: 16, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', margin: isMobile ? 0 : 7, borderRadius: 12, minHeight: 48, boxShadow: '0 8px 18px -6px rgba(22,160,106,0.6)' }}>
                   {t.searchBtn}
                 </button>
               </div>

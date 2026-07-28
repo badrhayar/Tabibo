@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { CREDENTIAL_DOCS } from '../shared.jsx';
+import { CREDENTIAL_DOCS, BTN_GREEN } from '../shared.jsx';
 import BrandMark from '../components/BrandMark';
 import { uploadCredential, doctorResubmit, notifyVerification, fetchMyCredentialDocs } from '../lib/api';
 
@@ -113,7 +113,7 @@ export default function DoctorPending() {
               <>
                 <p style={{ fontSize: 13, color: MUTED, margin: '0 0 20px' }}>Corrigez votre dossier puis soumettez à nouveau vos documents — sans recréer de compte.</p>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                  <button onClick={() => setResubmit(true)} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Resoumettre mes documents</button>
+                  <button onClick={() => setResubmit(true)} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Resoumettre mes documents</button>
                   <button onClick={() => authSignOut()} style={{ background: BG, color: DARK, border: `1px solid ${BORDER}`, borderRadius: 10, padding: '11px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Se déconnecter</button>
                 </div>
               </>
@@ -138,7 +138,7 @@ export default function DoctorPending() {
                 })}
                 <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                   <button onClick={() => setResubmit(false)} style={{ flex: 1, background: BG, color: DARK, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Annuler</button>
-                  <button onClick={doResubmit} disabled={busy} style={{ flex: 1.4, background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Envoi…' : 'Soumettre pour révision'}</button>
+                  <button onClick={doResubmit} disabled={busy} style={{ flex: 1.4, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Envoi…' : 'Soumettre pour révision'}</button>
                 </div>
               </div>
             )}
@@ -168,7 +168,7 @@ export default function DoctorPending() {
                     </div>
                   );
                 })}
-                <button onClick={doComplete} disabled={busy} style={{ width: '100%', marginTop: 6, background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>
+                <button onClick={doComplete} disabled={busy} style={{ width: '100%', marginTop: 6, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>
                   {busy ? 'Envoi…' : 'Envoyer mes documents'}
                 </button>
               </div>

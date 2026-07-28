@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 import { useApp } from '../context/AppContext';
 import BrandMark from '../components/BrandMark';
 import { resendConfirmation } from '../lib/auth';
@@ -73,7 +74,7 @@ export default function CheckEmail() {
           {resent ? tr('Email renvoyé ✓', 'Email re-sent ✓', 'تمت إعادة الإرسال ✓') : busy ? '…' : tr('Renvoyer l\'email', 'Resend the email', 'إعادة إرسال الرسالة')}
         </button>
         <button onClick={() => go(isDoctor ? 'login' : 'plogin')}
-          style={{ width: '100%', marginTop: 10, padding: '13px 0', background: G, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+          style={{ width: '100%', marginTop: 10, padding: '13px 0', background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
           {tr('J\'ai confirmé — Se connecter', 'I confirmed — Sign in', 'أكدت — تسجيل الدخول')}
         </button>
       </div>

@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { autoTasks, loadManualTasks, saveManualTasks, TASK_CATS, catOf, EMPTY_TASK } from '../../lib/tasks';
 import { moroccoNow } from '../../lib/time';
-import { DEMO_PATIENTS, initials as initialsOf } from '../../shared.jsx';
+import { DEMO_PATIENTS, initials as initialsOf, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { updateAppointmentStatus, markInConsultation, sendApptWhatsApp, notifyApptEmail, fetchStaff } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ function MultiFilter({ label, options, value, onChange }) {
             <label key={o} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: DARK, whiteSpace: 'nowrap' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#F3F8F5'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
-              <input type="checkbox" checked={value.includes(o)} onChange={() => toggle(o)} style={{ accentColor: TEAL, width: 15, height: 15, cursor: 'pointer' }} />
+              <input type="checkbox" checked={value.includes(o)} onChange={() => toggle(o)} style={{ accentColor: BTN_GREEN_SOLID, width: 15, height: 15, cursor: 'pointer' }} />
               {o}
             </label>
           ))}
@@ -253,7 +253,7 @@ export default function Tasks({ state, setState, go }) {
             const on = tab === k;
             return (
               <button key={k} onClick={() => setTab(k)}
-                style={{ padding: '7px 14px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: on ? 700 : 500, whiteSpace: 'nowrap', background: on ? DEEP : 'transparent', color: on ? '#fff' : '#3E4F49', boxShadow: on ? '0 1px 2px rgba(12,74,55,0.25)' : 'none', transition: 'background .12s' }}>
+                style={{ padding: '7px 14px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: on ? 700 : 500, whiteSpace: 'nowrap', background: on ? BTN_GREEN : 'transparent', color: on ? '#fff' : '#3E4F49', boxShadow: on ? '0 1px 2px rgba(12,74,55,0.25)' : 'none', transition: 'background .12s' }}>
                 {label}
               </button>
             );
@@ -299,7 +299,7 @@ export default function Tasks({ state, setState, go }) {
       {/* ── Actions ── */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
         <button onClick={() => setAddOpen(true)}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', border: 'none', borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
           {IC.plus} Ajouter une tâche
         </button>
         <button onClick={() => { setFDue(todayISO); setTab('all'); }}
@@ -481,7 +481,7 @@ function AddTaskModal({ onClose, onSave, people, roster, me, todayISO, isMobile 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 22px', borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
           <button onClick={onClose} style={{ padding: '9px 16px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
           <button onClick={save} disabled={!f.text.trim()}
-            style={{ padding: '9px 18px', borderRadius: 10, border: 'none', background: f.text.trim() ? `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)` : '#C9D6D1', color: '#fff', fontSize: 13, fontWeight: 700, cursor: f.text.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+            style={{ padding: '9px 18px', borderRadius: 10, border: 'none', background: f.text.trim() ? BTN_GREEN : '#C9D6D1', color: '#fff', fontSize: 13, fontWeight: 700, cursor: f.text.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
             Ajouter la tâche
           </button>
         </div>

@@ -1,6 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { DOCTORS, BOOK_DAYS, docDisplayName } from '../shared.jsx';
+import { DOCTORS, BOOK_DAYS, docDisplayName, BTN_GREEN } from '../shared.jsx';
 import Icon from '../components/Icon';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { moroccoToUTCISO } from '../lib/time';
@@ -174,7 +174,7 @@ export default function Confirm() {
           style={{
             width: '100%',
             padding: '13px 0',
-            background: '#16A06A',
+            background: BTN_GREEN,
             color: '#fff',
             border: 'none',
             borderRadius: 10,

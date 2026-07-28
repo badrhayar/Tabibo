@@ -1,4 +1,5 @@
 import { useApp } from '../context/AppContext';
+import { BTN_GREEN } from '../shared.jsx';
 import { useViewport } from '../hooks/useViewport';
 import MarketingHeader from '../components/MarketingHeader';
 import MarketingFooter from '../components/MarketingFooter';
@@ -45,7 +46,7 @@ export default function Confidentialite() {
           ))}
           <div style={{ marginTop: 30, paddingTop: 20, borderTop: `1px solid ${BORDER}`, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontSize: 13.5, color: MUTED }}>Une question sur vos données ?</span>
-            <button onClick={() => go('contact')} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}>Nous contacter</button>
+            <button onClick={() => go('contact')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}>Nous contacter</button>
           </div>
         </div>
       </div>

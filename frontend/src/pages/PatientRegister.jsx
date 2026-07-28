@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import PasswordInput from '../components/PasswordInput';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { GOOGLE_SVG } from '../shared.jsx';
+import { GOOGLE_SVG, BTN_GREEN } from '../shared.jsx';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import PhoneField from '../components/PhoneField';
 import Turnstile, { isCaptchaEnabled } from '../components/Turnstile';
@@ -228,7 +228,7 @@ export default function PatientRegister() {
                 Chaque adresse email ne peut servir qu'à un seul compte (patient ou médecin). Connectez-vous
                 avec cet email — ou utilisez une autre adresse pour créer un nouveau compte.
               </p>
-              <button onClick={() => go('plogin')} style={{ background: '#16A06A', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              <button onClick={() => go('plogin')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                 Se connecter
               </button>
             </div>
@@ -250,7 +250,7 @@ export default function PatientRegister() {
             style={{
               width: '100%',
               padding: '13px',
-              background: PRIMARY,
+              background: BTN_GREEN,
               color: '#fff',
               border: 'none',
               borderRadius: 11,

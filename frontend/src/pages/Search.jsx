@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import LangPill from '../components/LangPill';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import { useViewport } from '../hooks/useViewport';
-import { DOCTORS, SPEC_INFO, SPEC_OPTS, CITY_OPTS, tint, initials, doctorCoords, docDisplayName } from '../shared.jsx';
+import { DOCTORS, SPEC_INFO, SPEC_OPTS, CITY_OPTS, tint, initials, doctorCoords, docDisplayName, BTN_GREEN } from '../shared.jsx';
 import NearbyMap from '../components/NearbyMap';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import Pager, { usePager } from '../components/Pager';
@@ -71,7 +71,7 @@ export default function Search() {
         <div style={{ fontSize: 12, color: PRIMARY, fontWeight: 600 }}>{SPEC_INFO[pinDoc.spec]?.label || pinDoc.spec}</div>
         <div style={{ fontSize: 12, color: MUTED }}>★ {pinDoc.rating} · {pinDoc.price} MAD</div>
       </div>
-      <button onClick={() => { setState({ selDoc: pinDoc.id }); setMapFull(false); go('profile'); }} style={{ background: GRAD, color: '#fff', border: 'none', borderRadius: 10, padding: '9px 15px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, boxShadow: '0 6px 14px -6px rgba(22,160,106,0.6)' }}>
+      <button onClick={() => { setState({ selDoc: pinDoc.id }); setMapFull(false); go('profile'); }} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '9px 15px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, boxShadow: '0 6px 14px -6px rgba(22,160,106,0.6)' }}>
         {tr('Voir le profil', 'View profile', 'عرض الملف')}
       </button>
       <button onClick={() => setState({ selPin: null })} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 8, cursor: 'pointer', fontSize: 16, color: MUTED, width: 30, height: 30, flexShrink: 0 }}>×</button>
@@ -118,7 +118,7 @@ export default function Search() {
             const isDoctorUser = appUser?.role === 'doctor' || state.isStaff;
             const name = patient?.name || appUser?.full_name || '';
             if (!loggedIn) return (
-              <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: isMobile ? '0 14px' : '0 16px', height: isMobile ? 40 : 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              <button onClick={() => go('plogin')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: isMobile ? '0 14px' : '0 16px', height: isMobile ? 40 : 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0, whiteSpace: 'nowrap' }}>
                 {tr('Se connecter', 'Sign in', 'تسجيل الدخول')}
               </button>
             );
@@ -228,7 +228,7 @@ export default function Search() {
               <option value="price_desc">{tr('Prix décroissant', 'Price: high to low', 'السعر تنازلياً')}</option>
             </select>
 
-            <button onClick={() => setFiltersOpen(false)} style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 12, border: 'none', background: GRAD, color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', minHeight: 50 }}>
+            <button onClick={() => setFiltersOpen(false)} style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 12, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', minHeight: 50 }}>
               {tr('Voir', 'Show', 'عرض')} {list.length} {tr(list.length !== 1 ? 'médecins' : 'médecin', list.length !== 1 ? 'doctors' : 'doctor', 'طبيب')}
             </button>
           </div>
@@ -278,7 +278,7 @@ export default function Search() {
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent("Bonjour Docteur, j'aimerais pouvoir prendre rendez-vous avec vous en ligne. Découvrez Tabibo (essai gratuit) : https://tabibo.ma/fordoctors")}`}
                   target="_blank" rel="noopener noreferrer"
-                  style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 7 }}
+                  style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 7 }}
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.62-.93-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.49.71.3 1.27.49 1.7.63.72.23 1.37.2 1.88.12.58-.09 1.76-.72 2-1.42.25-.7.25-1.3.18-1.42-.08-.13-.28-.2-.58-.35z"/><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2zm0 18.3a8.3 8.3 0 0 1-4.2-1.2l-.3-.18-2.9.9.9-2.8-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
                   {tr('Inviter mon médecin sur Tabibo', 'Invite my doctor to Tabibo', 'دعوة طبيبي إلى Tabibo')}
@@ -327,7 +327,7 @@ export default function Search() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                       <button
                         onClick={(e) => { e.stopPropagation(); setState({ selDoc: d.id }); go('profile'); }}
-                        style={{ background: GRAD, color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 14px' : '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 6px 14px -6px rgba(22,160,106,0.6)' }}
+                        style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 14px' : '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 6px 14px -6px rgba(22,160,106,0.6)' }}
                       >
                         Réserver
                       </button>

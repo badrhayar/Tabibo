@@ -3,7 +3,7 @@ import BrandMark, { Wordmark } from '../components/BrandMark';
 import { useApp } from '../context/AppContext';
 import PhoneField from '../components/PhoneField';
 import { useViewport } from '../hooks/useViewport';
-import { DOCTORS, MOTIF_OPTS, greenBtn, greenBtnBusy } from '../shared.jsx';
+import { DOCTORS, MOTIF_OPTS, greenBtn, greenBtnBusy, BTN_GREEN } from '../shared.jsx';
 import { createAppointment, guestBookingEnabled, guestBookingStart, guestBookingVerify, fetchRelatives } from '../lib/api';
 import { stationsOf } from '../lib/stations';
 import { moroccoToUTCISO } from '../lib/time.js';
@@ -243,7 +243,7 @@ export default function BookingInfo() {
               <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{patient.name?.split(' ')[0]}</span>
             </button>
           ) : (
-            <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
+            <button onClick={() => go('plogin')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
               Se connecter
             </button>
           )}
@@ -445,7 +445,7 @@ export default function BookingInfo() {
             onClick={handleConfirm}
             style={{
               width: '100%',
-              background: PRIMARY,
+              background: BTN_GREEN,
               color: '#fff',
               border: 'none',
               borderRadius: 12,

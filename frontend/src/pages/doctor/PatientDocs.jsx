@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { BTN_GREEN_SOLID } from '../../shared.jsx';
 import { uploadDocument, listDocuments, getDocumentUrl, downloadDocument, updateAppointment } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -230,7 +231,7 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
                 <div key={d.id} onClick={() => setSelId(d.id)}
                   style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '11px 12px', borderBottom: `1px solid #F1F6F3`, cursor: 'pointer', background: on ? '#EEF7F2' : 'transparent', borderInlineStart: `3px solid ${on ? TEAL : 'transparent'}` }}>
                   <input type="checkbox" checked={checked.includes(d.id)} onClick={(e) => e.stopPropagation()} onChange={() => toggleCheck(d.id)}
-                    style={{ accentColor: TEAL, width: 15, height: 15, marginTop: 2, cursor: 'pointer', flexShrink: 0 }} />
+                    style={{ accentColor: BTN_GREEN_SOLID, width: 15, height: 15, marginTop: 2, cursor: 'pointer', flexShrink: 0 }} />
                   <span style={{ width: 26, height: 26, borderRadius: 8, background: c.bg, color: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{c.icon}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

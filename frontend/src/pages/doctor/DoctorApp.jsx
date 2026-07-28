@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import BrandMark, { Wordmark } from '../../components/BrandMark';
 import { useApp } from '../../context/AppContext';
 import { useViewport } from '../../hooks/useViewport';
-import { tint, initials, MOTIF_OPTS, CITY_OPTS, DOC_TYPE_OPTS, subscriptionState, billingDue, docDisplayName, greenBtn, GREEN_GRAD } from '../../shared.jsx';
+import { tint, initials, MOTIF_OPTS, CITY_OPTS, DOC_TYPE_OPTS, subscriptionState, billingDue, docDisplayName, greenBtn, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow, moroccoToUTCISO } from '../../lib/time.js';
 import { inviteNewPatient, createWalkinAppointment, createPatient, subscribeToInbox, fetchDoctorPayments, declareCurrentPayment, notifyVerification } from '../../lib/api';
 import PhoneField from '../../components/PhoneField';
@@ -563,7 +563,7 @@ export default function DoctorApp() {
           <CommandPalette state={state} setState={setState} go={goNav} isMobile={isMobile} dark />
           <div style={{ flex:1 }} />
           {/* Nouveau rendez-vous — white on the dark bar so it pops */}
-          <button onClick={openNewAppt} aria-label="Nouveau rendez-vous" style={{ display:'flex', alignItems:'center', gap:6, background:'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color:'#fff', border:'none', cursor:'pointer', fontWeight:700, fontSize:isMobile?20:13, letterSpacing:'0.1px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", padding:isMobile?0:'0 14px', width:isMobile?42:'auto', height:isMobile?42:36, borderRadius:isMobile?'50%':10, justifyContent:'center', boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink:0, marginRight:6 }}>
+          <button onClick={openNewAppt} aria-label="Nouveau rendez-vous" style={{ display:'flex', alignItems:'center', gap:6, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', fontWeight:700, fontSize:isMobile?20:13, letterSpacing:'0.1px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", padding:isMobile?0:'0 14px', width:isMobile?42:'auto', height:isMobile?42:36, borderRadius:isMobile?'50%':10, justifyContent:'center', boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink:0, marginRight:6 }}>
             <span style={{ fontSize:isMobile?20:15, lineHeight:1 }}>+</span>{!isMobile && ' Nouveau rendez-vous'}
           </button>
 
@@ -640,7 +640,7 @@ export default function DoctorApp() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4V8z"/></svg>
               Mode démonstration — données fictives
             </span>
-            <button onClick={() => go('docregister')} style={{ background:'#0C4A37', color:'#fff', border:'1px solid rgba(255,255,255,0.25)', borderRadius:99, padding:'5px 14px', fontSize:12.5, fontWeight:600, cursor:'pointer', boxShadow:'0 2px 6px -2px rgba(6,32,23,0.5)' }}>
+            <button onClick={() => go('docregister')} style={{ background:BTN_GREEN, color:'#fff', border:'1px solid rgba(255,255,255,0.25)', borderRadius:99, padding:'5px 14px', fontSize:12.5, fontWeight:600, cursor:'pointer', boxShadow:'0 2px 6px -2px rgba(6,32,23,0.5)' }}>
               Créer mon compte gratuit (14 j)
             </button>
             <span onClick={() => go('fordoctors')} style={{ textDecoration:'underline', cursor:'pointer', fontWeight:700 }}>Quitter la démo</span>
@@ -670,7 +670,7 @@ export default function DoctorApp() {
                 {PAY_T[lang].review}
               </span>
             ) : (
-              <button onClick={declarePay} disabled={payBusy} style={{ background:'#0F6E56', color:'#fff', border:'none', borderRadius:99, padding:'5px 14px', fontSize:12.5, fontWeight:600, cursor: payBusy ? 'default' : 'pointer', opacity: payBusy ? 0.7 : 1 }}>
+              <button onClick={declarePay} disabled={payBusy} style={{ background:BTN_GREEN, color:'#fff', border:'none', borderRadius:99, padding:'5px 14px', fontSize:12.5, fontWeight:600, cursor: payBusy ? 'default' : 'pointer', opacity: payBusy ? 0.7 : 1 }}>
                 {PAY_T[lang].pay}
               </button>
             )}
@@ -793,7 +793,7 @@ export default function DoctorApp() {
               </div>
               <div style={{ padding: isMobile ? '0 16px 18px' : '0 26px 22px', display:'flex', gap:10 }}>
                 <button onClick={closeNewAppt} style={{ flex:1, background:BG, color:'#5A6B65', border:`1px solid ${BORDER}`, cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600, whiteSpace:'nowrap' }}>Annuler</button>
-                <button onClick={submitNewAppt} style={{ flex: isMobile ? 1.4 : 1.5, background:'#0F6E56', color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600, whiteSpace:'nowrap' }}>{isMobile ? 'Enregistrer' : 'Enregistrer le rendez-vous'}</button>
+                <button onClick={submitNewAppt} style={{ flex: isMobile ? 1.4 : 1.5, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600, whiteSpace:'nowrap' }}>{isMobile ? 'Enregistrer' : 'Enregistrer le rendez-vous'}</button>
               </div>
             </div>
           </div>
@@ -896,7 +896,7 @@ export default function DoctorApp() {
               </div>
               <div style={{ padding:'18px 26px 22px', display:'flex', gap:10, borderTop:'1px solid #F0F3F2' }}>
                 <button onClick={closeAddPatient} style={{ flex:1, background:BG, color:'#5A6B65', border:`1px solid ${BORDER}`, cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Annuler</button>
-                <button onClick={submitAddPatient} style={{ flex:1.5, background:'#0F6E56', color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Enregistrer le patient</button>
+                <button onClick={submitAddPatient} style={{ flex:1.5, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Enregistrer le patient</button>
               </div>
             </div>
           </div>

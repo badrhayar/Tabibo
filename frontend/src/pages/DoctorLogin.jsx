@@ -3,7 +3,7 @@ import { authErrorMessage } from '../lib/auth';
 import PasswordInput from '../components/PasswordInput';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { GOOGLE_SVG } from '../shared.jsx';
+import { GOOGLE_SVG, BTN_GREEN } from '../shared.jsx';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import Turnstile, { isCaptchaEnabled } from '../components/Turnstile';
 import { signOut as sbSignOut } from '../lib/auth';
@@ -155,7 +155,7 @@ export default function DoctorLogin() {
             style={{
               width: '100%',
               padding: '13px',
-              background: PRIMARY,
+              background: BTN_GREEN,
               color: '#fff',
               border: 'none',
               borderRadius: 11,

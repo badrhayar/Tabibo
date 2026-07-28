@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
-import { initials as initialsOf } from '../../shared.jsx';
+import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
 import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff } from '../../lib/api';
 import { loadStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
 
@@ -227,7 +227,7 @@ export default function Navigator({ state, setState, go }) {
     );
   };
 
-  const btnPri = { background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' };
+  const btnPri = { background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' };
   const btnGhost = { background: '#fff', color: DARK, border: `1px solid ${BORDER}`, borderRadius: 8, padding: '6px 11px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' };
 
   const Column = ({ title, count, children, tint }) => (
@@ -255,7 +255,7 @@ export default function Navigator({ state, setState, go }) {
         </div>
         <div style={{ flex: 1 }} />
         <button onClick={() => setWalkOpen(true)}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', border: 'none', borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '10px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
           {IC.plus} Walk-in
         </button>
         <button onClick={() => setShowOut((v) => !v)}
@@ -268,7 +268,9 @@ export default function Navigator({ state, setState, go }) {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : `repeat(${2 + Math.min(stations.length, 4)}, minmax(0,1fr))`, gap: 14, alignItems: 'start' }}>
+      {/* Un tableau de bord se lit en rangée : toutes les colonnes s'arrêtent à
+          la même hauteur, sinon le regard décroche. */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : `repeat(${2 + Math.min(stations.length, 4)}, minmax(0,1fr))`, gap: 14, alignItems: isMobile ? 'start' : 'stretch' }}>
         {/* Visites à venir */}
         <Column title="Visites à venir" count={upcoming.length}>
           {upcoming.length === 0 && empty('Aucune visite à venir aujourd’hui.')}
@@ -467,7 +469,7 @@ function StationsManager({ stations, onClose, onSave, isMobile }) {
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 20px', borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
           <button onClick={onClose} style={{ padding: '9px 15px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
           <button onClick={() => { onSave(list); onClose(); }}
-            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             Enregistrer les postes
           </button>
         </div>
@@ -505,7 +507,7 @@ function NoteModal({ a, onClose, onSave, isMobile }) {
           <div style={{ flex: 1 }} />
           <button onClick={onClose} style={{ padding: '9px 15px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
           <button onClick={() => onSave(a, text.trim(), urgent)}
-            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             Transmettre au médecin
           </button>
         </div>
@@ -602,7 +604,7 @@ function WalkinModal({ state, setState, onClose, isMobile, practitioners, doctor
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 20px', borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
           <button onClick={onClose} style={{ padding: '9px 15px', borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', color: DARK, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Annuler</button>
           <button onClick={save} disabled={!name.trim() || saving}
-            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: name.trim() ? `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)` : '#C9D6D1', color: '#fff', fontSize: 13, fontWeight: 700, cursor: name.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+            style={{ padding: '9px 17px', borderRadius: 10, border: 'none', background: name.trim() ? BTN_GREEN : '#C9D6D1', color: '#fff', fontSize: 13, fontWeight: 700, cursor: name.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
             {saving ? 'Ajout…' : 'Ajouter en salle d’attente'}
           </button>
         </div>

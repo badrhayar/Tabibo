@@ -3,7 +3,7 @@ import BrandMark, { Wordmark } from '../components/BrandMark';
 import LangPill from '../components/LangPill';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { DOCTORS, SPEC_INFO, BOOK_DAYS, BOOK_SLOTS, genSlots, tint, initials, bioFor, doctorCoords, docDisplayName, greenBtn, greenBtnBusy } from '../shared.jsx';
+import { DOCTORS, SPEC_INFO, BOOK_DAYS, BOOK_SLOTS, genSlots, tint, initials, bioFor, doctorCoords, docDisplayName, greenBtn, greenBtnBusy, BTN_GREEN } from '../shared.jsx';
 import DoctorLocationMap from '../components/DoctorLocationMap';
 import Icon from '../components/Icon';
 import { moroccoNow, slotToMinutes } from '../lib/time.js';
@@ -288,7 +288,7 @@ export default function Profile() {
               <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{patient.name?.split(' ')[0]}</span>
             </button>
           ) : (
-            <button onClick={() => go('plogin')} style={{ background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
+            <button onClick={() => go('plogin')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '0 16px', height: 34, fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", cursor: 'pointer', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)', flexShrink: 0 }}>
               Se connecter
             </button>
           )}
@@ -516,7 +516,7 @@ export default function Profile() {
                   style={{
                     height: 44, borderRadius: 11, cursor: available ? 'pointer' : 'default',
                     border: selected ? '1.5px solid transparent' : (isToday ? `1.5px solid ${PRIMARY}` : `1px solid ${BORDER}`),
-                    background: selected ? GRAD : (available ? '#fff' : '#F4F6F5'),
+                    background: selected ? BTN_GREEN : (available ? '#fff' : '#F4F6F5'),
                     color: selected ? '#fff' : (available ? DARK : '#C0CBC6'),
                     fontSize: 14, fontWeight: selected || isToday ? 800 : 600,
                     boxShadow: selected ? '0 6px 14px -6px rgba(22,160,106,0.6)' : 'none',
@@ -558,7 +558,7 @@ export default function Profile() {
                           minHeight: 44, padding: '8px 4px', borderRadius: 10,
                           cursor: disabled ? 'not-allowed' : 'pointer',
                           border: `1.5px solid ${isActive ? 'transparent' : (disabled ? '#EDF1EF' : BORDER)}`,
-                          background: isActive ? GRAD : (disabled ? '#F4F6F5' : '#fff'),
+                          background: isActive ? BTN_GREEN : (disabled ? '#F4F6F5' : '#fff'),
                           color: isActive ? '#fff' : (disabled ? '#B7C2BD' : DARK),
                           fontSize: 14, fontWeight: 700, textAlign: 'center',
                           textDecoration: blockState === 'booked' || blockState === 'past' ? 'line-through' : 'none',
@@ -619,7 +619,7 @@ export default function Profile() {
             onClick={startConfirm}
             disabled={!selectedDate || !selectedSlot}
             style={{
-              width: '100%', background: (!selectedDate || !selectedSlot) ? '#C9D6D1' : GRAD, color: '#fff',
+              width: '100%', background: (!selectedDate || !selectedSlot) ? '#C9D6D1' : BTN_GREEN, color: '#fff',
               border: 'none', borderRadius: 13, padding: '15px 20px', minHeight: 50,
               fontSize: 15, fontWeight: 700, cursor: (!selectedDate || !selectedSlot) ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,

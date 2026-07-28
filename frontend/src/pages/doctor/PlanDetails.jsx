@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BTN_GREEN } from '../../shared.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { PLAN_DEF, planFeatures, PRO_PRICE } from '../../lib/plans';
 
@@ -74,7 +75,7 @@ export default function PlanDetails({ state, setState, go }) {
           const on = tab === k;
           return (
             <button key={k} onClick={() => setTab(k)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 11, border: `1px solid ${on ? TEAL : BORDER}`, background: on ? TEAL : '#fff', color: on ? '#fff' : DARK, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 11, border: `1px solid ${on ? TEAL : BORDER}`, background: on ? BTN_GREEN : '#fff', color: on ? '#fff' : DARK, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
               {PLAN_DEF[k].name}
               <span style={{ fontSize: 11.5, fontWeight: 600, opacity: on ? 0.85 : 0.7 }}>
                 {PLAN_DEF[k].available ? `${PLAN_DEF[k].price} MAD` : 'bientôt'}
@@ -141,7 +142,7 @@ export default function PlanDetails({ state, setState, go }) {
           </div>
         </div>
         <button onClick={back}
-          style={{ background: 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)', color: '#fff', border: 'none', borderRadius: 11, padding: '11px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '11px 20px', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           Retour à l'abonnement
         </button>
       </div>

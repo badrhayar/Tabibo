@@ -3,7 +3,7 @@ import { authErrorMessage } from '../lib/auth';
 import PasswordInput from '../components/PasswordInput';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import { useApp } from '../context/AppContext';
-import { GOOGLE_SVG } from '../shared.jsx';
+import { GOOGLE_SVG, BTN_GREEN } from '../shared.jsx';
 import Turnstile, { isCaptchaEnabled } from '../components/Turnstile';
 
 const PRIMARY = '#16A06A';
@@ -162,7 +162,7 @@ export default function PatientLogin() {
           style={{
             width: '100%',
             padding: '13px',
-            background: PRIMARY,
+            background: BTN_GREEN,
             color: '#fff',
             border: 'none',
             borderRadius: 11,

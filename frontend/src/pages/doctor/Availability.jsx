@@ -6,7 +6,7 @@ import {
   fetchTimeOff, addTimeOff, deleteTimeOff,
   updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail,
 } from '../../lib/api';
-import { BOOK_SLOTS, genSlots, greenBtn, greenBtnBusy } from '../../shared.jsx';
+import { BOOK_SLOTS, genSlots, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow, moDateKeyOf } from '../../lib/time.js';
 import { fetchPrayerTimes, PRAYER_FALLBACK, PRAYER_LABELS, prayerBlockedSlots } from '../../lib/prayer.js';
 
@@ -28,7 +28,7 @@ const isoOf = (d) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate(
 
 function Toggle({ on, onChange }) {
   return (
-    <div onClick={() => onChange(!on)} style={{ width: 44, height: 24, borderRadius: 12, background: on ? PRIMARY : '#CBD5E0', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
+    <div onClick={() => onChange(!on)} style={{ width: 44, height: 24, borderRadius: 12, background: on ? BTN_GREEN : '#CBD5E0', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
       <div style={{ position: 'absolute', top: 3, left: on ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.20)', transition: 'left 0.2s' }} />
     </div>
   );
@@ -611,7 +611,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
             {SLOT_DURATIONS.map((d) => {
               const active = slotDuration === d;
               return (
-                <button key={d} onClick={() => { setSlotDuration(d); try { localStorage.setItem(slotCacheKey, String(d)); } catch { /* private mode */ } }} style={{ padding: '6px 15px', borderRadius: 20, minHeight: 32, border: `1px solid ${active ? '#0F6E56' : BORDER}`, background: active ? '#0F6E56' : '#fff', color: active ? '#fff' : MUTED, fontWeight: 600, fontSize: 12.5, cursor: 'pointer' }}>{d} min</button>
+                <button key={d} onClick={() => { setSlotDuration(d); try { localStorage.setItem(slotCacheKey, String(d)); } catch { /* private mode */ } }} style={{ padding: '6px 15px', borderRadius: 20, minHeight: 32, border: `1px solid ${active ? '#0F6E56' : BORDER}`, background: active ? BTN_GREEN : '#fff', color: active ? '#fff' : MUTED, fontWeight: 600, fontSize: 12.5, cursor: 'pointer' }}>{d} min</button>
               );
             })}
           </div>

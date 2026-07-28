@@ -1,4 +1,5 @@
 import { reportClientError } from '../lib/monitor.js';
+import { BTN_GREEN } from '../shared.jsx';
 import { Component } from 'react';
 
 /**
@@ -43,7 +44,7 @@ export default class ErrorBoundary extends Component {
             </p>
             <button
               onClick={() => window.location.reload()}
-              style={{ background: 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 18px -6px rgba(22,160,106,0.5)' }}
+              style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 18px -6px rgba(22,160,106,0.5)' }}
             >
               Recharger l’application
             </button>

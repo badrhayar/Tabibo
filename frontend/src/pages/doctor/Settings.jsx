@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PasswordInput from '../../components/PasswordInput';
-import { SPEC_INFO, SPEC_OPTS, CITY_OPTS, greenBtn, greenBtnBusy } from '../../shared.jsx';
+import { SPEC_INFO, SPEC_OPTS, CITY_OPTS, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import LocationPicker from '../../components/LocationPicker';
 import { saveDoctorServices, updateDoctorFields, updateMyProfile, uploadAvatar, setMySlug } from '../../lib/api';
 import { signIn, updatePassword, authErrorMessage } from '../../lib/auth';
@@ -544,7 +544,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
                 </div>
               )}
               <button onClick={changePassword} disabled={pwBusy} style={{
-                background: '#0F6E56',
+                background: BTN_GREEN,
                 color: '#fff',
                 border: 'none',
                 borderRadius: 9,

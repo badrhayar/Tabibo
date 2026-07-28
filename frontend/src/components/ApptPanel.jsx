@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { BTN_GREEN, BTN_GREEN_SOLID } from '../shared.jsx';
 import { useViewport } from '../hooks/useViewport';
 import {
   updateAppointment, updateAppointmentStatus, markArrived, markInConsultation,
@@ -47,7 +48,7 @@ const lbl = { display: 'block', fontSize: 12.5, fontWeight: 700, color: DARK, ma
 
 function Toggle({ on, onChange }) {
   return (
-    <div onClick={() => onChange(!on)} role="switch" aria-checked={on} style={{ width: 40, height: 22, borderRadius: 11, background: on ? TEAL : '#CBD5D0', position: 'relative', cursor: 'pointer', transition: 'background .18s', flexShrink: 0 }}>
+    <div onClick={() => onChange(!on)} role="switch" aria-checked={on} style={{ width: 40, height: 22, borderRadius: 11, background: on ? BTN_GREEN : '#CBD5D0', position: 'relative', cursor: 'pointer', transition: 'background .18s', flexShrink: 0 }}>
       <div style={{ position: 'absolute', top: 3, left: on ? 21 : 3, width: 16, height: 16, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.25)', transition: 'left .18s' }} />
     </div>
   );
@@ -293,7 +294,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
                 {!dobLbl && age == null ? 'Dossier sans date de naissance' : ''}
               </div>
             </div>
-            <button onClick={openDossier} style={{ display: 'flex', alignItems: 'center', gap: 7, background: TEAL, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 13px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
+            <button onClick={openDossier} style={{ display: 'flex', alignItems: 'center', gap: 7, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 13px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
               {IC.folder} Ouvrir le dossier patient
             </button>
           </div>
@@ -313,7 +314,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
                 catch (e) { setState({ toast: 'Confirmation impossible : ' + (e?.message || 'erreur'), toastShow: true }); return; }
               }
               setState({ toast: 'Rendez-vous confirmé — le patient est notifié ✓', toastShow: true });
-            }} style={{ background: TEAL, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 13px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>
+            }} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 13px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>
               Confirmer le rendez-vous
             </button>
           </div>
@@ -359,7 +360,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
 
             <label style={lbl}>Nouveau patient</label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, color: DARK, cursor: 'pointer', marginBottom: 20 }}>
-              <input type="checkbox" checked={draft.firstVisit} onChange={(e) => setD('firstVisit', e.target.checked)} style={{ width: 16, height: 16, accentColor: TEAL }} />
+              <input type="checkbox" checked={draft.firstVisit} onChange={(e) => setD('firstVisit', e.target.checked)} style={{ width: 16, height: 16, accentColor: BTN_GREEN_SOLID }} />
               Premier rendez-vous pour ce patient
             </label>
 
@@ -412,7 +413,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
         {/* ── Footer ── */}
         <div style={{ padding: isMobile ? '12px 16px' : '14px 24px', borderTop: `1px solid ${BORDER}`, display: 'flex', gap: 10, justifyContent: 'flex-end', flexShrink: 0, background: '#fff' }}>
           <button onClick={close} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid #D8E2DD`, background: '#fff', color: DARK, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ANNULER</button>
-          <button onClick={save} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
+          <button onClick={save} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
             {saving ? 'ENREGISTREMENT…' : 'MODIFIER LE RENDEZ-VOUS'}
           </button>
         </div>
@@ -430,12 +431,12 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               {[['cash', 'Espèces'], ['card', 'Carte / CMI'], ['wallet', 'Wallet']].map(([val, label]) => (
                 <button key={val} onClick={() => setPayDraft((p) => ({ ...p, method: val }))}
-                  style={{ flex: 1, padding: '7px 6px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: payDraft.method === val ? TEAL : '#fff', color: payDraft.method === val ? '#fff' : MUTED, border: `1px solid ${payDraft.method === val ? TEAL : '#D8E2DD'}` }}>{label}</button>
+                  style={{ flex: 1, padding: '7px 6px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: payDraft.method === val ? BTN_GREEN : '#fff', color: payDraft.method === val ? '#fff' : MUTED, border: `1px solid ${payDraft.method === val ? TEAL : '#D8E2DD'}` }}>{label}</button>
               ))}
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setPayOpen(false)} style={{ padding: '7px 13px', borderRadius: 8, border: '1px solid #D8E2DD', background: '#fff', color: DARK, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
-              <button onClick={doPay} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Encaisser</button>
+              <button onClick={doPay} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Encaisser</button>
             </div>
           </div>
         </div>
@@ -467,7 +468,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
                   <p style="margin-top:36px"><strong>${esc(docName)}</strong></p>
                   <script>window.onload=()=>window.print()</` + `script></body></html>`);
                 w.document.close();
-              }} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Imprimer le courrier</button>
+              }} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Imprimer le courrier</button>
             </div>
           </div>
         </div>

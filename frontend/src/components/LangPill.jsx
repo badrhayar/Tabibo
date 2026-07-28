@@ -1,4 +1,5 @@
 import { useApp } from '../context/AppContext';
+import { BTN_GREEN } from '../shared.jsx';
 
 // Compact language switcher for the patient booking funnel (the marketing
 // pages have their own in MarketingHeader). Flips document direction to RTL
@@ -19,7 +20,7 @@ export default function LangPill({ style, dark = false }) {
           style={{
             border: 'none', cursor: 'pointer', borderRadius: 8, padding: '5px 10px',
             fontSize: 12, fontWeight: 700, lineHeight: 1,
-            background: cur === code ? (dark ? '#fff' : '#0F6E56') : 'transparent',
+            background: cur === code ? (dark ? '#fff' : BTN_GREEN) : 'transparent',
             color: cur === code ? (dark ? '#0C4A37' : '#fff') : (dark ? 'rgba(255,255,255,0.8)' : '#6B7B76'),
             fontFamily: code === 'ar' ? "'Noto Sans Arabic','Inter',sans-serif" : 'inherit',
           }}

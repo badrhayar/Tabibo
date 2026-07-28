@@ -1,6 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { I18N, CITY_OPTS } from '../shared.jsx';
+import { I18N, CITY_OPTS, BTN_GREEN } from '../shared.jsx';
 import Icon from '../components/Icon';
 import MarketingHeader from '../components/MarketingHeader';
 import MarketingFooter from '../components/MarketingFooter';
@@ -106,7 +106,7 @@ export default function ForPatients() {
             <button
               onClick={() => go('search')}
               style={{
-                background: PRIMARY, color: '#fff', border: 'none',
+                background: BTN_GREEN, color: '#fff', border: 'none',
                 borderRadius: 10, padding: '13px 20px',
                 fontSize: 15, fontWeight: 700, cursor: 'pointer', textAlign: 'center', whiteSpace: 'nowrap',
                 boxShadow: '0 4px 20px rgba(22,160,106,0.30)',
@@ -337,7 +337,7 @@ export default function ForPatients() {
             <button
               onClick={() => go('pregister')}
               style={{
-                background: PRIMARY, color: '#fff', border: 'none',
+                background: BTN_GREEN, color: '#fff', border: 'none',
                 borderRadius: 10, padding: '14px 18px', whiteSpace: 'nowrap', textAlign: 'center', width: isMobile ? '100%' : undefined, flex: isMobile ? undefined : 1,
                 fontSize: 16, fontWeight: 700, cursor: 'pointer',
                 boxShadow: '0 4px 20px rgba(22,160,106,0.35)',

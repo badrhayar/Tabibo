@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
-import { SPEC_INFO, subscriptionState, renewalInfo, paymentRef, greenBtn, greenBtnBusy } from '../../shared.jsx';
+import { SPEC_INFO, subscriptionState, renewalInfo, paymentRef, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow } from '../../lib/time.js';
 import { fetchDoctorPayments, declarePayment, doctorRequestActivation, notifyVerification } from '../../lib/api';
-import { PLAN_DEF, planFeatures } from '../../lib/plans';
+import { PLAN_DEF, planFeatures, renderLabel } from '../../lib/plans';
 
 const PRIMARY = '#0F6E56';
 const DARK = '#15314A';
@@ -31,11 +31,11 @@ const Download = ({ c = PRIMARY }) => (
 const PLANS = {
   pro: {
     ...PLAN_DEF.pro,
-    features: planFeatures('pro').map((f) => f.label),
+    features: planFeatures('pro'),
   },
   premium: {
     ...PLAN_DEF.premium,
-    features: planFeatures('premium').map((f) => f.label),
+    features: planFeatures('premium'),
   },
 };
 
@@ -128,16 +128,27 @@ export default function Subscription({ state, setState, go }) {
         )}
         <div style={{ fontWeight: 800, fontSize: 19, color: DARK }}>{p.name}</div>
         <div style={{ fontSize: 13, color: MUTED, marginTop: 2, marginBottom: 12 }}>{p.tagline}</div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 12, minHeight: 42 }}>
+        {/* Hauteur fixe et contenu centré : le « 399 » et la mention « tarif
+            annoncé » occupent exactement la même bande sur les deux cartes. */}
+        <div style={{ height: 44, display: 'flex', alignItems: 'center', marginBottom: 12 }}>
           {price != null
-            ? <><span style={{ fontSize: 34, fontWeight: 800, color: DARK }}>{price}</span><span style={{ fontSize: 15, fontWeight: 500, color: MUTED }}>MAD/mois</span></>
+            ? <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}><span style={{ fontSize: 34, fontWeight: 800, color: DARK, lineHeight: 1 }}>{price}</span><span style={{ fontSize: 15, fontWeight: 500, color: MUTED }}>MAD/mois</span></span>
             : <span style={{ fontSize: 15, fontWeight: 600, color: MUTED }}>Tarif annoncé à l'ouverture</span>}
         </div>
-        <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, margin: '0 0 16px' }}>{p.pitch}</p>
+        {/* Même réserve de hauteur pour le chapeau : les deux listes commencent
+            à la même ligne, quelle que soit la longueur du texte. */}
+        <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, margin: '0 0 16px', minHeight: 80 }}>{p.pitch}</p>
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 18px 0', display: 'flex', flexDirection: 'column', gap: 11 }}>
           {p.features.map((f, i) => (
-            <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 13.5, color: DARK, fontWeight: i === 0 && p.key === 'premium' ? 700 : 400, lineHeight: 1.45 }}>
-              <span style={{ flexShrink: 0, marginTop: 2 }}><Check c={p.key === 'premium' ? '#5B45A0' : PRIMARY} /></span> {f}
+            <li key={f.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 13.5, color: DARK, fontWeight: i === 0 && p.key === 'premium' ? 700 : 400, lineHeight: 1.45 }}>
+              <span style={{ flexShrink: 0, marginTop: 2 }}><Check c={p.key === 'premium' ? '#5B45A0' : PRIMARY} /></span>
+              <span>
+                {renderLabel(f.label).map((frag) => (
+                  frag.acronym
+                    ? <span key={frag.key} style={{ letterSpacing: '0.09em' }}>{frag.text}</span>
+                    : <span key={frag.key}>{frag.text}</span>
+                ))}
+              </span>
             </li>
           ))}
         </ul>
@@ -145,7 +156,7 @@ export default function Subscription({ state, setState, go }) {
           <button
             onClick={() => choosePlan(p.key)}
             disabled={locked}
-            style={{ width: '100%', background: locked ? '#EAF6F0' : (recommended ? '#0F6E56' : 'transparent'), color: locked ? '#0E7C52' : (recommended ? '#fff' : '#0F6E56'), border: locked ? '1px solid #C3E8D8' : '1px solid #0F6E56', borderRadius: 9, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: locked ? 'default' : 'pointer', fontFamily: 'inherit' }}
+            style={{ width: '100%', background: locked ? '#EAF6F0' : (recommended ? BTN_GREEN : 'transparent'), color: locked ? '#0E7C52' : (recommended ? '#fff' : '#0F6E56'), border: locked ? '1px solid #C3E8D8' : '1px solid #0F6E56', borderRadius: 9, padding: '10px 0', fontWeight: 700, fontSize: 13, cursor: locked ? 'default' : 'pointer', fontFamily: 'inherit' }}
           >
             {label}
           </button>
@@ -231,7 +242,7 @@ export default function Subscription({ state, setState, go }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 26 }}>
         <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 50, padding: 4, display: 'flex' }}>
           {[['Mensuel', false], ['Annuel −20%', true]].map(([label, val]) => (
-            <button key={label} onClick={() => setState({ aboAnnual: val })} style={{ background: annual === val ? '#0F6E56' : 'transparent', color: annual === val ? '#fff' : MUTED, border: 'none', borderRadius: 50, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>{label}</button>
+            <button key={label} onClick={() => setState({ aboAnnual: val })} style={{ background: annual === val ? BTN_GREEN : 'transparent', color: annual === val ? '#fff' : MUTED, border: 'none', borderRadius: 50, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>{label}</button>
           ))}
         </div>
       </div>

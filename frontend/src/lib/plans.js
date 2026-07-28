@@ -15,6 +15,8 @@ export const FEATURES = {
   dossier: {
     plan: 'pro', icon: 'file',
     label: 'Dossier patient numérique',
+    labelEn: 'Digital patient record',
+    labelAr: 'الملف الطبي الرقمي',
     short: "Tout l'historique médical d'un patient sur un seul écran.",
     long: [
       "Le dossier patient de Tabibo remplace le classeur papier du cabinet. Chaque patient dispose d'un dossier unique, structuré en sections professionnelles : consultation en cours, profil patient, informations administratives, historique du parcours de soins, antécédents et mode de vie, traitements en cours, données de suivi, biologie et biométrie, documents, prévention, carnet de vaccination et factures.",
@@ -33,6 +35,8 @@ export const FEATURES = {
   docs: {
     plan: 'pro', icon: 'folder',
     label: 'Gestion documentaire',
+    labelEn: 'Document management',
+    labelAr: 'إدارة الوثائق',
     short: 'Importer, classer et retrouver chaque document du patient.',
     long: [
       "Chaque document reçu au cabinet — bilan de laboratoire, compte-rendu d'imagerie, radiographie, ECG, ordonnance, courrier confrère, arrêt de travail, facture, carte d'assurance — est importé dans le dossier du patient et classé dans une catégorie couleur.",
@@ -51,6 +55,8 @@ export const FEATURES = {
   finance: {
     plan: 'pro', icon: 'chart',
     label: 'Facturation et aperçu financier',
+    labelEn: 'Billing and financial overview',
+    labelAr: 'الفوترة والنظرة المالية',
     short: 'Ce qui reste à facturer, ce qui est encaissé, et par quel moyen.',
     long: [
       "Le module Facturation donne au cabinet la vue complète de son activité économique : le montant facturable qui n'a pas encore été facturé, les recettes de la période choisie (mois, trimestre, année ou période personnalisée), la répartition entre facturation AMO et facturation privée, et le détail des paiements.",
@@ -69,6 +75,8 @@ export const FEATURES = {
   rdv: {
     plan: 'pro', icon: 'calendar',
     label: 'Rendez-vous illimités',
+    labelEn: 'Unlimited appointments',
+    labelAr: 'مواعيد غير محدودة',
     short: 'Aucun plafond sur le nombre de rendez-vous pris en ligne.',
     long: [
       "Le nombre de rendez-vous pris sur Tabibo n'est jamais limité, quel que soit le volume du cabinet. Les patients réservent depuis votre page publique ou depuis l'application, et le créneau apparaît immédiatement dans votre agenda.",
@@ -87,6 +95,8 @@ export const FEATURES = {
   rappels: {
     plan: 'pro', icon: 'bell',
     label: 'Agenda & rappels e-mail / WhatsApp (500 / mois)',
+    labelEn: 'Agenda & email / WhatsApp reminders (500 / month)',
+    labelAr: 'أجندة وتذكيرات بالبريد وواتساب (500 / شهر)',
     short: 'Le rappel automatique qui fait chuter les rendez-vous non honorés.',
     long: [
       "Tabibo envoie automatiquement à vos patients la confirmation de leur rendez-vous puis un rappel avant l'échéance, par e-mail et par WhatsApp — les deux canaux réellement utilisés au Maroc. Vous choisissez le délai du rappel et le texte du message.",
@@ -105,6 +115,8 @@ export const FEATURES = {
   messagerie: {
     plan: 'pro', icon: 'chat',
     label: 'Messagerie patients',
+    labelEn: 'Patient messaging',
+    labelAr: 'مراسلة المرضى',
     short: 'Les questions des patients traitées hors du téléphone.',
     long: [
       "La messagerie permet au patient d'adresser une demande écrite au cabinet — renouvellement d'ordonnance, question sur un résultat, demande de certificat ou de courrier, question administrative — avec une pièce jointe si nécessaire.",
@@ -122,8 +134,10 @@ export const FEATURES = {
   },
   conformite: {
     plan: 'pro', icon: 'shield',
-    label: 'Conformité loi 09-08 (CNDP) — protection maximale des données',
-    short: 'Les données de santé de vos patients traitées selon la loi marocaine.',
+    label: 'Conformité loi 09-08 (CNDP)',
+    labelEn: 'Law 09-08 (CNDP) compliance',
+    labelAr: 'مطابقة القانون 09-08 (CNDP)',
+    short: 'Protection maximale : les données de santé de vos patients traitées selon la loi marocaine.',
     long: [
       "Le traitement des données à caractère personnel au Maroc est encadré par la loi n° 09-08, sous le contrôle de la Commission Nationale de contrôle de la protection des Données à caractère Personnel (CNDP). Les données de santé y sont des données sensibles, soumises au régime le plus strict.",
       "Tabibo est conçu pour ce cadre : cloisonnement strict des données par cabinet au niveau de la base de données, chiffrement des échanges et des fichiers stockés, accès nominatif pour chaque membre de l'équipe avec des droits limités à sa fonction (une secrétaire ne voit ni la facturation du cabinet ni les ordonnances), et journalisation des accès.",
@@ -143,6 +157,8 @@ export const FEATURES = {
   toutpro: {
     plan: 'premium', icon: 'check',
     label: 'Tout ce qui est inclus dans Pro',
+    labelEn: 'Everything included in Pro',
+    labelAr: 'كل ما تتضمنه صيغة Pro',
     short: "L'intégralité de la formule Pro, sans exception.",
     long: [
       "Premium n'est pas une formule séparée : c'est Pro auquel s'ajoutent l'intelligence artificielle et la vidéo. Toutes les fonctions décrites dans Pro restent disponibles à l'identique, sans limitation.",
@@ -157,6 +173,8 @@ export const FEATURES = {
   iaphone: {
     plan: 'premium', icon: 'phone',
     label: 'Assistant téléphonique IA',
+    labelEn: 'AI phone assistant',
+    labelAr: 'مساعد هاتفي بالذكاء الاصطناعي',
     short: 'Le standard du cabinet répond même quand personne ne peut décrocher.',
     long: [
       "L'assistant téléphonique répond aux appels que le cabinet ne peut pas prendre : pendant une consultation, à l'heure du déjeuner, le soir, le week-end. Il comprend le darija, l'arabe et le français.",
@@ -175,6 +193,8 @@ export const FEATURES = {
   iaconsult: {
     plan: 'premium', icon: 'mic',
     label: 'Assistant de consultation IA',
+    labelEn: 'AI consultation assistant',
+    labelAr: 'مساعد استشارة بالذكاء الاصطناعي',
     short: "L'observation médicale rédigée pendant que vous parlez au patient.",
     long: [
       "L'assistant de consultation écoute la consultation, avec l'accord du patient, et rédige l'observation à votre place : interrogatoire, examen clinique, conclusion. Vous relisez, corrigez si besoin, et validez.",
@@ -193,6 +213,8 @@ export const FEATURES = {
   iabilling: {
     plan: 'premium', icon: 'receipt',
     label: 'Assistant de facturation IA',
+    labelEn: 'AI billing assistant',
+    labelAr: 'مساعد فوترة بالذكاء الاصطناعي',
     short: 'La facture juste, complète, sans acte oublié.',
     long: [
       "L'assistant de facturation relit chaque consultation et propose la facturation correspondante : acte principal, actes associés, majorations applicables, part AMO et part patient. Ce qui a été fait et non facturé remonte automatiquement.",
@@ -211,6 +233,8 @@ export const FEATURES = {
   video: {
     plan: 'premium', icon: 'video',
     label: 'Téléconsultation vidéo',
+    labelEn: 'Video teleconsultation',
+    labelAr: 'استشارة عن بُعد بالفيديو',
     short: 'La consultation à distance, intégrée au dossier du patient.',
     long: [
       "La téléconsultation se lance depuis le rendez-vous, dans le navigateur : rien à installer pour le patient, qui reçoit simplement un lien. La qualité s'adapte automatiquement à la connexion, ce qui compte hors des grandes villes.",
@@ -229,6 +253,8 @@ export const FEATURES = {
   rappelsill: {
     plan: 'premium', icon: 'bell',
     label: 'Rappels e-mail / WhatsApp illimités',
+    labelEn: 'Unlimited email / WhatsApp reminders',
+    labelAr: 'تذكيرات غير محدودة بالبريد وواتساب',
     short: 'Aucun plafond mensuel, quel que soit le volume du cabinet.',
     long: [
       "Les 500 rappels mensuels de la formule Pro couvrent un cabinet individuel. Un cabinet de groupe, un centre avec plusieurs praticiens ou une activité à fort volume dépasse ce seuil.",
@@ -239,6 +265,26 @@ export const FEATURES = {
       'Relance automatique après un rendez-vous non honoré',
       'Campagnes de prévention (vaccination, dépistage)',
       'Aucun surcoût au volume',
+    ],
+  },
+  synthese: {
+    plan: 'premium', icon: 'file',
+    label: 'Synthèse automatique du dossier patient',
+    labelEn: 'Automatic patient-record summary',
+    labelAr: 'ملخص تلقائي لملف المريض',
+    short: "L'essentiel d'un dossier de dix ans, lu en trente secondes.",
+    long: [
+      "Un patient suivi depuis des années accumule des dizaines de consultations, de comptes rendus et de résultats. Avant de le recevoir, le médecin n'a ni le temps de tout relire, ni le droit de passer à côté d'un antécédent.",
+      "Premium produit une synthèse écrite du dossier : motif des dernières visites, antécédents marquants, traitements de fond en cours, allergies, résultats hors normes récents et points de suivi ouverts. Elle se met à jour à chaque nouvel élément versé au dossier.",
+      "La synthèse est une aide à la lecture, jamais une décision : chaque affirmation renvoie à la pièce du dossier dont elle est tirée, et le médecin garde la main sur ce qu'il en retient.",
+    ],
+    bullets: [
+      'Synthèse du dossier générée avant la consultation',
+      'Antécédents, traitements de fond et allergies mis en avant',
+      'Résultats hors normes des douze derniers mois signalés',
+      'Chaque affirmation renvoie à sa source dans le dossier',
+      'Mise à jour automatique à chaque nouvel élément',
+      'Exportable en une page pour un confrère',
     ],
   },
 };
@@ -254,8 +300,26 @@ export const PLAN_DEF = {
     key: 'premium', name: 'Premium', price: null, available: false,
     tagline: "L'intelligence artificielle et la vidéo",
     pitch: "Tout Pro, augmenté de quatre assistants : le téléphone qui répond seul, l'observation rédigée pendant la consultation, la facturation contrôlée automatiquement, et la consultation à distance en vidéo.",
-    features: ['toutpro', 'iaphone', 'iaconsult', 'iabilling', 'video', 'rappelsill'],
+    features: ['toutpro', 'iaphone', 'iaconsult', 'iabilling', 'synthese', 'video', 'rappelsill'],
   },
 };
 
 export const planFeatures = (key) => (PLAN_DEF[key]?.features || []).map((f) => ({ key: f, ...FEATURES[f] }));
+
+/**
+ * Rend un libellé en soignant les sigles : « IA » collé à son mot se lit mal,
+ * et une coupure de ligne entre « consultation » et « IA » casse le sens.
+ * On soude donc le sigle par une espace insécable et on l'aère très légèrement.
+ * Retourne un tableau de fragments React — à insérer tel quel dans du JSX.
+ */
+export function renderLabel(text) {
+  const glued = String(text || '').replace(/ (IA|AI)\b/g, '\u00A0$1');
+  return glued.split(/(IA|AI)(?![a-zà-ÿ])/).map((part, i) =>
+    (part === 'IA' || part === 'AI')
+      ? { acronym: true, text: part, key: i }
+      : { acronym: false, text: part, key: i });
+}
+
+/** Libellé d'une fonction dans la langue affichée (français par défaut). */
+export const featureLabel = (f, lang = 'fr') =>
+  (lang === 'en' ? f.labelEn : lang === 'ar' ? f.labelAr : f.label) || f.label;

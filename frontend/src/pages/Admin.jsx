@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
 import { fetchClientErrors, clearClientErrors, fetchActivationStats, fetchAllAccounts, adminDeleteUser, saveAppSettings, fetchAppSettings, fetchDoctorsForReview, reviewDoctor, getCredentialUrl, notifyVerification, sendTestEmail, adminSetBlocked, adminSetSubscription, adminConfirmPayment, adminAddPayment, adminRenewSubscription, adminStopSubscription } from '../lib/api';
 import LocationPicker from '../components/LocationPicker';
-import { initials, CREDENTIAL_DOCS, DECLINE_REASONS, subscriptionState, renewalInfo, fmtPeriod } from '../shared.jsx';
+import { initials, CREDENTIAL_DOCS, DECLINE_REASONS, subscriptionState, renewalInfo, fmtPeriod, BTN_GREEN } from '../shared.jsx';
 
 const DOC_LABEL = Object.fromEntries(CREDENTIAL_DOCS.map((d) => [d.key, d.label]));
 
@@ -161,7 +161,7 @@ export default function Admin() {
         <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: 36, maxWidth: 380, textAlign: 'center' }}>
           <div style={{ fontSize: 18, fontWeight: 800, color: DARK, marginBottom: 8 }}>Accès réservé</div>
           <p style={{ fontSize: 14, color: MUTED, margin: '0 0 18px' }}>Cette console est réservée aux administrateurs Tabibo.</p>
-          <button onClick={() => go('home')} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Retour à l'accueil</button>
+          <button onClick={() => go('home')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Retour à l'accueil</button>
         </div>
       </div>
     );
@@ -289,7 +289,7 @@ export default function Admin() {
                         <tr key={a.id} style={{ borderTop: `1px solid ${BORDER}` }}>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                              {declared && <button onClick={() => confirmPay(doc, declared)} title="Valider le paiement reçu" style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 11px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}>Valider</button>}
+                              {declared && <button onClick={() => confirmPay(doc, declared)} title="Valider le paiement reçu" style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '6px 11px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}>Valider</button>}
                               <div style={{ width: 34, height: 34, borderRadius: '50%', background: GRAD, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{initials(a.full_name)}</div>
                               <div style={{ minWidth: 0 }}>
                                 <span style={{ fontSize: 14, fontWeight: 600, color: DARK }}>{a.full_name || '—'}</span>
@@ -418,7 +418,7 @@ export default function Admin() {
           <>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
               {[['pending', 'En attente'], ['approved', 'Approuvés'], ['rejected', 'Refusés'], ['all', 'Tous']].map(([k, label]) => (
-                <button key={k} onClick={() => setReviewFilter(k)} style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: reviewFilter === k ? PRIMARY : '#fff', color: reviewFilter === k ? '#fff' : MUTED, border: `1.5px solid ${reviewFilter === k ? PRIMARY : BORDER}` }}>{label}</button>
+                <button key={k} onClick={() => setReviewFilter(k)} style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: reviewFilter === k ? BTN_GREEN : '#fff', color: reviewFilter === k ? '#fff' : MUTED, border: `1.5px solid ${reviewFilter === k ? PRIMARY : BORDER}` }}>{label}</button>
               ))}
             </div>
             <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden' }}>
@@ -514,7 +514,7 @@ export default function Admin() {
                             </div>
                           )}
                           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-                            <button onClick={() => renewSub(detail)} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Renouveler l'abonnement (+1 mois)</button>
+                            <button onClick={() => renewSub(detail)} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Renouveler l'abonnement (+1 mois)</button>
                             <button onClick={() => blockToggle(detail)} style={{ background: detail.blocked ? '#E7F6EE' : '#FEF6E7', color: detail.blocked ? '#0E7C52' : '#C28A1B', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>{detail.blocked ? 'Débloquer' : 'Bloquer'}</button>
                             {!s.expired && (
                               <button onClick={() => stopSub(detail)} style={{ background: '#FCE8EC', color: '#C2415C', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Arrêter l'abonnement</button>
@@ -531,7 +531,7 @@ export default function Admin() {
                                   <span style={{ display: 'inline-block', marginTop: 3, background: pp.bg, color: pp.c, borderRadius: 99, padding: '2px 9px', fontSize: 11.5, fontWeight: 700 }}>{pp.t}</span>
                                 </div>
                                 {p.status !== 'paid' && (
-                                  <button onClick={() => confirmPay(detail, p)} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Confirmer &amp; renouveler</button>
+                                  <button onClick={() => confirmPay(detail, p)} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Confirmer &amp; renouveler</button>
                                 )}
                               </div>
                             );
@@ -548,7 +548,7 @@ export default function Admin() {
                   </div>
                   {detail.verification_status === 'pending' && (
                     <div style={{ padding: '0 22px 20px', display: 'flex', gap: 10 }}>
-                      <button onClick={() => approve(detail)} style={{ flex: 1, background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Accepter</button>
+                      <button onClick={() => approve(detail)} style={{ flex: 1, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Accepter</button>
                       <button onClick={() => { setDeclineFor(detail); setDeclineReason(DECLINE_REASONS[0]); setDeclineNote(''); }} style={{ flex: 1, background: '#FCE8EC', color: '#C2415C', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Refuser</button>
                     </div>
                   )}
@@ -596,7 +596,7 @@ export default function Admin() {
                     <div style={{ fontSize: 12.5, color: MUTED }}>{fmtPeriod(p.period)} · {p.amount} MAD · signalé le {p.declared_at ? new Date(p.declared_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
                   </div>
                   <button onClick={() => setDetailId(doc.id)} style={{ background: BG, color: DARK, border: `1px solid ${BORDER}`, borderRadius: 8, padding: '8px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Voir le profil</button>
-                  <button onClick={() => renewSub(doc)} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Paiement reçu — renouveler</button>
+                  <button onClick={() => renewSub(doc)} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Paiement reçu — renouveler</button>
                 </div>
               ))}
             </div>
@@ -634,7 +634,7 @@ export default function Admin() {
                         </td>
                         <td style={{ padding: '12px 16px', fontSize: 13, color: declared ? '#0E7C52' : MUTED, fontWeight: declared ? 700 : 400 }}>{declared ? 'Oui — à confirmer' : '—'}</td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button onClick={() => setDetailId(doc.id)} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Gérer</button>
+                          <button onClick={() => setDetailId(doc.id)} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Gérer</button>
                         </td>
                       </tr>
                     );
@@ -654,7 +654,7 @@ export default function Admin() {
             <input value={rib} onChange={(e) => setRib(e.target.value)} placeholder="230 810 0000000000000000 12" style={{ ...inputStyle, marginBottom: 16, fontFamily: 'monospace' }} />
             <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: DARK, marginBottom: 6 }}>Banque / titulaire</label>
             <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Attijariwafa Bank — Tabibo SAS" style={{ ...inputStyle, marginBottom: 22 }} />
-            <button onClick={saveRib} disabled={busy} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Enregistrement…' : 'Enregistrer le RIB'}</button>
+            <button onClick={saveRib} disabled={busy} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Enregistrement…' : 'Enregistrer le RIB'}</button>
 
             {/* Email tester */}
             <div style={{ marginTop: 28, paddingTop: 22, borderTop: `1px solid ${BORDER}` }}>
@@ -721,7 +721,7 @@ export default function Admin() {
               />
             </div>
 
-            <button onClick={saveCompany} disabled={busy} style={{ marginTop: 20, background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Enregistrement…' : 'Enregistrer les informations'}</button>
+            <button onClick={saveCompany} disabled={busy} style={{ marginTop: 20, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '12px 22px', fontWeight: 700, fontSize: 14, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>{busy ? 'Enregistrement…' : 'Enregistrer les informations'}</button>
           </div>
         )}
       </div>

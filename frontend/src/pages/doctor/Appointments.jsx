@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
-import { initials, greenBtn, greenBtnBusy } from '../../shared.jsx';
+import { initials, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import Icon from '../../components/Icon';
 import { updateAppointmentStatus, updateAppointment, markAppointmentPaid, markArrived, markInConsultation, sendApptWhatsApp, notifyApptEmail, ringPatient, STATUS_FR, PAY_METHOD_FR } from '../../lib/api';
 import { moroccoToUTCISO, moPartsOf } from '../../lib/time.js';
@@ -101,7 +101,7 @@ function RowActionsInline({ actions }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
       {actions.filter((a) => !a.divider).map((a) => {
-        const [bg, fg] = a.active ? ['#0F6E56', '#fff']
+        const [bg, fg] = a.active ? [BTN_GREEN, '#fff']
           : a.disabled ? ['#F4F6F5', '#C6D0CC']
           : a.danger ? ['#FDE7EA', '#C2415C']
           : [CHIP_BG[a.tone] || '#E9F5F0', a.tone || '#0E7C52'];
@@ -594,7 +594,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
                 {[['cash', 'Espèces'], ['card', 'Carte / CMI'], ['wallet', 'Wallet']].map(([val, label]) => (
                   <button key={val} onClick={() => setPayModal({ ...payModal, method: val })} style={{
                     flex: 1, padding: '7px 6px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                    background: payModal.method === val ? '#0F6E56' : '#fff',
+                    background: payModal.method === val ? BTN_GREEN : '#fff',
                     color: payModal.method === val ? '#fff' : MUTED,
                     border: `1px solid ${payModal.method === val ? '#0F6E56' : BORDER_STRONG}`,
                   }}>{label}</button>

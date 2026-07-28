@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BTN_GREEN } from '../../shared.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { STATION_KINDS, kindOf, loadStations, saveStations, defaultStations } from '../../lib/stations';
 import { saveDoctorStations } from '../../lib/api';
@@ -94,7 +95,9 @@ export default function Stations({ state, setState, go }) {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px', gap: 16, alignItems: 'start' }}>
+      {/* `stretch` : les deux colonnes s'arrêtent à la même ligne, sinon la carte
+          d'aide flotte plus haut ou plus bas que la liste des postes. */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px', gap: 16, alignItems: isMobile ? 'start' : 'stretch' }}>
         {/* Les postes */}
         <div style={card}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -140,14 +143,14 @@ export default function Stations({ state, setState, go }) {
               {STATION_KINDS.map((x) => <option key={x.key} value={x.key}>{x.label}</option>)}
             </select>
             <button onClick={add} disabled={!name.trim()}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: name.trim() ? 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)' : '#EAF0EC', color: name.trim() ? '#fff' : MUTED, border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: name.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: name.trim() ? BTN_GREEN : '#EAF0EC', color: name.trim() ? '#fff' : MUTED, border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: name.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
               {IC.plus} Ajouter
             </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 18, flexWrap: 'wrap' }}>
             <button onClick={save} disabled={busy || !dirty}
-              style={{ background: dirty && !busy ? 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)' : '#EAF0EC', color: dirty && !busy ? '#fff' : MUTED, border: 'none', borderRadius: 10, padding: '11px 20px', fontSize: 13.5, fontWeight: 700, cursor: dirty && !busy ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+              style={{ background: dirty && !busy ? BTN_GREEN : '#EAF0EC', color: dirty && !busy ? '#fff' : MUTED, border: 'none', borderRadius: 10, padding: '11px 20px', fontSize: 13.5, fontWeight: 700, cursor: dirty && !busy ? 'pointer' : 'default', fontFamily: 'inherit' }}>
               {busy ? 'Enregistrement…' : 'Enregistrer les postes'}
             </button>
             {!doctorId && <span style={{ fontSize: 12.5, color: MUTED }}>En démonstration, les postes restent sur cet appareil.</span>}

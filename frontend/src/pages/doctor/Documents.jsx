@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { uploadDocument, listDocuments, downloadDocument } from '../../lib/api';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
-import { DEMO_PATIENTS, GREEN_GRAD } from '../../shared.jsx';
+import { DEMO_PATIENTS, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
 
 const PRIMARY = '#16A06A';
@@ -281,7 +281,7 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
               disabled={busy}
               style={{
                 width: '100%',
-                background: '#0F6E56',
+                background: BTN_GREEN,
                 color: '#fff',
                 border: 'none',
                 borderRadius: 9,

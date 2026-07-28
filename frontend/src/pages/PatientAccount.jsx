@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { tint, initials, DOC_TYPE_OPTS, SPEC_INFO, docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD } from '../shared.jsx';
+import { tint, initials, DOC_TYPE_OPTS, SPEC_INFO, docDisplayName, greenBtn, greenBtnBusy, GREEN_GRAD, BTN_GREEN } from '../shared.jsx';
 import Icon from '../components/Icon';
 import LangPill from '../components/LangPill';
 import BrandMark, { Wordmark } from '../components/BrandMark';
@@ -440,7 +440,7 @@ export default function PatientAccount() {
               {!isMobile && tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}
             </button>
           )}
-          <button onClick={() => go('search')} style={{ background:'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', color:'#fff', border:'none', cursor:'pointer', padding: isMobile?0:'0 15px', width: isMobile?44:'auto', height: isMobile?44:34, borderRadius:9, fontSize:13, fontWeight:700, letterSpacing:'0.2px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6, boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)' }}>
+          <button onClick={() => go('search')} style={{ background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding: isMobile?0:'0 15px', width: isMobile?44:'auto', height: isMobile?44:34, borderRadius:9, fontSize:13, fontWeight:700, letterSpacing:'0.2px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6, boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)' }}>
             <span style={{ fontSize:15, lineHeight:1 }}>+</span>{isMobile ? tr('RDV', 'Book', 'حجز') : tr('Prendre un rendez-vous', 'Book an appointment', 'حجز موعد')}
           </button>
           <button onClick={() => authSignOut()} aria-label="Déconnexion" title="Déconnexion" style={{ background:'transparent', color:'rgba(255,255,255,0.85)', border:'1px solid rgba(255,255,255,0.22)', cursor:'pointer', padding: isMobile?0:'7px 13px', width: isMobile?44:'auto', height: isMobile?44:'auto', borderRadius:9, fontSize:13, fontWeight:600, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}
@@ -691,7 +691,7 @@ export default function PatientAccount() {
                       <span style={{ flex:1, minWidth:0, fontSize:12.5, color: docFile ? DARK : '#9AA8A2', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', textAlign:'left', direction:'ltr' }}>{docFile ? docFile.name : 'Choisir un fichier…'}</span>
                     </button>
                   </div>
-                  <button onClick={sendDoc} disabled={docBusy || !docFile} style={{ background:'#0F6E56', color:'#fff', border:'none', cursor: (docBusy || !docFile) ? 'default' : 'pointer', opacity: (docBusy || !docFile) ? 0.6 : 1, padding:'9px 11px', borderRadius:9, fontSize:12.5, fontWeight:600 }}>
+                  <button onClick={sendDoc} disabled={docBusy || !docFile} style={{ background:BTN_GREEN, color:'#fff', border:'none', cursor: (docBusy || !docFile) ? 'default' : 'pointer', opacity: (docBusy || !docFile) ? 0.6 : 1, padding:'9px 11px', borderRadius:9, fontSize:12.5, fontWeight:600 }}>
                     {docBusy ? tr('Envoi…', 'Sending…', 'جارٍ الإرسال…') : tr('Envoyer le document', 'Send the document', 'إرسال المستند')}
                   </button>
                 </div>
@@ -746,7 +746,7 @@ export default function PatientAccount() {
                 </div>
               ))}
             </div>
-            <button onClick={saveProfile} disabled={pfSaving} style={{ marginTop:20, background:'#0F6E56', color:'#fff', border:'none', cursor:pfSaving?'default':'pointer', opacity:pfSaving?0.6:1, padding:'8px 16px', borderRadius:9, fontSize:13, fontWeight:600 }}>
+            <button onClick={saveProfile} disabled={pfSaving} style={{ marginTop:20, background:BTN_GREEN, color:'#fff', border:'none', cursor:pfSaving?'default':'pointer', opacity:pfSaving?0.6:1, padding:'8px 16px', borderRadius:9, fontSize:13, fontWeight:600 }}>
               {pfSaving ? tr('Enregistrement…', 'Saving…', 'جارٍ الحفظ…') : tr('Enregistrer les modifications', 'Save changes', 'حفظ التعديلات')}
             </button>
           </div>
@@ -783,7 +783,7 @@ export default function PatientAccount() {
               <input type="date" value={relForm.dob} onChange={(e) => setRelForm((f) => ({ ...f, dob: e.target.value }))}
                 style={{ height:42, border:`1.5px solid ${BORDER}`, borderRadius:10, padding:'0 10px', fontSize:13, color:DARK, background:'#fff', fontFamily:'inherit' }} />
               <button onClick={handleAddRelative} disabled={relBusy}
-                style={{ background:'#0F6E56', color:'#fff', border:'none', borderRadius:9, padding:'0 16px', height:38, fontSize:12.5, fontWeight:600, cursor:'pointer', opacity:relBusy?0.6:1 }}>
+                style={{ background:BTN_GREEN, color:'#fff', border:'none', borderRadius:9, padding:'0 16px', height:38, fontSize:12.5, fontWeight:600, cursor:'pointer', opacity:relBusy?0.6:1 }}>
                 {relBusy ? '…' : '+ ' + tr('Ajouter', 'Add', 'إضافة')}
               </button>
             </div>
@@ -957,7 +957,7 @@ export default function PatientAccount() {
               disabled={!patientMsgInput.trim()}
               title={tr('Envoyer', 'Send', 'إرسال')}
               aria-label={tr('Envoyer le message', 'Send the message', 'إرسال الرسالة')}
-              style={{ width:38, height:38, borderRadius:'50%', background:G, border:'none', cursor: patientMsgInput.trim() ? 'pointer' : 'default', opacity: patientMsgInput.trim() ? 1 : 0.45, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0, transition:'opacity .15s' }}
+              style={{ width:38, height:38, borderRadius:'50%', background:BTN_GREEN, border:'none', cursor: patientMsgInput.trim() ? 'pointer' : 'default', opacity: patientMsgInput.trim() ? 1 : 0.45, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0, transition:'opacity .15s' }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
             </button>
@@ -980,7 +980,7 @@ export default function PatientAccount() {
             <textarea value={reviewText} onChange={e => setState({ reviewText: e.target.value })} placeholder="Partagez votre expérience (optionnel)…" style={{ width:'100%', minHeight:84, padding:'12px 13px', border:'1px solid #DCE5E0', borderRadius:11, fontSize:13.5, background:'#F8FBF9', outline:'none', resize:'vertical', marginBottom:18, boxSizing:'border-box' }} />
             <div style={{ display:'flex', gap:10 }}>
               <button onClick={() => setState({ reviewOpen:false })} style={{ flex:1, background:BG, color:'#5A6B65', border:`1px solid ${BORDER}`, cursor:'pointer', padding:12, borderRadius:11, fontSize:14, fontWeight:700 }}>Annuler</button>
-              <button onClick={publishReview} style={{ flex:1.4, background:'#0F6E56', color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Publier mon avis</button>
+              <button onClick={publishReview} style={{ flex:1.4, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Publier mon avis</button>
             </div>
           </div>
         </div>

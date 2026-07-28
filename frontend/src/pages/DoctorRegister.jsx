@@ -3,7 +3,7 @@ import { authErrorMessage } from '../lib/auth';
 import PasswordInput from '../components/PasswordInput';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { GOOGLE_SVG, CITY_OPTS as CITY_LIST, CREDENTIAL_DOCS, SPEC_OPTS, cityCoord } from '../shared.jsx';
+import { GOOGLE_SVG, CITY_OPTS as CITY_LIST, CREDENTIAL_DOCS, SPEC_OPTS, cityCoord, BTN_GREEN } from '../shared.jsx';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import LocationPicker from '../components/LocationPicker';
 import PhoneField from '../components/PhoneField';
@@ -493,7 +493,7 @@ export default function DoctorRegister() {
                   Si c'est votre compte médecin, connectez-vous. Sinon, utilisez une <strong>autre adresse email</strong> pour
                   votre compte médecin — votre formulaire est conservé, il suffit de changer l'email ci-dessus.
                 </p>
-                <button onClick={() => go('login')} style={{ background: '#16A06A', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => go('login')} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   Se connecter
                 </button>
               </div>
@@ -508,7 +508,7 @@ export default function DoctorRegister() {
               style={{
                 width: '100%',
                 padding: '13px',
-                background: PRIMARY,
+                background: BTN_GREEN,
                 color: '#fff',
                 border: 'none',
                 borderRadius: 11,

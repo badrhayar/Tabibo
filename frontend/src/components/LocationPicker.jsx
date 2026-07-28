@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { cleanMoroccoMap } from '../lib/mapClean';
-import { CITY_COORDS, CITY_OPTS } from '../shared.jsx';
+import { CITY_COORDS, CITY_OPTS, BTN_GREEN } from '../shared.jsx';
 
 const KEY = import.meta.env.VITE_MAPTILER_KEY;
 const STYLE = KEY
@@ -211,7 +211,7 @@ export default function LocationPicker({ city, value, initialQuery = '', onChang
             onClick={handleSave}
             disabled={saving || !hasLoc}
             style={{
-              background: saved ? '#E9F5F0' : '#0F6E56',
+              background: saved ? '#E9F5F0' : BTN_GREEN,
               color: saved ? '#0F6E56' : '#fff',
               border: saved ? '1px solid #BFE0D4' : 'none',
               borderRadius: 8, padding: '6px 14px', minHeight: 30, fontSize: 12.5, fontWeight: 600,

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 import PasswordInput from '../components/PasswordInput';
 import { useApp } from '../context/AppContext';
 import { updatePassword } from '../lib/auth';
@@ -53,7 +54,7 @@ export default function ResetPassword() {
 
         {error && <div style={{ background: '#FCE7EE', color: '#C2466A', borderRadius: 9, padding: '10px 12px', fontSize: 12.5, fontWeight: 600, marginBottom: 16 }}>{error}</div>}
 
-        <button onClick={submit} disabled={busy} style={{ width: '100%', padding: '13px', background: PRIMARY, color: '#fff', border: 'none', borderRadius: 11, fontSize: 15, fontWeight: 600, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>
+        <button onClick={submit} disabled={busy} style={{ width: '100%', padding: '13px', background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, fontSize: 15, fontWeight: 600, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.7 : 1 }}>
           {busy ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
         </button>
       </div>

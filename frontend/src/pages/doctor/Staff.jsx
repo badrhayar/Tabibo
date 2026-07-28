@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BTN_GREEN } from '../../shared.jsx';
 import { useApp } from '../../context/AppContext';
 import { fetchStaff, inviteStaff, setStaffActive, removeStaff } from '../../lib/api';
 
@@ -107,7 +108,7 @@ function StaffPreview() {
                 style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F7FAF9', width: '100%', boxSizing: 'border-box' }} />
             </div>
             <button onClick={demoToast}
-              style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', opacity: 0.6 }}>Inviter</button>
+              style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', opacity: 0.6 }}>Inviter</button>
           </div>
         </Card>
 
@@ -306,7 +307,7 @@ export default function Staff() {
               type="submit"
               disabled={inviting || !email.trim()}
               style={{
-                background: PRIMARY,
+                background: BTN_GREEN,
                 color: '#fff',
                 border: 'none',
                 borderRadius: 10,

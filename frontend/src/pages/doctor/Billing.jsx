@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { moroccoNow } from '../../lib/time';
 import {
@@ -227,9 +228,9 @@ export default function Billing({ state, setState, go }) {
 
             <H2>Recettes par période</H2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-              <button onClick={() => { setPOff(0); }} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 10, padding: '8px 15px', fontSize: 13, fontWeight: 700, color: DARK, cursor: 'pointer', fontFamily: 'inherit', boxShadow: SHADOW }}>Aujourd'hui</button>
-              <button onClick={() => setPOff((o) => o - 1)} aria-label="Période précédente" style={{ background: 'none', border: 'none', cursor: 'pointer', color: DARK, display: 'flex', padding: 6 }}>{IC.left}</button>
-              <button onClick={() => setPOff((o) => o + 1)} aria-label="Période suivante" style={{ background: 'none', border: 'none', cursor: 'pointer', color: DARK, display: 'flex', padding: 6 }}>{IC.right}</button>
+              <button onClick={() => { setPOff(0); }} style={{ height: 34, display: 'inline-flex', alignItems: 'center', background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 10, padding: '0 15px', fontSize: 13, fontWeight: 700, color: DARK, cursor: 'pointer', fontFamily: 'inherit', boxShadow: SHADOW }}>Aujourd'hui</button>
+              <button onClick={() => setPOff((o) => o - 1)} aria-label="Période précédente" style={{ height: 34, width: 34, background: 'none', border: 'none', cursor: 'pointer', color: DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>{IC.left}</button>
+              <button onClick={() => setPOff((o) => o + 1)} aria-label="Période suivante" style={{ height: 34, width: 34, background: 'none', border: 'none', cursor: 'pointer', color: DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>{IC.right}</button>
               <span style={{ fontSize: 15, fontWeight: 700, color: DARK, textTransform: 'capitalize' }}>{range.label}</span>
               <span style={{ flex: 1 }} />
               <div style={{ display: 'flex', background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 12, padding: 3, boxShadow: SHADOW }}>
@@ -237,7 +238,7 @@ export default function Billing({ state, setState, go }) {
                   const on = pKind === p.key;
                   return (
                     <button key={p.key} onClick={() => { setPKind(p.key); setPOff(0); }}
-                      style={{ background: on ? '#0C3D2D' : 'transparent', color: on ? '#fff' : MUTED, border: 'none', borderRadius: 9, padding: '7px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{p.label}</button>
+                      style={{ background: on ? BTN_GREEN : 'transparent', color: on ? '#fff' : MUTED, border: 'none', borderRadius: 9, padding: '7px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{p.label}</button>
                   );
                 })}
               </div>
@@ -390,7 +391,7 @@ export default function Billing({ state, setState, go }) {
                       return (
                         <tr key={i.id} style={{ borderBottom: '1px solid #F4F7F5' }}>
                           <td style={{ padding: '11px 12px', width: 34 }}>
-                            <input type="checkbox" checked={on} onChange={() => setChecked((l) => (on ? l.filter((x) => x !== i.id) : [...l, i.id]))} style={{ accentColor: TEAL, width: 15, height: 15, cursor: 'pointer' }} />
+                            <input type="checkbox" checked={on} onChange={() => setChecked((l) => (on ? l.filter((x) => x !== i.id) : [...l, i.id]))} style={{ accentColor: BTN_GREEN_SOLID, width: 15, height: 15, cursor: 'pointer' }} />
                           </td>
                           <td onClick={() => setDetail(i)} style={{ padding: '11px 12px', cursor: 'pointer' }}>
                             <div style={{ fontWeight: 700, color: DARK }}>{i.no}</div>
@@ -458,7 +459,7 @@ export default function Billing({ state, setState, go }) {
               <span style={{ fontSize: 15, fontWeight: 700, color: DARK }}>{amoRange.label}</span>
               <span style={{ flex: 1 }} />
               <button onClick={printBordereau} disabled={amoRows.length === 0}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: amoRows.length ? 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)' : '#EAF0EC', color: amoRows.length ? '#fff' : MUTED, border: 'none', borderRadius: 11, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: amoRows.length ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: amoRows.length ? BTN_GREEN : '#EAF0EC', color: amoRows.length ? '#fff' : MUTED, border: 'none', borderRadius: 11, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: amoRows.length ? 'pointer' : 'default', fontFamily: 'inherit' }}>
                 {IC.print} Générer le bordereau
               </button>
             </div>
@@ -534,7 +535,7 @@ export default function Billing({ state, setState, go }) {
                   </div>
                   <div style={{ fontSize: 13.5, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>{mad(c.amount || c.fee || 0)}</div>
                   <button onClick={() => invoiceConsult(c)}
-                    style={{ background: 'linear-gradient(135deg, #14795C 0%, #0C4A37 100%)', color: '#fff', border: 'none', borderRadius: 9, padding: '8px 13px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Facturer</button>
+                    style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '8px 13px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>Facturer</button>
                 </div>
               ))}
               {ni.rows.length === 0 && <div style={{ fontSize: 13, color: MUTED, textAlign: 'center', padding: 24 }}>Tout est facturé.</div>}

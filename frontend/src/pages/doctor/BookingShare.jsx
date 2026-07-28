@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { useApp } from '../../context/AppContext';
-import { docDisplayName } from '../../shared.jsx';
+import { docDisplayName, BTN_GREEN } from '../../shared.jsx';
 
 const G = '#16A06A';
 const DARK = '#15314A';
@@ -98,13 +98,13 @@ export default function BookingShare() {
           <div style={{ fontSize: 12.5, fontWeight: 800, color: '#9AA8A2', textTransform: 'uppercase', letterSpacing: .5, marginBottom: 10 }}>Votre lien de réservation</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <input readOnly value={link} onFocus={(e) => e.target.select()} style={{ flex: '1 1 280px', minWidth: 0, padding: '11px 13px', border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: 13.5, background: BG, color: DARK, direction: 'ltr' }} />
-            <button onClick={copy} style={btn(G, '#fff')}>
+            <button onClick={copy} style={btn(BTN_GREEN, '#fff')}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
               Copier
             </button>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <a href={preview ? undefined : `https://wa.me/?text=${waText}`} onClick={(e) => { if (preview) { e.preventDefault(); previewToast(); } }} target="_blank" rel="noreferrer" style={btn('#16A06A', '#fff')}>
+            <a href={preview ? undefined : `https://wa.me/?text=${waText}`} onClick={(e) => { if (preview) { e.preventDefault(); previewToast(); } }} target="_blank" rel="noreferrer" style={btn(BTN_GREEN, '#fff')}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.1-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-3.3-1-5.4-4.4-5.6-4.6-.2-.2-1.4-1.8-1.4-3.5s.9-2.5 1.2-2.8c.3-.3.6-.4.8-.4h.6c.2 0 .5 0 .7.5l.9 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2 1.3 2.3 1.5.3.1.5.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.4.2.5.3.1.2.1.7-.1 1.4z"/></svg>
               Partager sur WhatsApp
             </a>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 import { useApp } from '../context/AppContext';
 import { Stethoscope } from './BrandMark';
 
@@ -78,7 +79,7 @@ export default function AuthChoice() {
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setOpen((v) => (v === 'register' ? null : 'register'))}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', border: 'none', borderRadius: 8, padding: '8px 15px', cursor: 'pointer', fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", color: '#fff', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, background: BTN_GREEN, border: 'none', borderRadius: 8, padding: '8px 15px', cursor: 'pointer', fontSize: 13, fontWeight: 700, letterSpacing: '0.2px', fontFamily: "'Plus Jakarta Sans', Inter, sans-serif", color: '#fff', boxShadow: '0 4px 14px -5px rgba(18,144,94,0.65)' }}
         >
           {tr('Créer un compte', 'Create an account', 'إنشاء حساب')}
           <span style={{ fontSize: 9, opacity: 0.85, transform: open === 'register' ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>▾</span>

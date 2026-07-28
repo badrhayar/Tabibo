@@ -2,7 +2,7 @@ import { useState } from 'react';
 import BrandMark, { Wordmark } from './BrandMark';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { I18N, initials } from '../shared.jsx';
+import { I18N, initials, BTN_GREEN } from '../shared.jsx';
 import AuthChoice from './AuthChoice';
 import { Stethoscope } from './BrandMark';
 
@@ -82,7 +82,7 @@ export default function MarketingHeader({ activeKey, audience = 'patient' }) {
       <button
         onClick={() => (stacked ? goMobile(registerKey) : go(registerKey))}
         style={{
-          background: stacked ? PRIMARY : 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', border: 'none', borderRadius: stacked ? 11 : 8,
+          background: stacked ? BTN_GREEN : 'linear-gradient(135deg, #1FBB7C 0%, #12905E 100%)', border: 'none', borderRadius: stacked ? 11 : 8,
           padding: stacked ? '13px' : '8px 16px', minHeight: stacked ? 48 : undefined,
           cursor: 'pointer', fontSize: stacked ? 15 : 13, fontWeight: 700,
           letterSpacing: stacked ? undefined : '0.2px', fontFamily: stacked ? undefined : "'Plus Jakarta Sans', Inter, sans-serif",
@@ -217,7 +217,7 @@ export default function MarketingHeader({ activeKey, audience = 'patient' }) {
         {isMobile && (
           <div style={{ marginInlineStart: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
             {loggedIn && (
-              <button onClick={() => go('paccount')} aria-label="Compte" style={{ width: 40, height: 40, borderRadius: '50%', background: PRIMARY, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
+              <button onClick={() => go('paccount')} aria-label="Compte" style={{ width: 40, height: 40, borderRadius: '50%', background: BTN_GREEN, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
                 {initials(loggedInName)}
               </button>
             )}
@@ -275,7 +275,7 @@ export default function MarketingHeader({ activeKey, audience = 'patient' }) {
                     {tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}
                   </button>
                 )}
-                <button onClick={() => { setMenuOpen(false); go('paccount'); }} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 10, padding: '13px 14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => { setMenuOpen(false); go('paccount'); }} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, padding: '13px 14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
                   {tr('Mon espace patient', 'My patient space', 'فضائي كمريض')}
                 </button>
               </div>

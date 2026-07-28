@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { BTN_GREEN } from '../shared.jsx';
 import { useApp } from '../context/AppContext';
 import BrandMark from '../components/BrandMark';
 import { notifyWelcome } from '../lib/api';
@@ -48,7 +49,7 @@ export default function Verified() {
                   'شكراً دكتور. تم إرسال ملفكم إلى فريقنا : ستتم مراجعته خلال 24 إلى 48 ساعة وستتوصلون ببريد إلكتروني فور اتخاذ القرار. سجلوا الدخول لاستكمال وثائقكم.')}
             </p>
             <button onClick={() => go(user ? 'doctor' : 'login')}
-              style={{ width: '100%', padding: '13px 0', background: G, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '13px 0', background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               {user ? tr('Accéder à mon espace', 'Go to my space', 'الدخول إلى فضائي') : tr('Se connecter', 'Sign in', 'تسجيل الدخول')}
             </button>
           </>
@@ -60,7 +61,7 @@ export default function Verified() {
                   'مرحباً بكم في Tabibo ! حسابكم جاهز — يمكنكم الآن حجز مواعيدكم عبر الإنترنت.')}
             </p>
             <button onClick={() => go(user ? 'paccount' : 'plogin')}
-              style={{ width: '100%', padding: '13px 0', background: G, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '13px 0', background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               {user ? tr('Accéder à mon compte', 'Go to my account', 'الدخول إلى حسابي') : tr('Se connecter', 'Sign in', 'تسجيل الدخول')}
             </button>
             <button onClick={() => go('search')}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { subscriptionState, paymentRef, fmtPeriod } from '../shared.jsx';
+import { subscriptionState, paymentRef, fmtPeriod, BTN_GREEN } from '../shared.jsx';
 import { fetchDoctorPayments, declarePayment, declareCurrentPayment, notifyVerification } from '../lib/api';
 
 const PRIMARY = '#16A06A';
@@ -99,7 +99,7 @@ export default function DoctorBlocked() {
                 <div style={{ fontSize: 14, fontWeight: 700, color: DARK }}>{fmtPeriod(new Date().toISOString().slice(0, 7))} · {d?.plan === 'premium' ? 499 : 299} MAD</div>
                 <div style={{ fontSize: 12, color: MUTED }}>Abonnement du mois en cours</div>
               </div>
-              <button onClick={declareNow} disabled={busyId === 'now'} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: busyId === 'now' ? 0.7 : 1 }}>J'ai payé</button>
+              <button onClick={declareNow} disabled={busyId === 'now'} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: busyId === 'now' ? 0.7 : 1 }}>J'ai payé</button>
             </div>
           )
         )}
@@ -112,7 +112,7 @@ export default function DoctorBlocked() {
             {p.status === 'declared' ? (
               <span style={{ fontSize: 12.5, fontWeight: 700, color: '#C28A1B', background: '#FEF6E7', borderRadius: 99, padding: '5px 12px' }}>En attente ✓</span>
             ) : (
-              <button onClick={() => declare(p)} disabled={busyId === p.id} style={{ background: PRIMARY, color: '#fff', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: busyId === p.id ? 0.7 : 1 }}>J'ai payé</button>
+              <button onClick={() => declare(p)} disabled={busyId === p.id} style={{ background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 9, padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: busyId === p.id ? 0.7 : 1 }}>J'ai payé</button>
             )}
           </div>
         ))}
