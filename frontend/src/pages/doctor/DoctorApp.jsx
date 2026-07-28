@@ -64,6 +64,7 @@ import Requests from './Requests';
 import Billing from './Billing';
 import PlanDetails from './PlanDetails';
 import Stations from './Stations';
+import Network from './Network';
 import { loadStations } from '../../lib/stations';
 import { taskBadge } from '../../lib/tasks';
 
@@ -143,6 +144,7 @@ const IC = {
 // a SECOND rail (lighter green) listing the group's screens.
 const IC_TASKS = <svg {...S}><path fillRule="evenodd" d="M12 2.2a9.8 9.8 0 1 0 0 19.6 9.8 9.8 0 0 0 0-19.6zm4.72 7.05a1.1 1.1 0 0 0-1.56-1.56l-4.6 4.6-1.72-1.72a1.1 1.1 0 1 0-1.56 1.56l2.5 2.5a1.1 1.1 0 0 0 1.56 0z"/></svg>;
 const IC_BILL = <svg {...S}><path d="M14.9 3.4a1.3 1.3 0 0 1 0 2.6h-2.1c-2 0-3.7 1.2-4.5 3h6.6a1.3 1.3 0 0 1 0 2.6H7.9a5.4 5.4 0 0 0 0 .8h7a1.3 1.3 0 0 1 0 2.6H8.3c.8 1.8 2.5 3 4.5 3h2.1a1.3 1.3 0 0 1 0 2.6h-2.1c-3.6 0-6.6-2.3-7.5-5.6H4.3a1.3 1.3 0 0 1 0-2.6h.9a7.7 7.7 0 0 1 0-.8h-.9a1.3 1.3 0 0 1 0-2.6h1c.9-3.3 3.9-5.6 7.5-5.6z"/></svg>;
+const IC_SILA = <svg {...S}><circle cx="12" cy="7.6" r="3.5"/><path d="M12 12.6c-3.35 0-6.05 2.05-6.05 4.75 0 .72.58 1.3 1.3 1.3h9.5c.72 0 1.3-.58 1.3-1.3 0-2.7-2.7-4.75-6.05-4.75z"/><circle cx="4.5" cy="9.6" r="2.7"/><path d="M4.5 13.7c-2.4 0-4.3 1.45-4.3 3.4 0 .55.45 1 1 1h2.62a7.1 7.1 0 0 1 2.3-4.24 6.6 6.6 0 0 0-1.62-.16z"/><circle cx="19.5" cy="9.6" r="2.7"/><path d="M19.5 13.7c-.57 0-1.11.06-1.62.16a7.1 7.1 0 0 1 2.3 4.24h2.62c.55 0 1-.45 1-1 0-1.95-1.9-3.4-4.3-3.4z"/></svg>;
 const IC_NAV = <svg {...S}><circle cx="9.4" cy="7.3" r="3.9"/><path d="M9.4 12.9c-4 0-7.2 2.4-7.2 5.55 0 .8.65 1.45 1.45 1.45h8.2a6.55 6.55 0 0 1 2.2-6.44 11.6 11.6 0 0 0-4.65-.56z"/><path fillRule="evenodd" d="M17.5 13.1a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4zm2.36 3.06a.95.95 0 0 0-1.34-.11l-2.13 1.8-.72-.72a.95.95 0 1 0-1.34 1.34l1.33 1.33a.95.95 0 0 0 1.28.05l2.8-2.36a.95.95 0 0 0 .12-1.33z"/></svg>;
 const NAV = [
   { key:'doctor',   screen:'doctor', icon:IC.doctor, label:'Accueil' },
@@ -159,6 +161,7 @@ const NAV = [
     { screen:'dhist',      icon:IC.dhist,      label:'Consultations' },
     { screen:'dshare',     icon:IC.dshare,     label:'Inviter mes patients' },
   ] },
+  { key:'dsila',    screen:'dsila',  icon:IC_SILA,   label:'Réseau Sila' },
   { key:'dstaff',   screen:'dstaff', icon:IC.dstaff, label:'Équipe' },
   { key:'dchat',    screen:'dchat',  icon:IC.dchat,  label:'Messagerie', badge:'chat' },
   { key:'dbill',    screen:'dbill',  icon:IC_BILL,   label:'Facturation' },
@@ -289,7 +292,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails, dstations: Stations,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails, dstations: Stations, dsila: Network,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 

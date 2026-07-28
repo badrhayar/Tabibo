@@ -64,7 +64,7 @@ const URL_SCREENS = new Set([
   'docregister', 'admin', 'forgotpw', 'resetpw', 'contact', 'pmessages',
   'confidentialite', 'rxverify', 'verified', 'checkemail',
   'doctor', 'dcal', 'dappts', 'dhist', 'dpatients', 'ddocs', 'davail',
-  'dnotif', 'dstats', 'dabo', 'dsettings', 'dchat', 'dshare', 'dprescribe', 'dstaff', 'dpfile', 'dtasks', 'dnav', 'dreq', 'dbill', 'dplans', 'dstations',
+  'dnotif', 'dstats', 'dabo', 'dsettings', 'dchat', 'dshare', 'dprescribe', 'dstaff', 'dpfile', 'dtasks', 'dnav', 'dreq', 'dbill', 'dplans', 'dstations', 'dsila',
 ]);
 const pathScreen = () => {
   try {

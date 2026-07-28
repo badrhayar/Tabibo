@@ -1856,3 +1856,131 @@ export async function logCall({ conversationId, type = 'video', status = 'comple
   if (error) throw error;
   return data;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sila — le réseau des confrères  (voir 20260802120000_sila_network.sql)
+//   Trois gestes : se relier à un confrère, lui adresser un patient, lui
+//   écrire un mot. Aucune pièce du dossier ne circule : un adressage porte le
+//   nom du patient, son téléphone et le motif — le dossier reste au cabinet.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** L'annuaire des cabinets Tabibo, filtrable par spécialité et par ville. */
+export async function fetchColleagues({ q = '', specialty = 'all', city = 'all', exclude = null } = {}) {
+  let query = supabase.from('sila_directory').select('*').limit(60);
+  if (specialty !== 'all') query = query.eq('specialty', specialty);
+  if (city !== 'all') query = query.eq('city', city);
+  if (q.trim()) query = query.ilike('full_name', `%${q.trim()}%`);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || [])
+    .filter((r) => !exclude || r.id !== exclude)
+    .map((r) => ({
+      id: r.id, name: r.full_name, spec: r.specialty, city: r.city,
+      clinic: r.clinic_address, languages: r.languages || [],
+      teleconsultation: !!r.teleconsultation, cnss: !!r.cnss_cnopss,
+      years: r.experience_years, avatar: r.avatar_url, slug: r.slug,
+      services: Array.isArray(r.services) ? r.services : [],
+    }));
+}
+
+/** Tous mes liens — demandes reçues, demandes envoyées, confrères reliés. */
+export async function fetchMyLinks(myDoctorId) {
+  if (!myDoctorId) return [];
+  const { data, error } = await supabase
+    .from('doctor_links').select('*')
+    .or(`requester_id.eq.${myDoctorId},addressee_id.eq.${myDoctorId}`)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map((l) => ({
+    id: l.id,
+    otherId: l.requester_id === myDoctorId ? l.addressee_id : l.requester_id,
+    incoming: l.addressee_id === myDoctorId,
+    status: l.status, message: l.message, createdAt: l.created_at,
+  }));
+}
+
+export async function requestLink(myDoctorId, otherDoctorId, message = null) {
+  const { data, error } = await supabase
+    .from('doctor_links')
+    .insert({ requester_id: myDoctorId, addressee_id: otherDoctorId, message: message || null })
+    .select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function respondLink(linkId, accept) {
+  const { data, error } = await supabase
+    .from('doctor_links')
+    .update({ status: accept ? 'accepted' : 'declined', responded_at: new Date().toISOString() })
+    .eq('id', linkId).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function removeLink(linkId) {
+  const { error } = await supabase.from('doctor_links').delete().eq('id', linkId);
+  if (error) throw error;
+  return true;
+}
+
+/** Les adressages, dans les deux sens. */
+export async function fetchReferrals(myDoctorId) {
+  if (!myDoctorId) return [];
+  const { data, error } = await supabase
+    .from('doctor_referrals').select('*')
+    .or(`from_doctor_id.eq.${myDoctorId},to_doctor_id.eq.${myDoctorId}`)
+    .order('created_at', { ascending: false }).limit(120);
+  if (error) throw error;
+  return (data || []).map((r) => ({
+    id: r.id, fromId: r.from_doctor_id, toId: r.to_doctor_id,
+    incoming: r.to_doctor_id === myDoctorId,
+    patientName: r.patient_name, patientPhone: r.patient_phone,
+    reason: r.reason, note: r.note, urgency: r.urgency,
+    status: r.status, createdAt: r.created_at,
+  }));
+}
+
+export async function sendReferral(myDoctorId, { toDoctorId, patientName, patientPhone, reason, note, urgency = 'normal' }) {
+  const { data, error } = await supabase
+    .from('doctor_referrals')
+    .insert({
+      from_doctor_id: myDoctorId, to_doctor_id: toDoctorId,
+      patient_name: patientName, patient_phone: patientPhone || null,
+      reason, note: note || null, urgency,
+    })
+    .select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateReferralStatus(referralId, status) {
+  const { data, error } = await supabase
+    .from('doctor_referrals')
+    .update({ status, responded_at: new Date().toISOString() })
+    .eq('id', referralId).select().single();
+  if (error) throw error;
+  return data;
+}
+
+/** Les mots échangés avec un confrère. */
+export async function fetchColleagueNotes(myDoctorId, otherDoctorId) {
+  if (!myDoctorId || !otherDoctorId) return [];
+  const { data, error } = await supabase
+    .from('doctor_notes').select('*')
+    .or(`and(from_doctor_id.eq.${myDoctorId},to_doctor_id.eq.${otherDoctorId}),and(from_doctor_id.eq.${otherDoctorId},to_doctor_id.eq.${myDoctorId})`)
+    .order('created_at', { ascending: true }).limit(200);
+  if (error) throw error;
+  return (data || []).map((n) => ({
+    id: n.id, mine: n.from_doctor_id === myDoctorId, body: n.body,
+    createdAt: n.created_at, readAt: n.read_at, referralId: n.referral_id,
+  }));
+}
+
+export async function sendColleagueNote(myDoctorId, toDoctorId, body, referralId = null) {
+  const { data, error } = await supabase
+    .from('doctor_notes')
+    .insert({ from_doctor_id: myDoctorId, to_doctor_id: toDoctorId, body, referral_id: referralId })
+    .select().single();
+  if (error) throw error;
+  return data;
+}

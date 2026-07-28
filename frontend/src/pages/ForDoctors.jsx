@@ -7,6 +7,7 @@ import { fetchCompanyContact } from '../lib/api';
 import { PLAN_DEF, planFeatures, featureLabel, renderLabel } from '../lib/plans.js';
 import Icon from '../components/Icon';
 import MarketingHeader from '../components/MarketingHeader';
+import DoctorPitch from '../components/DoctorPitch';
 import SecurityTrust from '../components/SecurityTrust';
 import MarketingFooter from '../components/MarketingFooter';
 
@@ -519,47 +520,9 @@ export default function ForDoctors() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section style={{ padding: '56px 24px 72px', background: '#fff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: DARK, textAlign: 'center', whiteSpace: isMobile ? 'normal' : 'nowrap', marginBottom: 10, letterSpacing: '-0.3px' }}>
-            {lang === 'ar' ? 'كل ما تحتاجه لإدارة عيادتك' : lang === 'en' ? 'Everything you need to run your practice' : 'Tout ce qu\'il faut pour gérer votre cabinet'}
-          </h2>
-          <p style={{ textAlign: 'center', whiteSpace: isMobile ? 'normal' : 'nowrap', color: MUTED, fontSize: 15, marginBottom: 40 }}>
-            {lang === 'ar' ? 'مزايا مصممة لتوفير وقتك وتنمية نشاطك' : lang === 'en' ? 'Features designed to save you time and grow your practice' : 'Des fonctionnalités pensées pour vous faire gagner du temps et développer votre activité'}
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 14 : 24 }}>
-            {features.map((f, i) => (
-              <div
-                key={i}
-                style={{
-                  background: BG, border: `1px solid ${BORDER}`,
-                  borderRadius: 16, padding: '28px 28px',
-                  display: 'flex', gap: 20, alignItems: 'flex-start',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                }}
-              >
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-                  background: '#EAF6F0',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: PRIMARY,
-                }}>
-                  <Icon name={f.icon} size={24} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: DARK, marginBottom: 8, marginTop: 2 }}>
-                    {f.title}
-                  </h3>
-                  <p style={{ fontSize: 14, color: BODY, lineHeight: 1.65, margin: 0 }}>
-                    {f.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* La présentation du produit : repères, organisation du cabinet,
+          communication patient, réseau Sila, protection des données. */}
+      <DoctorPitch lang={lang} isMobile={isMobile} go={go} />
 
       {/* Pricing — transparent, no surprises (the #1 objection killer) */}
       <section style={{ padding: isMobile ? '44px 16px' : '64px 24px', background: BG }}>

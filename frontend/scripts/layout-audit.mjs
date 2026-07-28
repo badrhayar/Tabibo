@@ -24,7 +24,7 @@ const srv = createServer((q, r) => {
 await new Promise((r) => srv.listen(PORT, r));
 
 const PUBLIC = ['home', 'search', 'profile', 'pinfo', 'confirm', 'about', 'forpatients', 'fordoctors', 'contact', 'plogin', 'pregister', 'login', 'docregister', 'confidentialite', 'paccount', 'pmessages'];
-const DOCTOR = ['doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe', 'ddocs', 'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings', 'davail', 'dstations', 'dabo', 'dnotif', 'dplans'];
+const DOCTOR = ['doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe', 'ddocs', 'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings', 'davail', 'dstations', 'dsila', 'dabo', 'dnotif', 'dplans'];
 
 const PROBE = () => {
   const TOL = 2;

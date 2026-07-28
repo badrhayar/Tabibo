@@ -16,7 +16,7 @@ const SCREENS = [
   'pregister', 'paccount', 'about', 'forpatients', 'fordoctors', 'login',
   'docregister', 'admin', 'contact', 'pmessages', 'confidentialite', 'verified', 'checkemail',
   'doctor', 'dcal', 'dnav', 'dappts', 'dhist', 'dpatients', 'ddocs', 'davail',
-  'dnotif', 'dstats', 'dabo', 'dsettings', 'dchat', 'dshare', 'dprescribe', 'dstaff', 'dtasks', 'dpfile', 'dbill', 'dplans', 'dstations',
+  'dnotif', 'dstats', 'dabo', 'dsettings', 'dchat', 'dshare', 'dprescribe', 'dstaff', 'dtasks', 'dpfile', 'dbill', 'dplans', 'dstations', 'dsila',
 ];
 const WIDTHS = [1366, 390, 360];
 

@@ -66,5 +66,15 @@ Les verts profonds des rails, en-têtes et bandeaux sont des **surfaces**, pas
 des actions — ils ne sont pas concernés. `npm run test:green` fait respecter la
 règle et échoue à la première entorse.
 
-> Rappel : la migration `supabase/migrations/20260801120000_care_stations.sql`
-> doit être appliquée avant que les postes de soins soient visibles aux patients.
+### Migrations à appliquer
+
+Deux migrations attendent votre projet Supabase, dans cet ordre :
+
+| Fichier | Ce qu'elle apporte |
+|---|---|
+| `20260801120000_care_stations.sql` | Les postes de soins (`doctors.stations`, `appointments.station_id`). Sans elle, le patient ne voit pas les postes à la réservation. |
+| `20260802120000_sila_network.sql` | Le réseau Sila : liens entre cabinets, adressages de patients, mots entre confrères, et l'annuaire `sila_directory`. Sans elle, l'écran **Réseau Sila** reste vide hors démonstration. |
+
+Les deux posent leurs propres règles d'accès : un médecin ne lit que les lignes
+où son cabinet figure, et l'on ne peut adresser un patient qu'à un confrère dont
+le lien est **accepté** — la base le vérifie, pas seulement l'écran.
