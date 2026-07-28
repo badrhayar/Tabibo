@@ -431,12 +431,14 @@ function PatientPicker({ state, setState, go, isMobile }) {
   const th = { padding: '12px 16px', textAlign: 'start', fontWeight: 600, color: MUTED, fontSize: 12, whiteSpace: 'nowrap' };
 
   return (
-    <div style={{ padding: isMobile ? '18px 14px' : '32px', fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100%', boxSizing: 'border-box' }}>
-      {/* En-tête pleine largeur — même gabarit que Rendez-vous et Consultations */}
-      <div style={{ marginBottom: 22 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DARK, letterSpacing: '-0.3px' }}>Dossier patient</h1>
-        <p style={{ margin: '4px 0 0', fontSize: 13.5, color: MUTED }}>Sélectionnez un patient pour ouvrir son dossier médical.</p>
-      </div>
+    <div style={{ padding: isMobile ? 12 : 32, fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100%', boxSizing: 'border-box' }}>
+      <Hero tint={SEC.profil} icon={IC.idcard} isMobile={isMobile}
+        title="Dossier patient"
+        sub="Choisissez un patient pour ouvrir son dossier médical — antécédents, traitements, analyses et documents."
+        chips={[
+          { value: roster.length, label: roster.length > 1 ? 'patients au cabinet' : 'patient au cabinet' },
+          q.trim() ? { value: list.length, label: 'trouvés', color: '#0E7C52' } : null,
+        ]} />
 
       {/* Recherche — carte blanche, comme sur les autres sections */}
       <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, padding: '16px 20px', marginBottom: 20, boxShadow: SHADOW }}>

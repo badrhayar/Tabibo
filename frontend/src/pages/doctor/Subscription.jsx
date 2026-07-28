@@ -173,7 +173,7 @@ export default function Subscription({ state, setState, go }) {
   };
 
   return (
-    <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh' }}>
       <Hero tint={SEC.factures} icon={ICONS.card} isMobile={isMobile}
         title="Abonnement"
         sub="Votre formule, vos paiements et vos factures."

@@ -95,7 +95,7 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
   const docsPager = usePager(filteredDocs, 8);
 
   return (
-    <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
       <Hero tint={T} icon={IC.swap} isMobile={isMobile}
         title="Documents médicaux"
         sub="Envoyez un document à un patient, retrouvez tout ce qui a été échangé."

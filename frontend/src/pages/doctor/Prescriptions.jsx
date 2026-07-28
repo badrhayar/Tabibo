@@ -323,7 +323,7 @@ export default function Prescriptions() {
   );
 
   return (
-    <div style={{ padding: isMobile ? 8 : 32, background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
       {/* Bandeau de l'ordonnancier */}
       <Hero tint={T} icon={IC.rx} isMobile={isMobile}
         title="Ordonnances"

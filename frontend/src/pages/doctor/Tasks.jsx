@@ -225,7 +225,7 @@ export default function Tasks({ state, setState, go }) {
   const td = { padding: '13px 16px', fontSize: 13, color: DARK, borderBottom: `1px solid #F1F6F3`, verticalAlign: 'middle' };
 
   return (
-    <div className="tasks" style={{ padding: isMobile ? 12 : 26, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="tasks" style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <style>{`.tasks input:focus,.tasks select:focus,.tasks textarea:focus{border-color:${TEAL} !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}
 .tasks tbody tr:hover{background:#F7FBF9}`}</style>
 

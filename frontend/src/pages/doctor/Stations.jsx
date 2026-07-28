@@ -98,7 +98,7 @@ export default function Stations({ state, setState, go }) {
   };
 
   return (
-    <div style={{ padding: isMobile ? 14 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <Hero tint={SEC.histo} icon={ICONS.station} isMobile={isMobile}
         title="Postes de soins"
         sub="L’accueil, chaque praticien, la salle de soins, le laboratoire… Ils deviennent les colonnes du navigateur, et le patient peut choisir son poste dès la réservation."

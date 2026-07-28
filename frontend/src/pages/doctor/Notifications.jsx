@@ -138,7 +138,7 @@ export default function Notifications({ state, setState, go, openNewAppt, openAd
   const tabs = ['Messages envoyés', 'Rappels automatiques', 'Contenu des messages'];
 
   return (
-    <div style={{ padding: isMobile ? 8 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <Hero tint={SEC.ttt} icon={ICONS.bell} isMobile={isMobile}
         title="Rappels et notifications"
         sub="Les messages automatiques envoyés à vos patients, par WhatsApp et par courriel." />

@@ -266,7 +266,7 @@ export default function Navigator({ state, setState, go }) {
   const empty = (t) => <div style={{ padding: '22px 10px', textAlign: 'center', fontSize: 12.5, color: MUTED, lineHeight: 1.6 }}>{t}</div>;
 
   return (
-    <div className="nav" style={{ padding: isMobile ? 12 : 26, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div className="nav" style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <style>{`.nav input:focus,.nav select:focus,.nav textarea:focus{border-color:${TEAL} !important;box-shadow:0 0 0 3px rgba(15,110,86,0.07)}`}</style>
 
       <Hero tint={SEC.consult} icon={ICONS.navigator} isMobile={isMobile}

@@ -203,7 +203,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
   const pager = usePager(filtered, 10);
 
   return (
-    <div style={{ padding: isMobile ? '8px 6px' : '28px 32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
       <Hero tint={SEC.profil} icon={ICONS.users} isMobile={isMobile}
         title="Mes patients"
         sub="L’annuaire complet de votre patientèle — fiche, rendez-vous et ordonnance à portée de clic."

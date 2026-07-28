@@ -338,7 +338,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
   }
 
   return (
-    <div style={{ padding: isMobile ? '10px' : '32px', background: BG, minHeight: '100vh' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh' }}>
 
       <Hero tint={SEC.reglages} icon={SIC.gear} isMobile={isMobile}
         title="Mon profil et mes paramètres"

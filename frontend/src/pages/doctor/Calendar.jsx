@@ -629,7 +629,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
   );
 
   return (
-    <div style={{ padding: isMobile ? 6 : 26, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
 
       {/* ── Move-mode banner ── */}
       {moveId && movingConsult && (

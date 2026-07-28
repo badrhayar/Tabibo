@@ -179,7 +179,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
   };
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
 
       {/* Edit Modal */}
       {editOpen && (

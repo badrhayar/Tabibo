@@ -387,7 +387,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
   };
 
   return (
-    <div style={{ padding: isMobile ? '8px 6px' : '28px 32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
       <Hero tint={SEC.profil} icon={ICONS.calendar} isMobile={isMobile}
           title="Rendez-vous"
           sub="Tous vos rendez-vous, filtrables — confirmez, déplacez, encaissez."

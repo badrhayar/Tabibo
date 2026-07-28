@@ -335,7 +335,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
   const navBtn = { width: 40, height: 40, borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', cursor: 'pointer', fontSize: 18, color: DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 
   return (
-    <div style={{ padding: isMobile ? '8px' : '32px', background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
       <Hero tint={SEC.consult} icon={ICONS.clock} isMobile={isMobile}
         title="Disponibilités"
         sub="Horaires, durée des créneaux, pauses de prière et plafond de rendez-vous — vous gardez la main." />

@@ -168,7 +168,7 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
   ];
 
   return (
-    <div style={{ padding: isMobile ? 4 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
       {/* Le bandeau du jour — les chiffres qui comptent avant tout le reste.
           « Nouveau rendez-vous » vit dans la barre du haut : pas de doublon ici. */}

@@ -686,7 +686,7 @@ export default function Network({ state, setState, go }) {
   ];
 
   return (
-    <div style={{ padding: isMobile ? 10 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <Hero tint={SEC.consult} icon={ICONS.team} isMobile={isMobile}
         title="Tabibo Network"
         sub="Reliez votre cabinet à ceux de vos confrères, parlez-leur directement, adressez-leur un patient en trois champs. Aucune pièce du dossier ne circule d’elle-même : vous seul décidez d’envoyer un document."

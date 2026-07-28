@@ -85,11 +85,15 @@ function StaffPreview() {
     setTimeout(() => el.remove(), 2800);
   };
   return (
-    <div style={{ padding: 32, background: BG, minHeight: '100vh' }}>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: DARK, margin: 0 }}>Mon équipe</h1>
-      </div>
-      <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ padding: '32px 32px 48px', background: BG, minHeight: '100vh' }}>
+      <Hero tint={SEC.admin} icon={ICONS.team}
+        title="Mon équipe"
+        sub="Le secrétariat de votre cabinet : qui a accès, et à quoi."
+        chips={[
+          { value: PREVIEW_MEMBERS.filter((m) => m.active).length, label: 'membres actifs', color: '#0E7C52' },
+          { value: PREVIEW_MEMBERS.length, label: 'au total' },
+        ]} />
+      <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '14px 18px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
           <span><strong>Aperçu de démonstration.</strong> Voici la page telle qu'elle fonctionnera dès l'activation de votre compte. Les membres ci-dessous sont fictifs et aucune action n'est enregistrée.</span>
@@ -248,14 +252,14 @@ export default function Staff() {
   }
 
   return (
-    <div style={{ padding: 32, background: BG, minHeight: '100vh' }}>
+    <div style={{ padding: '32px 32px 48px', background: BG, minHeight: '100vh' }}>
 
       <Hero tint={SEC.admin} icon={ICONS.team}
         title="Mon équipe"
         sub="Le secrétariat de votre cabinet : qui a accès, et à quoi." />
 
       <div style={{
-        maxWidth: 720,
+        maxWidth: 900,
         margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',

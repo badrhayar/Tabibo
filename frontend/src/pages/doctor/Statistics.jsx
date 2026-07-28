@@ -239,7 +239,7 @@ export default function Statistics({ state, setState, go, openNewAppt, openAddPa
   const RANK_COLORS = [PRIMARY, '#3B82F6', '#8B5CF6', '#F59E0B', MUTED];
 
   return (
-    <div style={{ padding: isMobile ? 8 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: isMobile ? 12 : 32, backgroundColor: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
 
       <Hero tint={SEC.bio} icon={ICONS.chart} isMobile={isMobile}
         title="Statistiques et revenus"
