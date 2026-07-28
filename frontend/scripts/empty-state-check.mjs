@@ -31,7 +31,7 @@ const SCREENS = [
   'paccount', 'pmessages', 'admin',
   'doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe', 'ddocs',
   'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings', 'davail',
-  'dstations', 'dsila', 'dabo', 'dnotif', 'dplans',
+  'dstations', 'dnetwork', 'dabo', 'dnotif', 'dplans',
 ];
 // L'espace médecin est en français ; l'arabe concerne le parcours patient et
 // les pages publiques — c'est donc là qu'on teste le sens droite-à-gauche.

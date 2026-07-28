@@ -23,7 +23,7 @@ const srv = createServer((q, r) => {
 await new Promise((r) => srv.listen(PORT, r));
 
 const PUBLIC = ['home', 'search', 'profile', 'pinfo', 'confirm', 'about', 'forpatients', 'fordoctors', 'contact', 'plogin', 'pregister', 'login', 'docregister', 'confidentialite', 'paccount', 'pmessages', 'forgotpw', 'checkemail', 'verified', 'admin', 'rxverify'];
-const DOCTOR = ['doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe', 'ddocs', 'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings', 'davail', 'dstations', 'dsila', 'dabo', 'dnotif', 'dplans'];
+const DOCTOR = ['doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe', 'ddocs', 'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings', 'davail', 'dstations', 'dnetwork', 'dabo', 'dnotif', 'dplans'];
 
 // La référence, telle que le navigateur la restitue.
 const REF_STOPS = ['26, 174, 116', '18, 135, 90', '11, 106, 70'];   // #1AAE74 #12875A #0B6A46

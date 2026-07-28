@@ -103,7 +103,7 @@ function StaffPreview() {
         <Card title="Inviter un membre">
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 220 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>Email du membre</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>Email du membre</label>
               <input disabled value="" placeholder="secretaire@email.com"
                 style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F7FAF9', width: '100%', boxSizing: 'border-box' }} />
             </div>
@@ -282,7 +282,7 @@ export default function Staff() {
         <Card title="Inviter un membre">
           <form onSubmit={onInvite} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 220 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>
                 Email du membre
               </label>
               <input

@@ -53,7 +53,7 @@ function InfoCard({ icon, label, value, href }) {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
       </div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 4 }}>{label}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, marginBottom: 4 }}>{label}</div>
         <div style={{ fontSize: 14.5, fontWeight: 600, color: DARK, lineHeight: 1.5, wordBreak: 'break-word', direction: 'ltr' }}>{value}</div>
       </div>
     </div>

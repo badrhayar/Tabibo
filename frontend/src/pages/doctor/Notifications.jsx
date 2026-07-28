@@ -188,8 +188,7 @@ export default function Notifications({ state, setState, go, openNewAppt, openAd
                   {['Patient', 'Email / Téléphone', 'Type', 'Envoyé le', 'Statut'].map((col) => (
                     <th key={col} style={{
                       padding: '12px 16px', textAlign: 'left', fontSize: 12,
-                      fontWeight: 600, color: MUTED, textTransform: 'uppercase',
-                      letterSpacing: '0.05em', borderBottom: `1px solid ${BORDER}`,
+                      fontWeight: 600, color: MUTED, borderBottom: `1px solid ${BORDER}`,
                     }}>
                       {col}
                     </th>

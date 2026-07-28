@@ -1858,7 +1858,8 @@ export async function logCall({ conversationId, type = 'video', status = 'comple
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Sila — le réseau des confrères  (voir 20260802120000_sila_network.sql)
+// Tabibo Network — le réseau des confrères
+//   (voir 20260802120000_doctor_network.sql et 20260803120000_network_messaging.sql)
 //   Trois gestes : se relier à un confrère, lui adresser un patient, lui
 //   écrire un mot. Aucune pièce du dossier ne circule : un adressage porte le
 //   nom du patient, son téléphone et le motif — le dossier reste au cabinet.
@@ -1866,7 +1867,7 @@ export async function logCall({ conversationId, type = 'video', status = 'comple
 
 /** L'annuaire des cabinets Tabibo, filtrable par spécialité et par ville. */
 export async function fetchColleagues({ q = '', specialty = 'all', city = 'all', exclude = null } = {}) {
-  let query = supabase.from('sila_directory').select('*').limit(60);
+  let query = supabase.from('network_directory').select('*').limit(60);
   if (specialty !== 'all') query = query.eq('specialty', specialty);
   if (city !== 'all') query = query.eq('city', city);
   if (q.trim()) query = query.ilike('full_name', `%${q.trim()}%`);
@@ -1962,25 +1963,106 @@ export async function updateReferralStatus(referralId, status) {
   return data;
 }
 
-/** Les mots échangés avec un confrère. */
+// ── La messagerie entre confrères ───────────────────────────────────────────
+// Une seule table pour tout ce qui s'échange : un mot, une pièce jointe, une
+// proposition d'appel. « kind » dit lequel des trois.
+
+const noteShape = (n, myDoctorId) => ({
+  id: n.id,
+  mine: n.from_doctor_id === myDoctorId,
+  otherId: n.from_doctor_id === myDoctorId ? n.to_doctor_id : n.from_doctor_id,
+  kind: n.kind || 'text',
+  body: n.body || '',
+  file: n.file_path ? { path: n.file_path, name: n.file_name, type: n.file_type, size: n.file_size } : null,
+  callRoom: n.call_room || null,
+  createdAt: n.created_at, readAt: n.read_at, referralId: n.referral_id,
+});
+
+/** Les messages échangés avec un confrère, du plus ancien au plus récent. */
 export async function fetchColleagueNotes(myDoctorId, otherDoctorId) {
   if (!myDoctorId || !otherDoctorId) return [];
   const { data, error } = await supabase
     .from('doctor_notes').select('*')
     .or(`and(from_doctor_id.eq.${myDoctorId},to_doctor_id.eq.${otherDoctorId}),and(from_doctor_id.eq.${otherDoctorId},to_doctor_id.eq.${myDoctorId})`)
-    .order('created_at', { ascending: true }).limit(200);
+    .order('created_at', { ascending: true }).limit(300);
   if (error) throw error;
-  return (data || []).map((n) => ({
-    id: n.id, mine: n.from_doctor_id === myDoctorId, body: n.body,
-    createdAt: n.created_at, readAt: n.read_at, referralId: n.referral_id,
-  }));
+  return (data || []).map((n) => noteShape(n, myDoctorId));
 }
 
-export async function sendColleagueNote(myDoctorId, toDoctorId, body, referralId = null) {
+/**
+ * Toutes mes conversations d'un coup — le dernier message de chaque confrère
+ * et le nombre de messages que je n'ai pas encore lus. Une seule requête : la
+ * liste de gauche s'affiche sans attendre l'ouverture d'un fil.
+ */
+export async function fetchNetworkThreads(myDoctorId) {
+  if (!myDoctorId) return {};
+  const { data, error } = await supabase
+    .from('doctor_notes').select('*')
+    .or(`from_doctor_id.eq.${myDoctorId},to_doctor_id.eq.${myDoctorId}`)
+    .order('created_at', { ascending: false }).limit(400);
+  if (error) throw error;
+  const threads = {};
+  for (const row of data || []) {
+    const n = noteShape(row, myDoctorId);
+    const t = threads[n.otherId] || (threads[n.otherId] = { last: null, unread: 0 });
+    if (!t.last) t.last = n;                        // la liste arrive déjà triée
+    if (!n.mine && !n.readAt) t.unread += 1;
+  }
+  return threads;
+}
+
+/**
+ * Envoie un message. Le corps seul suffit ; « file » y ajoute une pièce jointe
+ * déjà déposée, « callRoom » transforme la ligne en proposition d'appel.
+ */
+export async function sendColleagueNote(myDoctorId, toDoctorId, { body = '', file = null, callRoom = null, referralId = null } = {}) {
+  const kind = callRoom ? 'call' : file ? 'file' : 'text';
   const { data, error } = await supabase
     .from('doctor_notes')
-    .insert({ from_doctor_id: myDoctorId, to_doctor_id: toDoctorId, body, referral_id: referralId })
+    .insert({
+      from_doctor_id: myDoctorId, to_doctor_id: toDoctorId,
+      kind, body: body || null, referral_id: referralId,
+      file_path: file?.path || null, file_name: file?.name || null,
+      file_type: file?.type || null, file_size: file?.size || null,
+      call_room: callRoom,
+    })
     .select().single();
   if (error) throw error;
-  return data;
+  return noteShape(data, myDoctorId);
+}
+
+/** Marque comme lus les messages reçus d'un confrère. */
+export async function markColleagueNotesRead(myDoctorId, otherDoctorId) {
+  if (!myDoctorId || !otherDoctorId) return 0;
+  const { data, error } = await supabase
+    .from('doctor_notes')
+    .update({ read_at: new Date().toISOString() })
+    .eq('to_doctor_id', myDoctorId).eq('from_doctor_id', otherDoctorId)
+    .is('read_at', null).select('id');
+  if (error) throw error;
+  return (data || []).length;
+}
+
+/**
+ * Dépose une pièce jointe dans le casier privé « confrere-media ». Rien n'est
+ * lisible publiquement : le fichier ne s'ouvre que par une adresse signée, et
+ * seulement pour les deux confrères de la conversation.
+ */
+export async function uploadConfrereFile(file) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth?.user) throw new Error('Non authentifié');
+  const ext = checkUpload(file, { exts: DOC_EXTS, maxBytes: 15 * MB, label: 'images, PDF ou documents' });
+  const path = `${auth.user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const up = await supabase.storage.from('confrere-media').upload(path, file, { upsert: false, contentType: file.type || undefined });
+  if (up.error) throw up.error;
+  return { path, name: safeFileName(file.name), type: file.type || '', size: file.size || 0 };
+}
+
+/** Adresse signée, valable une heure, pour ouvrir une pièce jointe. */
+export async function getConfrereFileUrl(path) {
+  if (!path) return '';
+  if (/^https?:|^blob:|^data:/i.test(path)) return path;      // démonstration
+  const { data, error } = await supabase.storage.from('confrere-media').createSignedUrl(path, 3600);
+  if (error) return '';
+  return data.signedUrl;
 }

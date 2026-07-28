@@ -49,6 +49,7 @@ npm run test:all
 | `npm run test:green` | **Un seul vert d'action.** Relève tout bouton ou interrupteur dont le fond n'est pas exactement `BTN_GREEN` (le dégradé du bouton « Rechercher »). Doit rendre 0. |
 | `npm run test:layout` | **Tournée de présentation.** Cartes voisines de hauteurs différentes, boutons mal alignés, texte tronqué. `W=390` pour le contrôle téléphone. Doit rendre 0. |
 | `npm run test:stations` | **Postes de soins : une seule liste.** Vérifie que le patient (page de réservation) et le secrétariat (fenêtre « Nouveau rendez-vous ») affichent exactement les libellés enregistrés par le médecin. |
+| `npm run test:caps` | **Plus un mot en capitales.** Ouvre chaque écran et lit le texte *tel que le navigateur l'affiche* (la capitalisation CSS comprise). Un libellé garde sa majuscule initiale, jamais davantage ; seuls les sigles (CIN, AMO, CNSS…) échappent à la règle. Doit rendre 0. |
 
 `npm run test:crawl` (long, ~40 min) va plus loin : il clique **chaque bouton de chaque écran** dans la démonstration et signale les erreurs et les contrôles sans effet.
 
@@ -84,15 +85,29 @@ Les verts profonds des rails, en-têtes et bandeaux sont des **surfaces**, pas
 des actions — ils ne sont pas concernés. `npm run test:green` fait respecter la
 règle et échoue à la première entorse.
 
+### La règle des capitales
+
+Aucun libellé de Tabibo n'est écrit tout en capitales : un mot garde sa
+majuscule initiale, et rien de plus. Cela vaut pour le texte écrit dans le code
+comme pour `textTransform: 'uppercase'` — les deux sont interdits. Seuls les
+sigles restent des sigles : CIN, AMO, CNSS, CNOPS, IMC, PDF, CNDP…
+
+`npm run test:caps` ouvre chaque écran, lit le rendu réel et échoue à la
+première entorse.
+
 ### Migrations à appliquer
 
-Deux migrations attendent votre projet Supabase, dans cet ordre :
+Trois migrations attendent votre projet Supabase, dans cet ordre :
 
 | Fichier | Ce qu'elle apporte |
 |---|---|
 | `20260801120000_care_stations.sql` | Les postes de soins (`doctors.stations`, `appointments.station_id`). Sans elle, le patient ne voit pas les postes à la réservation. |
-| `20260802120000_sila_network.sql` | Le réseau Sila : liens entre cabinets, adressages de patients, mots entre confrères, et l'annuaire `sila_directory`. Sans elle, l'écran **Réseau Sila** reste vide hors démonstration. |
+| `20260802120000_doctor_network.sql` | Tabibo Network : liens entre cabinets, adressages de patients, messages entre confrères, et l'annuaire `network_directory`. Sans elle, l'écran **Tabibo Network** reste vide hors démonstration. |
+| `20260803120000_network_messaging.sql` | La messagerie du réseau : pièces jointes et appels sur `doctor_notes`, plus le casier privé `confrere-media`. Sans elle, l'onglet **Messagerie** n'accepte ni fichier ni appel. |
 
-Les deux posent leurs propres règles d'accès : un médecin ne lit que les lignes
-où son cabinet figure, et l'on ne peut adresser un patient qu'à un confrère dont
-le lien est **accepté** — la base le vérifie, pas seulement l'écran.
+Toutes les trois posent leurs propres règles d'accès : un médecin ne lit que les
+lignes où son cabinet figure ; on ne peut adresser un patient — ni écrire, ni
+joindre un fichier — qu'à un confrère dont le lien est **accepté**, et c'est la
+base qui le vérifie, pas seulement l'écran. Une pièce jointe déposée dans
+`confrere-media` n'a aucune adresse publique : elle ne s'ouvre que par un lien
+signé d'une heure, et seulement pour les deux confrères de la conversation.

@@ -20,7 +20,7 @@ const BODY = '#5A6B65';
 const GRAD = 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)';
 
 // Hero search dropdown styles
-const sugHead = { padding: '9px 16px 5px', fontSize: 11, fontWeight: 800, color: '#9AA8A2', textTransform: 'uppercase', letterSpacing: '0.5px' };
+const sugHead = { padding: '9px 16px 5px', fontSize: 11, fontWeight: 800, color: '#9AA8A2' };
 const sugRow = { display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'start', background: 'none', border: 'none', borderBottom: '1px solid #F5F7F6', padding: '10px 16px', cursor: 'pointer' };
 const sugIcon = { width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 const sugTag = { fontSize: 11, fontWeight: 700, color: '#0E7C52', background: '#E7F6EE', borderRadius: 99, padding: '2px 9px', flexShrink: 0 };
@@ -260,7 +260,7 @@ export default function Landing() {
               </div>
             )}
 
-            <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '4px 0 8px' }}>{tr('Langue', 'Language', 'اللغة')}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, margin: '4px 0 8px' }}>{tr('Langue', 'Language', 'اللغة')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {langOptions.map((opt) => (
                 <button key={opt.key} onClick={() => { setState({ lang: opt.key }); }}
@@ -450,7 +450,7 @@ export default function Landing() {
       <section style={{ padding: isPhone ? '48px 16px' : '84px 24px', background: '#fff' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: isMobile ? 32 : 52 }}>
-            <span style={{ display: 'inline-block', fontSize: 12.5, fontWeight: 800, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12 }}>
+            <span style={{ display: 'inline-block', fontSize: 12.5, fontWeight: 800, color: PRIMARY, marginBottom: 12 }}>
               {tr('Comment ça marche', 'How it works', 'كيف يعمل')}
             </span>
             <h2 style={{ fontSize: isPhone ? 24 : 33, fontWeight: 800, color: DARK, margin: '0 0 10px', letterSpacing: '-0.8px' }}>{t.howTitle}</h2>

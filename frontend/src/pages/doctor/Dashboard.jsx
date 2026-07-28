@@ -194,7 +194,7 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
           {/* En consultation — who is with the doctor right now */}
           {inConsultation.length > 0 && (
             <div style={{ borderTop: `1px solid #F0F5F2`, padding: '10px 22px 14px' }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: '#0E7C52', textTransform: 'uppercase', letterSpacing: 0.5, margin: '4px 0 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#0E7C52', margin: '4px 0 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#16A06A', boxShadow: '0 0 0 3px rgba(22,160,106,0.22)' }} />
                 En consultation
               </div>
@@ -225,7 +225,7 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
           {waiting.length > 0 && (
             <div style={{ borderTop: `1px solid #F0F5F2`, padding: '10px 22px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, margin: '4px 0 10px' }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>Salle d'attente</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: MUTED }}>Salle d'attente</span>
                 {/* One click: take the longest-waiting patient into the consultation. */}
                 {inConsultation.length === 0 && (
                   <button onClick={() => moveConsult(waiting[0], true)} style={{ background: '#E7F6EE', color: '#0E7C52', border: '1px solid #CDE7DA', borderRadius: 8, padding: '4px 11px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer' }}>

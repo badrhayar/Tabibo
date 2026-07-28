@@ -37,7 +37,7 @@ export default function PrescriptionVerify() {
           <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 19, color: DARK }}>Tabib<span style={{ color: PRIMARY }}>o</span></span>
         </div>
 
-        <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 14 }}>Vérification d'ordonnance</div>
+        <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 14 }}>Vérification d'ordonnance</div>
 
         {status === 'loading' && <p style={{ fontSize: 14, color: MUTED }}>Vérification en cours…</p>}
 

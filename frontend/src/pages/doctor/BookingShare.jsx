@@ -95,7 +95,7 @@ export default function BookingShare() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
         {/* Link + actions */}
         <div style={card}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, color: '#9AA8A2', textTransform: 'uppercase', letterSpacing: .5, marginBottom: 10 }}>Votre lien de réservation</div>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: '#9AA8A2', marginBottom: 10 }}>Votre lien de réservation</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <input readOnly value={link} onFocus={(e) => e.target.select()} style={{ flex: '1 1 280px', minWidth: 0, padding: '11px 13px', border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: 13.5, background: BG, color: DARK, direction: 'ltr' }} />
             <button onClick={copy} style={btn(BTN_GREEN, '#fff')}>

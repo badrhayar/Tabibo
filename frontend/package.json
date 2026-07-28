@@ -17,10 +17,11 @@
     "test:empty": "node scripts/empty-state-check.mjs",
     "test:slow": "node scripts/late-directory-check.mjs",
     "test:crawl": "node scripts/deep-crawl.mjs",
-    "test:all": "npm run test:e2e && npm run test:headers && npm run test:files && npm run test:empty && npm run test:slow && npm run test:green && npm run test:layout && npm run test:stations",
+    "test:all": "npm run test:e2e && npm run test:headers && npm run test:files && npm run test:empty && npm run test:slow && npm run test:green && npm run test:layout && npm run test:stations && npm run test:caps",
     "test:green": "node scripts/green-audit.mjs",
     "test:layout": "node scripts/layout-audit.mjs",
-    "test:stations": "node scripts/stations-sync-check.mjs"
+    "test:stations": "node scripts/stations-sync-check.mjs",
+    "test:caps": "node scripts/caps-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

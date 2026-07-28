@@ -445,7 +445,7 @@ export default function Profile() {
                     {r.comment && <p style={{ margin: 0, fontSize: 13, color: '#4A5E57', lineHeight: 1.6 }}>{r.comment}</p>}
                     {r.reply && (
                       <div style={{ marginTop: 8, background: '#F0F9F4', border: '1px solid #CDE7DA', borderRadius: 10, padding: '9px 12px' }}>
-                        <div style={{ fontSize: 10.5, fontWeight: 800, color: '#0E7C52', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 3 }}>{tr('Réponse du praticien', 'Practitioner\'s reply', 'رد الطبيب')}</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 800, color: '#0E7C52', marginBottom: 3 }}>{tr('Réponse du praticien', 'Practitioner\'s reply', 'رد الطبيب')}</div>
                         <div style={{ fontSize: 12.5, color: '#0E5C40', lineHeight: 1.55 }}>{r.reply}</div>
                       </div>
                     )}

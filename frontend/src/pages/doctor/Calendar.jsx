@@ -291,7 +291,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
         onMouseLeave={(e) => { e.currentTarget.style.zIndex = 2; e.currentTarget.style.boxShadow = 'none'; }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
           <span style={{ fontSize: 11, fontWeight: 800, color: DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
-            {(c.patient || 'Patient').toUpperCase().split(' ').slice(-1)[0]} {(c.patient || '').split(' ').slice(0, -1).join(' ')} <span style={{ fontWeight: 700, color: col.color }}>{c.time}</span>
+            {(c.patient || 'Patient').split(' ').slice(-1)[0]} {(c.patient || '').split(' ').slice(0, -1).join(' ')} <span style={{ fontWeight: 700, color: col.color }}>{c.time}</span>
           </span>
           <span style={{ color: col.color, display: 'flex', flexShrink: 0 }}>{isTele(c.service) ? <VideoIcon /> : <PersonIcon />}</span>
         </div>
@@ -577,7 +577,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     <>
       <button onClick={openNewAppt}
         style={{ width: '100%', marginBottom: 12, padding: '12px 14px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-          background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+          background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 800, boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
         + Nouveau rendez-vous
       </button>
 
@@ -709,7 +709,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
       {/* ── Day ⋮ menu ── */}
       {dayMenu && (
         <div onMouseDown={(e) => e.stopPropagation()} style={{ position: 'fixed', left: Math.max(8, Math.min(dayMenu.x, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 240)), top: dayMenu.y, width: 232, background: '#fff', border: `1px solid ${GRID}`, borderRadius: 12, boxShadow: '0 16px 42px rgba(13,43,30,0.22)', zIndex: 900, overflow: 'hidden', padding: 5 }}>
-          <div style={{ padding: '7px 11px 5px', fontSize: 10.5, fontWeight: 800, color: '#9AA8A2', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <div style={{ padding: '7px 11px 5px', fontSize: 10.5, fontWeight: 800, color: '#9AA8A2' }}>
             {new Date(`${dayMenu.dateISO}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
           </div>
           {[

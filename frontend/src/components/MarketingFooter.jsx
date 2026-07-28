@@ -35,7 +35,7 @@ export default function MarketingFooter() {
           </div>
           {cols.map((col, i) => (
             <div key={i}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 14 }}>{col.h}</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', marginBottom: 14 }}>{col.h}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {col.items.map(([label, to], j) => (
                   <span key={j} onClick={() => go(to)} style={{ fontSize: 13.5, cursor: 'pointer' }}>{label}</span>

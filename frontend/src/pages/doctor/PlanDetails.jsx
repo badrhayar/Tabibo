@@ -87,7 +87,7 @@ export default function PlanDetails({ state, setState, go }) {
 
       {/* Sommaire */}
       <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 16 : 20, marginBottom: 20, boxShadow: SHADOW }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Ce que contient la formule {plan.name}</div>
+        <div style={{ fontSize: 12, fontWeight: 800, color: TEAL, marginBottom: 12 }}>Ce que contient la formule {plan.name}</div>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 8 }}>
           {feats.map((f) => (
             <a key={f.key} href={`#f-${f.key}`}
@@ -119,7 +119,7 @@ export default function PlanDetails({ state, setState, go }) {
           ))}
 
           <div style={{ background: '#F6FAF8', border: `1px solid ${BORDER}`, borderRadius: 13, padding: '14px 16px', marginTop: 14 }}>
-            <div style={{ fontSize: 11.5, fontWeight: 800, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 9 }}>En pratique</div>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: TEAL, marginBottom: 9 }}>En pratique</div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '8px 20px' }}>
               {f.bullets.map((b) => (
                 <li key={b} style={{ display: 'flex', gap: 9, fontSize: 13, color: DARK, lineHeight: 1.5 }}><CheckMark />{b}</li>

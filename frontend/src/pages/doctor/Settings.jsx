@@ -74,7 +74,7 @@ function Card({ title, children }) {
 function InputField({ label, value, onChange, type = 'text' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+      <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>
         {label}
       </label>
       {type === 'password' ? (
@@ -108,7 +108,7 @@ function InputField({ label, value, onChange, type = 'text' }) {
 function SelectField({ label, value, onChange, options }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+      <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>
         {label}
       </label>
       <select
@@ -432,7 +432,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
               <InputField label="Téléphone cabinet" value={form.telephone} onChange={v => updateForm('telephone', v)} type="tel" />
               {/* Email = login identity; changing it requires the auth email-change flow. */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>Email professionnel</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>Email professionnel</label>
                 <input type="email" value={form.email} disabled style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F4F6F5', width: '100%', boxSizing: 'border-box', direction: 'ltr' }} />
               </div>
             </div>

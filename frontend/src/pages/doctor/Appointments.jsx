@@ -302,7 +302,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
         body{font-family:Arial,Helvetica,sans-serif;color:#15314A;padding:28px}
         h1{font-size:19px;margin:0}p.sub{margin:4px 0 20px;color:#555;font-size:13px}
         table{width:100%;border-collapse:collapse;font-size:12.5px}
-        th{background:#F0F5F2;text-align:left;padding:8px 10px;border:1px solid #D8E4DE;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+        th{background:#F0F5F2;text-align:left;padding:8px 10px;border:1px solid #D8E4DE;font-size:11px;}
         td{padding:9px 10px;border:1px solid #D8E4DE;vertical-align:top}
         td:last-child{min-width:130px}
         footer{margin-top:18px;font-size:11px;color:#888}
@@ -440,7 +440,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
             { key: 'paiement', label: 'Paiement', value: filterPay, set: setFilterPay, opts: [['', 'Tous'], ['Payé', 'Payé'], ['Non payé', 'Non payé']], minWidth: 120 },
           ].map(f => (
             <div key={f.key}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>{f.label}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>{f.label}</div>
               <select value={f.value} onChange={e => f.set(e.target.value)}
                 style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: f.value ? DARK : MUTED, outline: 'none', cursor: 'pointer', minWidth: f.minWidth }}>
                 {f.opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -448,12 +448,12 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
             </div>
           ))}
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Du</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Du</div>
             <input type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Au</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
             <input type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
@@ -473,7 +473,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
                 {['Patient', 'Date & Heure', 'Service', 'Statut', 'Paiement', 'Actions'].map(col => (
                   <th key={col} style={{
                     padding: '12px 16px', textAlign: 'left', fontWeight: 600,
-                    color: MUTED, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em',
+                    color: MUTED, fontSize: 12,
                     whiteSpace: 'nowrap',
                   }}>{col}</th>
                 ))}

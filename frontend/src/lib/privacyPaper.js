@@ -118,12 +118,14 @@ const CONTENT = [
   { p: "Les documents importés — résultats de laboratoire, comptes rendus d'imagerie, courriers — sont chiffrés au stockage et accessibles par des liens temporaires signés, valables quelques minutes et liés à la session de la personne qui les demande." },
 
   { h2: 'Pendant la consultation' },
-  { p: "L'observation médicale, l'ordonnance et les données de suivi sont enregistrées dans le dossier du patient, à l'intérieur du périmètre du cabinet. Aucun autre cabinet ne peut y accéder, y compris un confrère du réseau Sila." },
+  { p: "L'observation médicale, l'ordonnance et les données de suivi sont enregistrées dans le dossier du patient, à l'intérieur du périmètre du cabinet. Aucun autre cabinet ne peut y accéder, y compris un confrère de Tabibo Network." },
   { note: "L'application fonctionne hors ligne pour son interface, jamais pour les dossiers. Un ordinateur partagé au cabinet ne conserve donc rien de lisible une fois la session fermée." },
 
   { h2: 'La communication avec les patients et les confrères' },
   { p: "Les échanges avec les patients passent par la messagerie du service, chiffrée en transit et cloisonnée par cabinet — jamais par une messagerie personnelle. Les rappels de rendez-vous sont envoyés par courrier électronique et par WhatsApp ; ils ne contiennent aucune donnée de santé, seulement la date, l'heure et le nom du cabinet." },
-  { p: "Le réseau Sila relie les cabinets entre eux pour l'adressage d'un patient. Ce qui circule est strictement limité : le nom du patient, son téléphone et le motif de l'adressage. L'observation, l'ordonnance et les documents restent dans le cabinet qui les a constitués. La base de données interdit d'ailleurs d'adresser un patient à un confrère dont le lien n'a pas été accepté." },
+  { p: "Tabibo Network relie les cabinets entre eux pour l'adressage d'un patient. Ce qui circule est strictement limité : le nom du patient, son téléphone et le motif de l'adressage. L'observation, l'ordonnance et les documents restent dans le cabinet qui les a constitués. La base de données interdit d'ailleurs d'adresser un patient à un confrère dont le lien n'a pas été accepté." },
+  { p: "La messagerie entre confrères obéit à la même règle : elle n'est ouverte qu'entre deux cabinets dont le lien a été accepté, et c'est la base de données qui le vérifie. Un message peut porter une pièce jointe — une image, un compte rendu — mais c'est alors un geste délibéré du médecin, jamais un envoi automatique. La pièce déposée n'a aucune adresse publique : elle ne s'ouvre que par un lien signé, valable une heure, et seulement pour les deux confrères de la conversation." },
+  { p: "Les appels audio et vidéo entre confrères ne transitent pas par Tabibo. Le service ouvre un salon chez le fournisseur de visioconférence et n'en conserve que le nom : ni l'image, ni le son, ni la durée de l'appel ne sont enregistrés." },
 
   { h2: 'Le compte patient' },
   { p: "Le patient dispose d'un compte personnel où il retrouve ses rendez-vous, ses ordonnances reçues et ses échanges. Ce compte est protégé par un mot de passe et, sur les actions sensibles, par une vérification du numéro de téléphone." },
@@ -146,7 +148,7 @@ const CONTENT = [
   { ul: [
     "Vendre, louer ou céder des données de patients ou de médecins, à quiconque, sous quelque forme que ce soit.",
     "Exploiter des données de santé à des fins publicitaires ou de ciblage.",
-    "Donner accès aux dossiers d'un cabinet à un autre cabinet, y compris à un confrère relié par Sila.",
+    "Donner accès aux dossiers d'un cabinet à un autre cabinet, y compris à un confrère relié par Tabibo Network.",
     "Conserver des données de santé lisibles sur l'appareil d'un utilisateur.",
     "Modifier ces engagements sans en informer les cabinets concernés par écrit et à l'avance.",
   ] },

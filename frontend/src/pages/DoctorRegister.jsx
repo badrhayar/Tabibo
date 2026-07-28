@@ -164,8 +164,6 @@ export default function DoctorRegister() {
     fontSize: 13,
     fontWeight: 700,
     color: MUTED,
-    textTransform: 'uppercase',
-    letterSpacing: '0.06em',
     margin: '0 0 16px',
     padding: '0 0 10px',
     borderBottom: `1px solid ${BORDER}`,

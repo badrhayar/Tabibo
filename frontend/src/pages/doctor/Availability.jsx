@@ -330,7 +330,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
 
   const setArr = (setter, i, val) => setter((prev) => { const n = [...prev]; n[i] = val; return n; });
   const card = { background: '#fff', borderRadius: 14, border: `1px solid ${BORDER}`, padding: isMobile ? 16 : 24 };
-  const labelMini = { fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 };
+  const labelMini = { fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 };
   const navBtn = { width: 40, height: 40, borderRadius: 10, border: `1px solid ${BORDER}`, background: '#fff', cursor: 'pointer', fontSize: 18, color: DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 
   return (
@@ -510,17 +510,17 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
           <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>Du</label>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 }}>Du</label>
                 <input type="date" value={offStart} min={todayISO} onChange={(e) => setOffStart(e.target.value)}
                   style={{ height: 44, border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '0 10px', fontSize: 13.5, color: DARK, background: '#fff', fontFamily: 'inherit' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>Au (inclus)</label>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 }}>Au (inclus)</label>
                 <input type="date" value={offEnd} min={offStart || todayISO} onChange={(e) => setOffEnd(e.target.value)}
                   style={{ height: 44, border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '0 10px', fontSize: 13.5, color: DARK, background: '#fff', fontFamily: 'inherit' }} />
               </div>
               <div style={{ flex: 1, minWidth: 160 }}>
-                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>Motif (optionnel)</label>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 }}>Motif (optionnel)</label>
                 <input type="text" value={offReason} placeholder="Ex. Congés annuels" maxLength={80} onChange={(e) => setOffReason(e.target.value)}
                   style={{ width: '100%', boxSizing: 'border-box', height: 44, border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '0 12px', fontSize: 13.5, color: DARK, background: '#fff', fontFamily: 'inherit' }} />
               </div>
@@ -546,7 +546,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13.5, fontWeight: 700, color: DARK }}>
                         {oneDay ? fmt(r.start_date) : `${fmt(r.start_date)} → ${fmt(r.end_date)}`}
-                        {active && <span style={{ marginLeft: 8, fontSize: 10.5, fontWeight: 800, background: '#FEF4DD', color: '#9A6510', borderRadius: 20, padding: '2px 8px', verticalAlign: 'middle' }}>EN COURS</span>}
+                        {active && <span style={{ marginLeft: 8, fontSize: 10.5, fontWeight: 800, background: '#FEF4DD', color: '#9A6510', borderRadius: 20, padding: '2px 8px', verticalAlign: 'middle' }}>En cours</span>}
                       </div>
                       {r.reason && <div style={{ fontSize: 12, color: MUTED, marginTop: 1 }}>{r.reason}</div>}
                       {(() => {
@@ -583,9 +583,9 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
           </p>
           <div style={{ borderRadius: 12, border: `1px solid ${BORDER}`, overflow: 'hidden', opacity: prayerBlock ? 1 : 0.45, pointerEvents: prayerBlock ? 'auto' : 'none' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 96px 64px', padding: '9px 16px', background: BG, borderBottom: `1px solid ${BORDER}` }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4 }}>Prière</span>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4 }}>Aujourd'hui</span>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, textAlign: 'center' }}>Bloquer</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED }}>Prière</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED }}>Aujourd'hui</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textAlign: 'center' }}>Bloquer</span>
             </div>
             {PRAYER_LABELS.map((pr, i) => (
               <div key={pr.id} style={{ display: 'grid', gridTemplateColumns: '1fr 96px 64px', alignItems: 'center', padding: '12px 16px', borderBottom: i < PRAYER_LABELS.length - 1 ? `1px solid ${BORDER}` : 'none' }}>

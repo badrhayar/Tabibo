@@ -473,7 +473,7 @@ export default function PatientAccount() {
         <div style={{ background:'linear-gradient(135deg, #0F6E56 0%, #0C4A37 100%)', borderRadius:18, padding:'22px 24px', marginBottom:22, display:'flex', alignItems:'center', gap:22, flexWrap:'wrap', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:'repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 30px), repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 30px)' }} />
           <div style={{ position:'relative', flex:1, minWidth: isMobile?140:230 }}>
-            <div style={{ fontSize:11.5, fontWeight:800, color:'#BFF0DA', textTransform:'uppercase', letterSpacing:.6, marginBottom:9 }}>⏱ {tr('Prochain rendez-vous', 'Next appointment', 'الموعد القادم')}</div>
+            <div style={{ fontSize:11.5, fontWeight:800, color:'#BFF0DA', marginBottom:9 }}>⏱ {tr('Prochain rendez-vous', 'Next appointment', 'الموعد القادم')}</div>
             {nextAppt ? (
               <>
                 <div style={{ fontSize:18, fontWeight:800, color:'#fff' }}>{docDisplayName(nextAppt.doctorName, nextAppt.spec)} · {SPEC_LABEL(nextAppt.spec)}</div>
@@ -733,7 +733,7 @@ export default function PatientAccount() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10, margin:'22px 0 14px' }}>
-              <span style={{ fontSize:11.5, fontWeight:800, color:MUT, textTransform:'uppercase', letterSpacing:.6, whiteSpace:'nowrap' }}>{tr('Informations médicales', 'Medical information', 'معلومات طبية')}</span>
+              <span style={{ fontSize:11.5, fontWeight:800, color:MUT, whiteSpace:'nowrap' }}>{tr('Informations médicales', 'Medical information', 'معلومات طبية')}</span>
               <span style={{ flex:1, height:1, background:BORDER_STRONG }} />
             </div>
             <div style={{ display:'grid', gridTemplateColumns: isMobile?'minmax(0,1fr)':'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)', gap:14 }}>
@@ -841,7 +841,7 @@ export default function PatientAccount() {
             {/* Table header */}
             <div style={{ display:'grid', gridTemplateColumns:'2fr 1.6fr 1.6fr 0.9fr 0.9fr', minWidth: isMobile?620:'auto', background:HEADER_BG, borderBottom:`1px solid ${BORDER_STRONG}`, padding:'9px 14px', gap:8 }}>
               {['Médecin','Motif','Date','Montant','Statut'].map(col => (
-                <span key={col} style={{ fontSize:11, fontWeight:700, color:MUT, textTransform:'uppercase', letterSpacing:.5 }}>{col}</span>
+                <span key={col} style={{ fontSize:11, fontWeight:700, color:MUT }}>{col}</span>
               ))}
             </div>
             {/* Empty state */}
@@ -969,7 +969,7 @@ export default function PatientAccount() {
       {reviewOpen && (
         <div style={{ position:'fixed', inset:0, background:'rgba(21,49,74,.4)', display:'flex', alignItems:'center', justifyContent:'center', padding:24, zIndex:60 }}>
           <div style={{ background:'#fff', borderRadius:18, padding:30, maxWidth:400, width:'100%', boxShadow:'0 24px 60px rgba(21,49,74,.28)', animation:'saPop .3s ease' }}>
-            <div style={{ fontSize:12, fontWeight:700, color:G, textTransform:'uppercase', letterSpacing:.5, marginBottom:6 }}>{tr('Laisser un avis', 'Leave a review', 'اترك رأيك')}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:G, marginBottom:6 }}>{tr('Laisser un avis', 'Leave a review', 'اترك رأيك')}</div>
             <h2 style={{ margin:'0 0 4px', fontSize:19, fontWeight:800, color:DARK }}>{reviewDoctor}</h2>
             <p style={{ margin:'0 0 18px', fontSize:13, color:MUT }}>Votre avis aide les autres patients à choisir.</p>
             <div style={{ display:'flex', gap:8, justifyContent:'center', marginBottom:18 }}>

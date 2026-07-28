@@ -57,6 +57,13 @@ const IC = {
   play:  <svg {...I}><path d="M7 4.5l12 7.5-12 7.5z"/></svg>,
   idcard:<svg {...I}><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2.1"/><path d="M5.4 16.2c.5-1.7 1.7-2.6 3.1-2.6s2.6.9 3.1 2.6"/><path d="M14.5 10h4M14.5 13.5h4"/></svg>,
   print: <svg {...I}><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7"/><path d="M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/></svg>,
+  phone: <svg {...I}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>,
+  pin:   <svg {...I}><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>,
+  drop:  <svg {...I}><path d="M12 3.2s6 6.6 6 10.4a6 6 0 0 1-12 0c0-3.8 6-10.4 6-10.4z"/></svg>,
+  scalp: <svg {...I}><path d="M14.5 4.5l5 5-9.4 9.4a3 3 0 0 1-1.7.8l-3.6.5.5-3.6a3 3 0 0 1 .8-1.7z"/><path d="M13 6l5 5"/></svg>,
+  dna:   <svg {...I}><path d="M6 3c0 5 12 5 12 10S6 18 6 21"/><path d="M18 3c0 5-12 5-12 10s12 5 12 8"/><path d="M8.5 6.5h7M8.5 17.5h7"/></svg>,
+  life:  <svg {...I}><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg>,
+  plus:  <svg {...I}><path d="M12 5v14M5 12h14"/></svg>,
 };
 
 // Premium card header: tinted icon chip + title + optional subtitle + right slot.
@@ -69,6 +76,107 @@ function CardHead({ icon, title, sub, right }) {
         {sub && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 1 }}>{sub}</div>}
       </div>
       {right}
+    </div>
+  );
+}
+
+// ── La palette du dossier ───────────────────────────────────────────────────
+// Chaque section porte sa propre couleur. Le dossier cesse d'être un empilement
+// de cadres gris : l'œil reconnaît la section avant même d'avoir lu son titre,
+// exactement comme les colonnes du navigateur ou les pastilles de l'agenda.
+const SEC = {
+  consult:  { c: '#0E7C52', bg: '#E7F6EE' },
+  profil:   { c: '#0891B2', bg: '#E3F5FA' },
+  admin:    { c: '#3B6FB0', bg: '#E8F1FC' },
+  histo:    { c: '#6B57A6', bg: '#EFEAFB' },
+  antec:    { c: '#C2466A', bg: '#FCE7EE' },
+  ttt:      { c: '#B45309', bg: '#FDF1E0' },
+  suivi:    { c: '#0E7C52', bg: '#E7F6EE' },
+  bio:      { c: '#12875A', bg: '#E3F8EE' },
+  docs:     { c: '#3B6FB0', bg: '#E8F1FC' },
+  prev:     { c: '#0891B2', bg: '#E3F5FA' },
+  vaccin:   { c: '#6B57A6', bg: '#EFEAFB' },
+  factures: { c: '#C28A1B', bg: '#FEF3DC' },
+};
+const secOf = (id) => SEC[id] || SEC.consult;
+
+/** Bandeau de section : la couleur, l'icône, le titre, et les repères clés. */
+function Hero({ tint, icon, title, sub, chips = [], right, isMobile }) {
+  return (
+    <div style={{
+      position: 'relative', overflow: 'hidden', borderRadius: 20, marginBottom: 16,
+      padding: isMobile ? '16px 16px' : '20px 22px',
+      background: `linear-gradient(132deg, ${tint.bg} 0%, #FFFFFF 68%)`,
+      border: `1px solid ${tint.bg}`, boxShadow: SHADOW,
+    }}>
+      <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -46, top: -70, width: 200, height: 200, borderRadius: '50%', background: tint.c, opacity: 0.07 }} />
+      <span aria-hidden style={{ position: 'absolute', insetInlineEnd: 60, bottom: -80, width: 130, height: 130, borderRadius: '50%', background: tint.c, opacity: 0.05 }} />
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <span style={{ width: 48, height: 48, borderRadius: 15, background: '#fff', color: tint.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 8px 18px -10px ${tint.c}` }}>
+          <span style={{ display: 'flex', transform: 'scale(1.35)' }}>{icon}</span>
+        </span>
+        <div style={{ flex: 1, minWidth: 170 }}>
+          <div style={{ fontSize: isMobile ? 17 : 19, fontWeight: 800, color: DARK, letterSpacing: '-0.45px' }}>{title}</div>
+          {sub && <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2, lineHeight: 1.5 }}>{sub}</div>}
+        </div>
+        {right}
+      </div>
+      {chips.length > 0 && (
+        <div style={{ position: 'relative', display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 15 }}>
+          {chips.filter(Boolean).map((ch, i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, background: '#fff', border: `1px solid ${tint.bg}`, borderRadius: 11, padding: '7px 13px', boxShadow: '0 1px 2px rgba(16,42,32,0.04)' }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: ch.color || tint.c, letterSpacing: '-0.3px', fontVariantNumeric: 'tabular-nums' }}>{ch.value}</span>
+              <span style={{ fontSize: 11.5, color: MUTED, fontWeight: 600 }}>{ch.label}</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Sous-carte titrée : un bloc de la section, avec sa pastille de couleur. */
+function Panel({ tint, icon, title, sub, right, children, pad = 16 }) {
+  return (
+    <div style={{ background: '#fff', border: '1px solid #EAF1ED', borderRadius: 16, boxShadow: SHADOW, marginBottom: 14, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 16px', borderBottom: '1px solid #F1F6F3', background: `linear-gradient(90deg, ${tint.bg} 0%, #FFFFFF 55%)`, flexWrap: 'wrap' }}>
+        <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: tint.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${tint.c}` }}>{icon}</span>
+        <div style={{ flex: 1, minWidth: 120 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: DARK, letterSpacing: '-0.2px' }}>{title}</div>
+          {sub && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 1 }}>{sub}</div>}
+        </div>
+        {right}
+      </div>
+      <div style={{ padding: pad }}>{children}</div>
+    </div>
+  );
+}
+
+/** Une donnée chiffrée, en grand. */
+function Metric({ tint, label, value, unit, note, noteColor }) {
+  const has = value != null && value !== '' && value !== '—';
+  return (
+    <div style={{ background: '#fff', border: '1px solid #EAF1ED', borderRadius: 15, padding: '13px 15px', boxShadow: SHADOW, minWidth: 0 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: MUTED }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 5 }}>
+        <span style={{ fontSize: 23, fontWeight: 800, color: has ? DARK : '#C3D0CA', letterSpacing: '-0.7px', fontVariantNumeric: 'tabular-nums' }}>{has ? value : '—'}</span>
+        {has && unit && <span style={{ fontSize: 11.5, color: MUTED, fontWeight: 600 }}>{unit}</span>}
+      </div>
+      {note && <div style={{ marginTop: 7, display: 'inline-flex', background: (noteColor || tint.c) + '18', color: noteColor || tint.c, borderRadius: 8, padding: '3px 9px', fontSize: 11, fontWeight: 700 }}>{note}</div>}
+    </div>
+  );
+}
+
+/** Une ligne « intitulé → valeur », avec l'action qui va avec quand il y en a une. */
+function Field({ label, value, href, tint }) {
+  const has = value && value !== '—';
+  const body = has ? value : <span style={{ color: '#B7C2BD', fontWeight: 500 }}>Non renseigné</span>;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid #F2F6F4', minWidth: 0 }}>
+      <span style={{ minWidth: 118, fontSize: 12, color: MUTED, flexShrink: 0 }}>{label}</span>
+      {has && href
+        ? <a href={href} style={{ fontSize: 13.5, fontWeight: 700, color: tint.c, textDecoration: 'none', wordBreak: 'break-word' }}>{value}</a>
+        : <span style={{ fontSize: 13.5, fontWeight: 700, color: DARK, wordBreak: 'break-word' }}>{body}</span>}
     </div>
   );
 }
@@ -281,21 +389,31 @@ const CONSULT_BANK = {
 const consultStruct = (service) => CONSULT_BANK[service] || CONSULT_BANK._default;
 
 // ── Small building blocks ────────────────────────────────────────────────────
-function ItemList({ items, onAdd, onRemove, placeholder }) {
+// Une liste d'entrées libres, présentée en pastilles : elles se lisent d'un
+// coup d'œil et se retirent d'un clic, au lieu de s'empiler en lignes grises.
+function ItemList({ items, onAdd, onRemove, placeholder, tint = SEC.consult, empty }) {
   const [val, setVal] = useState('');
   const add = () => { const v = val.trim(); if (v) { onAdd(v); setVal(''); } };
   return (
     <div>
-      {items.map((it, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: `1px solid ${BORDER}` }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: TEAL, flexShrink: 0 }} />
-          <span style={{ flex: 1, fontSize: 13, color: DARK }}>{it}</span>
-          <button onClick={() => onRemove(i)} aria-label={`Retirer ${it}`} style={{ background: 'none', border: 'none', color: '#C2466A', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</button>
+      {items.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 11 }}>
+          {items.map((it, i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: tint.bg, color: tint.c, border: `1px solid ${tint.c}22`, borderRadius: 11, padding: '6px 6px 6px 12px', fontSize: 12.5, fontWeight: 700, maxWidth: '100%' }}>
+              <span style={{ minWidth: 0, wordBreak: 'break-word' }}>{it}</span>
+              <button onClick={() => onRemove(i)} aria-label={`Retirer ${it}`} title="Retirer"
+                style={{ width: 20, height: 20, borderRadius: 7, border: 'none', background: 'rgba(255,255,255,0.75)', color: tint.c, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </button>
+            </span>
+          ))}
         </div>
-      ))}
-      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+      )}
+      {items.length === 0 && empty && <div style={{ fontSize: 12.5, color: '#9FAFA9', marginBottom: 11 }}>{empty}</div>}
+      <div style={{ display: 'flex', gap: 8 }}>
         <input value={val} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} placeholder={placeholder} style={{ ...inp, flex: 1 }} />
-        <button onClick={add} style={{ padding: '6px 13px', borderRadius: 8, border: `1px solid #CFE4DB`, background: '#E9F5F0', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Ajouter</button>
+        <button onClick={add} disabled={!val.trim()}
+          style={{ padding: '6px 15px', borderRadius: 10, border: 'none', background: val.trim() ? tint.c : '#EDF2EF', color: val.trim() ? '#fff' : '#A9B8B2', fontSize: 12.5, fontWeight: 700, cursor: val.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap', fontFamily: 'inherit' }}>+ Ajouter</button>
       </div>
     </div>
   );
@@ -329,21 +447,23 @@ function MedList({ items, onChange }) {
   );
 }
 
-function AntecedentBlock({ title, items, none, onChange, placeholder }) {
+function AntecedentBlock({ title, icon, tint, items, none, onChange, placeholder }) {
   return (
-    <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
-        <span style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px' }}>{title}</span>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: none ? TEAL : MUTED, fontWeight: 600, cursor: 'pointer' }}>
-          <input type="checkbox" checked={none} onChange={(e) => onChange({ none: e.target.checked })} style={{ accentColor: BTN_GREEN_SOLID }} />
+    <Panel tint={tint} icon={icon} title={title}
+      right={
+        <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: none ? tint.c : MUTED, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          <input type="checkbox" checked={none} onChange={(e) => onChange({ none: e.target.checked })} style={{ accentColor: BTN_GREEN_SOLID, width: 15, height: 15, cursor: 'pointer' }} />
           Pas d'antécédent
         </label>
-      </div>
-      {!none && <ItemList items={items} placeholder={placeholder}
+      }>
+      {!none && <ItemList items={items} placeholder={placeholder} tint={tint} empty="Rien de noté pour l'instant."
         onAdd={(v) => onChange({ items: [...items, v] })}
         onRemove={(i) => onChange({ items: items.filter((_, k) => k !== i) })} />}
-      {none && <div style={{ fontSize: 12.5, color: MUTED, fontStyle: 'italic' }}>Aucun antécédent signalé.</div>}
-    </div>
+      {none && <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#E7F6EE', color: '#0E7C52', borderRadius: 10, padding: '7px 12px', fontSize: 12.5, fontWeight: 700 }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        Aucun antécédent signalé
+      </div>}
+    </Panel>
   );
 }
 
@@ -407,7 +527,7 @@ function PatientPicker({ state, setState, go, isMobile }) {
     || norm(p.name).includes(norm(q)) || norm(p.cin).includes(norm(q)) || String(p.phone || '').replace(/\s/g, '').includes(q.replace(/\s/g, '')));
   const open = (p) => setState({ pfilePatient: p, pfileApptId: null, pfileFrom: null });
   const HEADER_BG = '#F2F8F5';
-  const th = { padding: '12px 16px', textAlign: 'start', fontWeight: 600, color: MUTED, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' };
+  const th = { padding: '12px 16px', textAlign: 'start', fontWeight: 600, color: MUTED, fontSize: 12, whiteSpace: 'nowrap' };
 
   return (
     <div style={{ padding: isMobile ? '18px 14px' : '32px', fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100%', boxSizing: 'border-box' }}>
@@ -602,7 +722,20 @@ export default function PatientFile({ state, setState, go }) {
     if (p.allergies && p.allergies !== '—') seed.allergies = String(p.allergies).split(/,\s*/).filter(Boolean);
     if (p.chronic && p.chronic !== '—') seed.medicaux = String(p.chronic).split(/,\s*/).filter(Boolean);
     if (isDemo) {
-      // Sales demo only: a small realistic lab history so the biology tool shows life.
+      // Démonstration uniquement : un dossier plausible, pour que le médecin
+      // voie ce que chaque section donne une fois remplie. Rien n'est
+      // enregistré, et aucun de ces patients n'existe.
+      if (!seed.medicaux.length) seed.medicaux = ['Diabète de type 2 (2019)', 'Hypertension artérielle'];
+      seed.chirurgicaux = ['Appendicectomie (2015)'];
+      seed.familiaux = ['Père : infarctus à 62 ans', 'Mère : diabète de type 2'];
+      if (!seed.allergies.length) seed.allergies = ['Pénicilline'];
+      seed.tttFond = ['Metformine 850 mg — 2/j', 'Ramipril 5 mg — 1/j le matin'];
+      seed.tttPonctuels = ['Paracétamol 1 g si douleur'];
+      seed.suivi = { taille: '164', poids: '78', tas: '138' };
+      seed.vie = { alcool: 'Non', tabac: 'Non', profession: 'Enseignante' };
+      seed.vaccins = ['Tétanos — rappel 03/2024', 'Grippe saisonnière — 10/2025', 'Hépatite B — schéma complet'];
+      seed.prevChecks = { ta: true, glycemie: true, dentaire: true };
+      seed.prevention = "Rappel du vaccin antigrippal en octobre. Reprise progressive de l'activité physique : 30 minutes de marche, 5 jours par semaine.";
       seed.bio = {
         fav: ['hba1c'],
         res: {
@@ -884,7 +1017,7 @@ export default function PatientFile({ state, setState, go }) {
   };
   const DetailSection = ({ label, children }) => (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, marginBottom: 6 }}>{label}</div>
       {children}
     </div>
   );
@@ -909,7 +1042,7 @@ export default function PatientFile({ state, setState, go }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {chips.map(([k, v]) => (
                 <span key={k} style={{ display: 'inline-flex', flexDirection: 'column', gap: 1, padding: '7px 13px', borderRadius: 11, background: '#F3F8F5', border: `1px solid ${BORDER}` }}>
-                  <span style={{ fontSize: 10, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: 600 }}>{k}</span>
+                  <span style={{ fontSize: 10, color: MUTED, fontWeight: 600 }}>{k}</span>
                   <span style={{ fontSize: 13.5, fontWeight: 700, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{v}</span>
                 </span>
               ))}
@@ -951,7 +1084,7 @@ export default function PatientFile({ state, setState, go }) {
       .hd{border-bottom:2px solid #0F6E56;padding-bottom:14px;margin-bottom:20px}
       .hd .t{font-size:20px;font-weight:800;color:#0C4A37;letter-spacing:-.3px}
       .hd .s{font-size:13px;color:#5A6B65;margin-top:3px}
-      h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#0F6E56;margin:18px 0 4px}
+      h3{font-size:12px;color:#0F6E56;margin:18px 0 4px}
       p{margin:0 0 4px;font-size:14px}ul{margin:4px 0;padding-left:18px}li{font-size:14px;margin-bottom:3px}
       .ft{margin-top:34px;padding-top:14px;border-top:1px solid #e0e8e4;font-size:12px;color:#8a988f}</style></head><body>
       <div class="hd"><div class="t">${esc(entry.title)}</div><div class="s">${esc(civ)} ${esc(patient.name)}${age != null ? ` · ${age} ans` : ''} — ${esc(dstr)}${f.durationSec ? ` · Durée ${durLbl(f.durationSec)}` : ''}</div></div>
@@ -1106,77 +1239,167 @@ export default function PatientFile({ state, setState, go }) {
     </div>
   );
 
-  const renderAntec = () => (
-    <div style={card}>
-      <CardHead icon={IC.file} title="Antécédents et mode de vie" sub="Partagés avec toutes vos consultations."
-        right={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
-            <button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '6px 13px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>
-          </div>
-        } />
-      <AntecedentBlock title="Antécédents médicaux" items={mh.medicaux} none={mh.noMedicaux} placeholder="Ex. Diabète de type 2"
-        onChange={(p) => patchMh(p.none !== undefined ? { noMedicaux: p.none } : { medicaux: p.items })} />
-      <AntecedentBlock title="Antécédents chirurgicaux" items={mh.chirurgicaux} none={mh.noChirurgicaux} placeholder="Ex. Appendicectomie (2015)"
-        onChange={(p) => patchMh(p.none !== undefined ? { noChirurgicaux: p.none } : { chirurgicaux: p.items })} />
-      <AntecedentBlock title="Antécédents familiaux" items={mh.familiaux} none={mh.noFamiliaux} placeholder="Ex. Père : hypertension"
-        onChange={(p) => patchMh(p.none !== undefined ? { noFamiliaux: p.none } : { familiaux: p.items })} />
-
-      {(patient.sex !== 'M') && (
-        <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 12 }}>Antécédents gynécologiques</div>
-          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <div><label style={lbl}>G (grossesses)</label><input type="number" min="0" value={mh.gyneco?.g ?? ''} onChange={(e) => patchMh({ gyneco: { ...mh.gyneco, g: e.target.value } })} style={{ ...inp, width: 82 }} /></div>
-            <div><label style={lbl}>P (parités)</label><input type="number" min="0" value={mh.gyneco?.p ?? ''} onChange={(e) => patchMh({ gyneco: { ...mh.gyneco, p: e.target.value } })} style={{ ...inp, width: 82 }} /></div>
-            <div><label style={lbl}>Enceinte</label><YesNo value={mh.gyneco?.enceinte} onChange={(v) => patchMh({ gyneco: { ...mh.gyneco, enceinte: v } })} /></div>
-            <div><label style={lbl}>Allaitement</label><YesNo value={mh.gyneco?.allaitement} onChange={(v) => patchMh({ gyneco: { ...mh.gyneco, allaitement: v } })} /></div>
-          </div>
-        </div>
-      )}
-
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 10 }}>Allergies</div>
-        <ItemList items={mh.allergies} placeholder="Ex. Pénicilline"
-          onAdd={(v) => patchMh({ allergies: [...mh.allergies, v] })}
-          onRemove={(i) => patchMh({ allergies: mh.allergies.filter((_, k) => k !== i) })} />
-      </div>
-
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 12 }}>Mode de vie</div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
-          <div><label style={lbl}>Alcool</label>
-            <select value={mh.vie?.alcool || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, alcool: e.target.value } })} style={{ ...inp, cursor: 'pointer' }}>
-              <option value="">—</option><option>Non</option><option>Occasionnel</option><option>Régulier</option>
-            </select></div>
-          <div><label style={lbl}>Tabac</label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <select value={mh.vie?.tabac || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, tabac: e.target.value } })} style={{ ...inp, cursor: 'pointer', flex: 1 }}>
-                <option value="">—</option><option>Non</option><option>Fumeur</option><option>Sevré</option>
-              </select>
-              <input type="number" min="0" placeholder="Âge de début" value={mh.vie?.tabacAge || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, tabacAge: e.target.value } })} style={{ ...inp, width: 110 }} />
-            </div></div>
-          <div style={{ gridColumn: isMobile ? 'auto' : '1 / -1' }}><label style={lbl}>Profession</label><input value={mh.vie?.profession || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, profession: e.target.value } })} style={inp} /></div>
-        </div>
-      </div>
+  // Le bouton d'enregistrement, identique dans toutes les sections modifiables.
+  const saveBtn = (tint) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {savedMsg && <span style={{ fontSize: 12.5, fontWeight: 700, color: '#0E7C52' }}>{savedMsg}</span>}
+      <button onClick={() => saveMh()} disabled={mhSaving}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 11, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1, fontFamily: 'inherit', boxShadow: `0 8px 18px -10px ${tint.c}` }}>
+        {mhSaving ? '…' : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><path d="M7 3v6h8M8 21v-6h8v6" /></svg> Enregistrer</>}
+      </button>
     </div>
   );
 
-  const renderTtt = () => (
-    <div style={card}>
-      <CardHead icon={IC.pill} title="Traitements en cours" sub="Traitements de fond et ponctuels du patient."
-        right={<button onClick={() => saveMh()} disabled={mhSaving} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: mhSaving ? 0.7 : 1 }}>{mhSaving ? '…' : 'Enregistrer'}</button>} />
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16, marginBottom: 14 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 10 }}>Traitements de fond</div>
-        <ItemList items={mh.tttFond} placeholder="Ex. METFORMINE 850 mg — 2/j"
-          onAdd={(v) => patchMh({ tttFond: [...mh.tttFond, v] })} onRemove={(i) => patchMh({ tttFond: mh.tttFond.filter((_, k) => k !== i) })} />
-      </div>
-      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: DARK, letterSpacing: '-0.1px', marginBottom: 10 }}>Traitements ponctuels</div>
-        <ItemList items={mh.tttPonctuels} placeholder="Ex. Paracétamol 1 g si douleur"
-          onAdd={(v) => patchMh({ tttPonctuels: [...mh.tttPonctuels, v] })} onRemove={(i) => patchMh({ tttPonctuels: mh.tttPonctuels.filter((_, k) => k !== i) })} />
-      </div>
-    </div>
-  );
+  const renderAntec = () => {
+    const t = SEC.antec;
+    const nAll = (mh.allergies || []).length;
+    return (
+      <>
+        <Hero tint={t} icon={IC.heart} isMobile={isMobile}
+          title="Antécédents et mode de vie"
+          sub="Le socle du dossier : ce qu'il faut savoir avant de prescrire, partagé par toutes vos consultations."
+          right={saveBtn(t)}
+          chips={[
+            { value: (mh.medicaux || []).length, label: 'médicaux' },
+            { value: (mh.chirurgicaux || []).length, label: 'chirurgicaux' },
+            { value: (mh.familiaux || []).length, label: 'familiaux' },
+            { value: nAll, label: nAll > 1 ? 'allergies' : 'allergie', color: nAll ? '#C2263F' : undefined },
+          ]} />
+
+        {nAll > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'linear-gradient(120deg,#FDEBEF,#fff 70%)', border: '1px solid #F7D2DC', borderRadius: 16, padding: '13px 16px', marginBottom: 14, boxShadow: SHADOW, flexWrap: 'wrap' }}>
+            <span style={{ width: 34, height: 34, borderRadius: 11, background: '#fff', color: '#C2263F', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 6px 14px -8px #C2263F' }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.5L2.8 20h18.4z" /><path d="M12 10v4M12 17.2v.1" /></svg>
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#8E1B31', flexShrink: 0 }}>Allergies connues</span>
+            <span style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {(mh.allergies || []).map((a, i) => (
+                <span key={i} style={{ background: '#fff', color: '#C2263F', border: '1px solid #F3C5D1', borderRadius: 9, padding: '4px 11px', fontSize: 12.5, fontWeight: 700 }}>{a}</span>
+              ))}
+            </span>
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, alignItems: 'start' }}>
+          <AntecedentBlock title="Antécédents médicaux" icon={IC.heart} tint={t} items={mh.medicaux} none={mh.noMedicaux} placeholder="Ex. Diabète de type 2"
+            onChange={(p) => patchMh(p.none !== undefined ? { noMedicaux: p.none } : { medicaux: p.items })} />
+          <AntecedentBlock title="Antécédents chirurgicaux" icon={IC.scalp} tint={SEC.histo} items={mh.chirurgicaux} none={mh.noChirurgicaux} placeholder="Ex. Appendicectomie (2015)"
+            onChange={(p) => patchMh(p.none !== undefined ? { noChirurgicaux: p.none } : { chirurgicaux: p.items })} />
+          <AntecedentBlock title="Antécédents familiaux" icon={IC.dna} tint={SEC.profil} items={mh.familiaux} none={mh.noFamiliaux} placeholder="Ex. Père : hypertension"
+            onChange={(p) => patchMh(p.none !== undefined ? { noFamiliaux: p.none } : { familiaux: p.items })} />
+
+          <Panel tint={SEC.antec} icon={IC.drop} title="Allergies" sub="Ce qui apparaît en tête du dossier.">
+            <ItemList items={mh.allergies} placeholder="Ex. Pénicilline" tint={{ c: '#C2263F', bg: '#FCE7EE' }} empty="Aucune allergie signalée."
+              onAdd={(v) => patchMh({ allergies: [...mh.allergies, v] })}
+              onRemove={(i) => patchMh({ allergies: mh.allergies.filter((_, k) => k !== i) })} />
+          </Panel>
+
+          {(patient.sex !== 'M') && (
+            <Panel tint={SEC.vaccin} icon={IC.heart} title="Antécédents gynécologiques">
+              <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div><label style={lbl}>G (grossesses)</label><input type="number" min="0" value={mh.gyneco?.g ?? ''} onChange={(e) => patchMh({ gyneco: { ...mh.gyneco, g: e.target.value } })} style={{ ...inp, width: 82 }} /></div>
+                <div><label style={lbl}>P (parités)</label><input type="number" min="0" value={mh.gyneco?.p ?? ''} onChange={(e) => patchMh({ gyneco: { ...mh.gyneco, p: e.target.value } })} style={{ ...inp, width: 82 }} /></div>
+                <div><label style={lbl}>Enceinte</label><YesNo value={mh.gyneco?.enceinte} onChange={(v) => patchMh({ gyneco: { ...mh.gyneco, enceinte: v } })} /></div>
+                <div><label style={lbl}>Allaitement</label><YesNo value={mh.gyneco?.allaitement} onChange={(v) => patchMh({ gyneco: { ...mh.gyneco, allaitement: v } })} /></div>
+              </div>
+            </Panel>
+          )}
+
+          <Panel tint={SEC.suivi} icon={IC.life} title="Mode de vie">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+              <div><label style={lbl}>Alcool</label>
+                <select value={mh.vie?.alcool || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, alcool: e.target.value } })} style={{ ...inp, cursor: 'pointer' }}>
+                  <option value="">—</option><option>Non</option><option>Occasionnel</option><option>Régulier</option>
+                </select></div>
+              <div><label style={lbl}>Tabac</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <select value={mh.vie?.tabac || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, tabac: e.target.value } })} style={{ ...inp, cursor: 'pointer', flex: 1 }}>
+                    <option value="">—</option><option>Non</option><option>Fumeur</option><option>Sevré</option>
+                  </select>
+                  <input type="number" min="0" placeholder="Depuis l'âge de" title="Âge de début" value={mh.vie?.tabacAge || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, tabacAge: e.target.value } })} style={{ ...inp, width: 130 }} />
+                </div></div>
+              <div><label style={lbl}>Profession</label><input value={mh.vie?.profession || ''} onChange={(e) => patchMh({ vie: { ...mh.vie, profession: e.target.value } })} style={inp} /></div>
+            </div>
+          </Panel>
+        </div>
+      </>
+    );
+  };
+
+  const renderTtt = () => {
+    const t = SEC.ttt;
+    const nF = (mh.tttFond || []).length, nP = (mh.tttPonctuels || []).length;
+    return (
+      <>
+        <Hero tint={t} icon={IC.pill} isMobile={isMobile}
+          title="Traitement en cours"
+          sub="Ce que le patient prend aujourd'hui — de fond ou ponctuellement. À vérifier avant toute nouvelle ordonnance."
+          right={saveBtn(t)}
+          chips={[
+            { value: nF, label: nF > 1 ? 'traitements de fond' : 'traitement de fond' },
+            { value: nP, label: 'ponctuel' + (nP > 1 ? 's' : ''), color: SEC.profil.c },
+            { value: nF + nP, label: 'au total', color: '#0E7C52' },
+          ]} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, alignItems: 'start' }}>
+          <Panel tint={t} icon={IC.pill} title="Traitements de fond" sub="Pris au long cours.">
+            <ItemList items={mh.tttFond} placeholder="Ex. Metformine 850 mg — 2/j" tint={t} empty="Aucun traitement de fond."
+              onAdd={(v) => patchMh({ tttFond: [...mh.tttFond, v] })} onRemove={(i) => patchMh({ tttFond: mh.tttFond.filter((_, k) => k !== i) })} />
+          </Panel>
+          <Panel tint={SEC.profil} icon={IC.rx} title="Traitements ponctuels" sub="Au besoin, ou pour une durée limitée.">
+            <ItemList items={mh.tttPonctuels} placeholder="Ex. Paracétamol 1 g si douleur" tint={SEC.profil} empty="Aucun traitement ponctuel."
+              onAdd={(v) => patchMh({ tttPonctuels: [...mh.tttPonctuels, v] })} onRemove={(i) => patchMh({ tttPonctuels: mh.tttPonctuels.filter((_, k) => k !== i) })} />
+          </Panel>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: '1px solid #EAF1ED', borderRadius: 14, padding: '12px 15px', boxShadow: SHADOW, fontSize: 12.5, color: MUTED, flexWrap: 'wrap' }}>
+          <span style={{ color: t.c, display: 'flex' }}>{IC.rx}</span>
+          Les médicaments prescrits pendant une consultation se trouvent dans l'ordonnance de cette consultation.
+          <button onClick={() => setSection('histo')} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: t.c, background: t.bg, border: 'none', borderRadius: 9, padding: '6px 12px', fontWeight: 700, cursor: 'pointer', fontSize: 12.5, fontFamily: 'inherit' }}>
+            Voir l'historique
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+          </button>
+        </div>
+      </>
+    );
+  };
+
+  // ── Données de suivi — la biométrie en grand, avec sa lecture clinique ─────
+  const imcRead = (v) => {
+    const n = parseFloat(v);
+    if (!Number.isFinite(n)) return null;
+    if (n < 18.5) return { t: 'Insuffisance pondérale', c: '#B45309' };
+    if (n < 25) return { t: 'Corpulence normale', c: '#0E7C52' };
+    if (n < 30) return { t: 'Surpoids', c: '#B45309' };
+    return { t: 'Obésité', c: '#C2263F' };
+  };
+  const tasRead = (v) => {
+    const n = parseFloat(v);
+    if (!Number.isFinite(n)) return null;
+    if (n < 90) return { t: 'Basse', c: '#B45309' };
+    if (n < 130) return { t: 'Normale', c: '#0E7C52' };
+    if (n < 140) return { t: 'Limite haute', c: '#B45309' };
+    return { t: 'Élevée', c: '#C2263F' };
+  };
+  const renderSuivi = () => {
+    const t = SEC.suivi;
+    const r = imcRead(imc), p = tasRead(mh.suivi?.tas);
+    return (
+      <>
+        <Hero tint={t} icon={IC.chart} isMobile={isMobile}
+          title="Données de suivi"
+          sub="Taille, poids, indice de masse corporelle et pression artérielle — relevés à chaque passage."
+          right={saveBtn(t)} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
+          <Metric tint={t} label="Taille" value={mh.suivi?.taille} unit="cm" />
+          <Metric tint={t} label="Poids" value={mh.suivi?.poids} unit="kg" />
+          <Metric tint={t} label="IMC" value={imc} unit="kg/m²" note={r?.t} noteColor={r?.c} />
+          <Metric tint={t} label="Pression systolique" value={mh.suivi?.tas} unit="mmHg" note={p?.t} noteColor={p?.c} />
+        </div>
+        <Panel tint={t} icon={IC.chart} title="Relever les mesures" sub="L'indice de masse corporelle se calcule tout seul.">
+          {renderSuiviFields()}
+        </Panel>
+      </>
+    );
+  };
 
   // ── Historique — the patient's course of care as one vertical timeline.
   //    Everything that happened lands here (consultations, comptes-rendus,
@@ -1187,11 +1410,16 @@ export default function PatientFile({ state, setState, go }) {
     if (x.full || x.planned) setDetail(x);
   };
   const renderHisto = () => (
-    <div style={card}>
-      <CardHead icon={IC.clock} title="Historique du patient"
+    <>
+      <Hero tint={SEC.histo} icon={IC.clock} isMobile={isMobile}
+        title="Historique du patient"
         sub="Le parcours de soins complet : consultations, comptes-rendus, ordonnances, documents et encaissements."
-        right={<span style={{ fontSize: 11.5, fontWeight: 600, color: TEAL, background: '#E9F5F0', borderRadius: 20, padding: '4px 11px' }}>{tlFeed.length} événement{tlFeed.length > 1 ? 's' : ''}</span>} />
-
+        chips={[
+          { value: tlFeed.length, label: tlFeed.length > 1 ? 'événements' : 'événement' },
+          { value: tlCounts.consult || 0, label: 'consultations', color: '#0E7C52' },
+          { value: tlCounts.ordo || 0, label: 'ordonnances', color: '#6B57A6' },
+        ]} />
+    <div style={card}>
       {/* Recherche */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 8, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '9px 13px', background: '#fff' }}>
@@ -1289,6 +1517,7 @@ export default function PatientFile({ state, setState, go }) {
         );
       })}
     </div>
+    </>
   );
 
   // ── Profil patient — a one-page (A4) clinical summary, auto-filled from every
@@ -1342,7 +1571,7 @@ export default function PatientFile({ state, setState, go }) {
       .id{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:#3A4A45;margin-bottom:16px}
       .synth{background:#F3F8F5;border:1px solid #E3EEE8;border-radius:12px;padding:14px 16px;font-size:13.5px;margin-bottom:20px}
       .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-      h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#0F6E56;margin:0 0 5px;border-bottom:1px solid #eef3f0;padding-bottom:4px}
+      h3{font-size:12px;color:#0F6E56;margin:0 0 5px;border-bottom:1px solid #eef3f0;padding-bottom:4px}
       ul{margin:4px 0;padding-left:16px}li{font-size:13px;margin-bottom:2px}p{font-size:13px;margin:3px 0}.mut{color:#8a988f}
       .ft{margin-top:28px;padding-top:12px;border-top:1px solid #e0e8e4;font-size:11.5px;color:#8a988f}</style></head><body>
       <div class="hd"><div><div class="t">Profil patient</div><div class="s">${esc(civ)} ${esc(patient.name)}${age != null ? ` · ${age} ans` : ''}${patient.sex ? ` · ${patient.sex === 'M' ? 'Homme' : 'Femme'}` : ''}</div></div><div class="s">Édité le ${esc(new Date(`${todayISO}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }))}</div></div>
@@ -1368,7 +1597,7 @@ export default function PatientFile({ state, setState, go }) {
     const d = profilData();
     const Block = ({ title, children }) => (
       <div style={{ border: `1px solid ${BORDER}`, borderRadius: 14, padding: '14px 16px', background: '#fff' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 9 }}>{title}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, marginBottom: 9 }}>{title}</div>
         {children}
       </div>
     );
@@ -1383,19 +1612,36 @@ export default function PatientFile({ state, setState, go }) {
         ))}</div>
       : <span style={{ fontSize: 12.5, color: MUTED, fontStyle: 'italic' }}>Non renseigné</span>;
     const av = (patient.name || '?').trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+    const t = SEC.profil;
     return (
+      <>
+      <Hero tint={t} icon={IC.idcard} isMobile={isMobile}
+        title="Profil patient"
+        sub="Une page, tout le dossier : ce qu'il faut savoir avant d'entrer dans la salle."
+        chips={[
+          age != null ? { value: age, label: 'ans' } : null,
+          { value: d.med.length + d.chir.length + d.fam.length, label: 'antécédents', color: SEC.antec.c },
+          { value: d.allerg.length, label: d.allerg.length > 1 ? 'allergies' : 'allergie', color: d.allerg.length ? '#C2263F' : '#0E7C52' },
+          { value: d.fond.length + d.ponct.length, label: 'traitements', color: SEC.ttt.c },
+        ]}
+        right={
+          <button onClick={printProfil}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 11, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: `0 8px 18px -10px ${t.c}` }}>
+            {IC.print} Imprimer le profil
+          </button>
+        } />
       <div style={{ ...card, maxWidth: 840, margin: '0 auto', padding: isMobile ? 18 : 30 }}>
         {/* A4 header band */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap', paddingBottom: 18, borderBottom: `2px solid ${TEAL}`, marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
             <span style={{ width: 54, height: 54, borderRadius: 15, background: 'linear-gradient(140deg,#DCEFE7,#BFE0D4)', color: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, flexShrink: 0 }}>{av}</span>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.6px' }}>Profil patient</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: TEAL }}>Profil patient</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: DARK, letterSpacing: '-0.4px', lineHeight: 1.2 }}>{civ} {patient.name}</div>
               <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2 }}>{[age != null ? `${age} ans` : null, patient.sex === 'M' ? 'Homme' : patient.sex === 'F' ? 'Femme' : null, dobLbl ? `Né(e) ${dobLbl}` : null].filter(Boolean).join(' · ')}</div>
             </div>
           </div>
-          <button onClick={printProfil} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 15px', borderRadius: 10, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{IC.print} Imprimer le profil</button>
+          <span style={{ fontSize: 11.5, color: MUTED }}>Édité le {new Date(`${todayISO}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>
 
         {/* Identity chips */}
@@ -1408,7 +1654,7 @@ export default function PatientFile({ state, setState, go }) {
 
         {/* Synthèse clinique (auto) */}
         <div style={{ background: '#F3F8F5', border: `1px solid #E3EEE8`, borderRadius: 14, padding: '15px 17px', marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Synthèse clinique</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, marginBottom: 6 }}>Synthèse clinique</div>
           <div style={{ fontSize: 13.5, color: '#33433E', lineHeight: 1.7 }}>{d.synth}</div>
         </div>
 
@@ -1444,7 +1690,7 @@ export default function PatientFile({ state, setState, go }) {
         {/* Dernières consultations */}
         {d.lastConsults.length > 0 && (
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 9 }}>Dernières consultations</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, marginBottom: 9 }}>Dernières consultations</div>
             {d.lastConsults.map((x) => (
               <button key={x.id} onClick={() => x.full && setDetail(x)} style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left', border: `1px solid ${BORDER}`, borderRadius: 11, padding: '9px 13px', marginBottom: 7, background: '#fff', cursor: x.full ? 'pointer' : 'default', fontFamily: 'inherit' }}>
                 <span style={{ width: 30, height: 30, borderRadius: 9, background: '#E7F6EE', color: '#0E7C52', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{IC.steth}</span>
@@ -1461,7 +1707,7 @@ export default function PatientFile({ state, setState, go }) {
         {/* Note de synthèse du médecin (éditable, enregistrée dans le dossier) */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 7 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Note de synthèse du médecin</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: TEAL }}>Note de synthèse du médecin</div>
             {savedMsg && <span style={{ fontSize: 12, fontWeight: 600, color: TEAL }}>{savedMsg}</span>}
           </div>
           <textarea value={mh.profilNote || ''} onChange={(e) => patchMh({ profilNote: e.target.value })} rows={3} placeholder="Ajoutez une note personnelle pour vous souvenir de ce patient (contexte, préférences, points d'attention…)" style={{ ...inp, resize: 'vertical' }} />
@@ -1470,30 +1716,57 @@ export default function PatientFile({ state, setState, go }) {
           </div>
         </div>
       </div>
+      </>
     );
   };
 
-  const renderAdmin = () => (
-    <div style={card}>
-      <CardHead icon={IC.admin} title="Infos administratives" sub="Identité, contact et couverture du patient." />
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 4, fontSize: 13.5, color: DARK }}>
-        {[['Nom complet', patient.name], ['CIN', patient.cin], ['Téléphone', patient.phone], ['Email', patient.email], ['Adresse', patient.address], ['Ville', patient.city], ['Assurance', patient.insurance], ['N° AMO', patient.amoNumber], ['Groupe sanguin', patient.blood]].map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', gap: 8, padding: '8px 0', borderBottom: `1px solid ${BORDER}` }}>
-            <span style={{ color: MUTED, minWidth: 120, fontSize: 12.5 }}>{k}</span>
-            <span style={{ fontWeight: 600 }}>{v && v !== '—' ? v : <span style={{ color: '#B7C2BD' }}>—</span>}</span>
+  const renderAdmin = () => {
+    const t = SEC.admin;
+    const tel = patient.phone ? `tel:${String(patient.phone).replace(/\s/g, '')}` : null;
+    const mail = patient.email ? `mailto:${patient.email}` : null;
+    const filled = [patient.name, patient.cin, patient.phone, patient.email, patient.address, patient.city, patient.insurance, patient.amoNumber, patient.blood].filter((v) => v && v !== '—').length;
+    return (
+      <>
+        <Hero tint={t} icon={IC.admin} isMobile={isMobile}
+          title="Infos administratives"
+          sub="Identité, contact et couverture — ce qu'il faut pour joindre le patient et facturer sa consultation."
+          chips={[
+            { value: `${filled}/9`, label: 'champs renseignés', color: filled >= 7 ? '#0E7C52' : filled >= 4 ? '#B45309' : '#C2466A' },
+            patient.blood ? { value: patient.blood, label: 'groupe sanguin', color: '#C2466A' } : null,
+            patient.insurance ? { value: patient.insurance, label: 'couverture' } : null,
+          ]} />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, alignItems: 'start' }}>
+          <Panel tint={t} icon={IC.idcard} title="Identité">
+            <Field label="Nom complet" value={patient.name} tint={t} />
+            <Field label="CIN" value={patient.cin} tint={t} />
+            <Field label="Date de naissance" value={dobLbl ? `${dobLbl}${age != null ? ` · ${age} ans` : ''}` : null} tint={t} />
+            <Field label="Sexe" value={patient.sex === 'M' ? 'Homme' : patient.sex === 'F' ? 'Femme' : null} tint={t} />
+            <Field label="Groupe sanguin" value={patient.blood} tint={t} />
+          </Panel>
+          <div>
+            <Panel tint={t} icon={IC.phone} title="Contact" sub="Cliquez pour appeler ou écrire.">
+              <Field label="Téléphone" value={patient.phone} href={tel} tint={t} />
+              <Field label="Email" value={patient.email} href={mail} tint={t} />
+              <Field label="Adresse" value={patient.address} tint={t} />
+              <Field label="Ville" value={patient.city} tint={t} />
+            </Panel>
+            <Panel tint={SEC.factures} icon={IC.shield} title="Couverture">
+              <Field label="Assurance" value={patient.insurance} tint={SEC.factures} />
+              <Field label="N° AMO" value={patient.amoNumber} tint={SEC.factures} />
+            </Panel>
           </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 12, fontSize: 12.5, color: MUTED }}>Modifiez ces informations depuis <button onClick={() => go('dpatients')} style={{ color: TEAL, background: 'none', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: 12.5, padding: 0 }}>Patients → Modifier</button>.</div>
-    </div>
-  );
-
-  const renderSimple = (title, body, opts = {}) => (
-    <div style={card}>
-      <CardHead icon={opts.icon || IC.file} title={title} sub={opts.sub} right={opts.right} />
-      {body}
-    </div>
-  );
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, background: '#fff', border: '1px solid #EAF1ED', borderRadius: 14, padding: '12px 15px', boxShadow: SHADOW, fontSize: 12.5, color: MUTED, flexWrap: 'wrap' }}>
+          <span style={{ color: t.c, display: 'flex' }}>{IC.admin}</span>
+          Ces informations appartiennent à la fiche du patient.
+          <button onClick={() => go('dpatients')} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: t.c, background: t.bg, border: 'none', borderRadius: 9, padding: '6px 12px', fontWeight: 700, cursor: 'pointer', fontSize: 12.5, fontFamily: 'inherit' }}>
+            Modifier dans Patients
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+          </button>
+        </div>
+      </>
+    );
+  };
 
   // ── Biologie et biométrie — Doctolib-style lab-results tool ─────────────────
   const bioData = mh.bio || { fav: [], res: {} };
@@ -1523,7 +1796,7 @@ export default function PatientFile({ state, setState, go }) {
         <thead>
           <tr>
             {[withStars ? '' : null, 'Paramètres', 'Unités', ...bioCols.map(bioDateLbl)].filter((x) => x !== null).map((h, i) => (
-              <th key={i} style={{ textAlign: 'left', padding: '9px 10px', fontSize: 11, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #EEF3F0', whiteSpace: 'nowrap' }}>{h}</th>
+              <th key={i} style={{ textAlign: 'left', padding: '9px 10px', fontSize: 11, fontWeight: 600, color: MUTED, borderBottom: '1px solid #EEF3F0', whiteSpace: 'nowrap' }}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -1551,37 +1824,175 @@ export default function PatientFile({ state, setState, go }) {
   const renderBioTool = () => {
     const favParams = bioData.fav.map(bioParam).filter(Boolean);
     const cat = BIO_CATALOG.find((c) => c.key === bioTab) || BIO_CATALOG[0];
+    const t = SEC.bio;
+    // Combien de valeurs sortent des bornes de référence, tous paramètres confondus.
+    const abnormal = Object.entries(bioData.res || {}).reduce((n, [k, byDate]) => {
+      const p = bioParam(k);
+      return n + Object.values(byDate || {}).filter((v) => bioAbnormal(p, v)).length;
+    }, 0);
     return (
       <>
-        {/* Suivis (favorites) */}
-        <div style={card}>
-          <CardHead icon={IC.bio} title="Suivis" sub="Vos paramètres épinglés, en un coup d'œil."
-            right={
-              <button onClick={() => setBioAdd({ date: todayISO, cat: bioTab, param: cat.params[0]?.k || '', value: '' })}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: TEAL, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                Ajouter des résultats d'analyses
-              </button>
-            } />
-          {bioTable(favParams, true)}
-        </div>
+        <Hero tint={t} icon={IC.bio} isMobile={isMobile}
+          title="Biologie et biométrie"
+          sub="Les résultats d'analyses du patient, épinglés ou rangés par catégorie."
+          chips={[
+            { value: bioData.fav.length, label: 'paramètres suivis' },
+            { value: bioDates.length, label: bioDates.length > 1 ? 'séries de résultats' : 'série de résultats', color: SEC.profil.c },
+            { value: abnormal, label: 'hors normes', color: abnormal ? '#C2263F' : '#0E7C52' },
+          ]}
+          right={
+            <button onClick={() => setBioAdd({ date: todayISO, cat: bioTab, param: cat.params[0]?.k || '', value: '' })}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 11, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: `0 8px 18px -10px ${t.c}` }}>
+              {IC.plus} Ajouter des résultats
+            </button>
+          } />
 
-        {/* Category tabs + table */}
+        <Panel tint={t} icon={IC.star} title="Suivis" sub="Vos paramètres épinglés, en un coup d'œil." pad={12}>
+          {bioTable(favParams, true)}
+        </Panel>
+
+        {/* Catégories — chaque pastille ouvre son tableau */}
         <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', margin: '2px 0 12px' }}>
           {BIO_CATALOG.map((c) => (
             <button key={c.key} onClick={() => setBioTab(c.key)}
-              style={{ padding: '5px 13px', borderRadius: 18, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: `1px solid ${bioTab === c.key ? TEAL : '#DCE6E1'}`, background: bioTab === c.key ? BTN_GREEN : '#fff', color: bioTab === c.key ? '#fff' : MUTED, transition: 'all .12s', fontFamily: 'inherit' }}>
+              style={{ padding: '7px 15px', borderRadius: 20, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', border: `1px solid ${bioTab === c.key ? 'transparent' : '#DCE6E1'}`, background: bioTab === c.key ? BTN_GREEN : '#fff', color: bioTab === c.key ? '#fff' : MUTED, transition: 'all .12s', fontFamily: 'inherit', boxShadow: bioTab === c.key ? `0 8px 18px -10px ${t.c}` : 'none' }}>
               {c.label}
             </button>
           ))}
         </div>
-        <div style={card}>
-          <CardHead icon={IC.bio} title={cat.label} sub="Résultats d'analyses par catégorie." />
+        <Panel tint={t} icon={IC.bio} title={cat.label} sub="Résultats d'analyses par catégorie." pad={12}>
           {bioTable(cat.params, true)}
-          <div style={{ marginTop: 10, fontSize: 11.5, color: MUTED }}>
-            Les valeurs hors normes de référence apparaissent <span style={{ background: '#FCE7EE', color: '#C2466A', borderRadius: 5, padding: '1px 7px', fontWeight: 600 }}>surlignées</span>. Biométrie (taille, poids, IMC, PA) : section « Données de suivi ».
+          <div style={{ marginTop: 12, fontSize: 11.5, color: MUTED, lineHeight: 1.6 }}>
+            Les valeurs hors normes de référence apparaissent <span style={{ background: '#FCE7EE', color: '#C2466A', borderRadius: 5, padding: '1px 7px', fontWeight: 700 }}>surlignées</span>. Biométrie (taille, poids, IMC, PA) : section « Données de suivi ».
           </div>
-        </div>
+        </Panel>
+      </>
+    );
+  };
+
+  // ── Prévention — la note libre, et une liste de dépistages qui se coche ───
+  const PREV_CHECKS = [
+    { k: 'ta',      label: 'Pression artérielle', sub: 'Une fois par an à partir de 40 ans' },
+    { k: 'glycemie',label: 'Glycémie à jeun',     sub: 'Tous les 3 ans, plus tôt si facteurs de risque' },
+    { k: 'lipides', label: 'Bilan lipidique',     sub: 'Tous les 5 ans à partir de 40 ans' },
+    { k: 'dentaire',label: 'Contrôle dentaire',   sub: 'Une fois par an' },
+    { k: 'vue',     label: 'Contrôle de la vue',  sub: 'Tous les 2 ans' },
+    { k: 'sein',    label: 'Dépistage du sein',   sub: 'Tous les 2 ans de 45 à 69 ans', femaleOnly: true },
+    { k: 'col',     label: 'Frottis cervical',    sub: 'Tous les 3 ans de 25 à 65 ans', femaleOnly: true },
+    { k: 'colon',   label: 'Dépistage colorectal', sub: 'Tous les 2 ans à partir de 50 ans' },
+  ];
+  const renderPrev = () => {
+    const t = SEC.prev;
+    const checks = mh.prevChecks || {};
+    const list = PREV_CHECKS.filter((c) => !c.femaleOnly || patient.sex !== 'M');
+    const done = list.filter((c) => checks[c.k]).length;
+    const toggle = (k) => { const next = { ...mh, prevChecks: { ...checks, [k]: !checks[k] } }; setMh(next); saveMh(next); };
+    return (
+      <>
+        <Hero tint={t} icon={IC.shield} isMobile={isMobile}
+          title="Prévention"
+          sub="Les dépistages à jour, et ce que vous voulez retenir pour la prochaine fois."
+          right={saveBtn(t)}
+          chips={[
+            { value: `${done}/${list.length}`, label: 'dépistages à jour', color: done === list.length ? '#0E7C52' : done ? '#B45309' : '#C2466A' },
+          ]} />
+        <Panel tint={t} icon={IC.shield} title="Suivi des dépistages" sub="Un clic suffit — la case est enregistrée aussitôt." pad={10}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
+            {list.map((c) => {
+              const on = !!checks[c.k];
+              return (
+                <button key={c.k} onClick={() => toggle(c.k)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 11, textAlign: 'start', width: '100%', padding: '11px 13px', borderRadius: 13, border: `1px solid ${on ? '#CBE9DC' : '#EDF2EF'}`, background: on ? 'linear-gradient(120deg,#EAF7F0,#fff 75%)' : '#FBFDFC', cursor: 'pointer', fontFamily: 'inherit', transition: 'background .12s, border-color .12s' }}>
+                  <span style={{ width: 26, height: 26, borderRadius: 9, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? BTN_GREEN : '#fff', border: on ? 'none' : '1px solid #D8E2DD', color: '#fff' }}>
+                    {on && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>}
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: DARK }}>{c.label}</span>
+                    <span style={{ display: 'block', fontSize: 11.5, color: MUTED, marginTop: 1 }}>{c.sub}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Panel>
+        <Panel tint={t} icon={IC.file} title="Notes de prévention" sub="Rappels, conseils, points à revoir.">
+          <textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4}
+            placeholder="Ex. Rappel du vaccin antigrippal en octobre. Reprendre l'activité physique progressivement."
+            style={{ ...inp, resize: 'vertical' }} />
+        </Panel>
+      </>
+    );
+  };
+
+  // ── Carnet de vaccination ────────────────────────────────────────────────
+  const renderVaccin = () => {
+    const t = SEC.vaccin;
+    const vaccins = mh.vaccins || [];
+    return (
+      <>
+        <Hero tint={t} icon={IC.vaccin} isMobile={isMobile}
+          title="Carnet de vaccination"
+          sub="Les vaccins effectués et les rappels à prévoir, notés à votre façon."
+          chips={[{ value: vaccins.length, label: vaccins.length > 1 ? 'vaccins notés' : 'vaccin noté' }]} />
+        <Panel tint={t} icon={IC.vaccin} title="Vaccins et rappels" sub="Chaque ligne est enregistrée dès son ajout.">
+          {vaccins.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 9, marginBottom: 12 }}>
+              {vaccins.map((v, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 11, background: 'linear-gradient(120deg,#F4F0FD,#fff 72%)', border: '1px solid #E6DDF8', borderRadius: 13, padding: '10px 12px' }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: t.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 5px 12px -7px ${t.c}` }}>{IC.vaccin}</span>
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: DARK, wordBreak: 'break-word' }}>{v}</span>
+                  <button onClick={() => { const next = { ...mh, vaccins: vaccins.filter((_, k) => k !== i) }; setMh(next); saveMh(next); }}
+                    aria-label={`Retirer ${v}`} title="Retirer"
+                    style={{ width: 24, height: 24, borderRadius: 8, border: 'none', background: '#fff', color: '#C2466A', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {vaccins.length === 0 && <div style={{ fontSize: 12.5, color: '#9FAFA9', marginBottom: 11 }}>Aucun vaccin noté pour l'instant.</div>}
+          <ItemList items={[]} placeholder="Ex. Tétanos — rappel 03/2024" tint={t}
+            onAdd={(v) => { const next = { ...mh, vaccins: [...vaccins, v] }; setMh(next); saveMh(next); }}
+            onRemove={() => {}} />
+        </Panel>
+      </>
+    );
+  };
+
+  // ── Factures du patient ──────────────────────────────────────────────────
+  const renderFactures = () => {
+    const t = SEC.factures;
+    const paid = consults.filter((c) => c.status === 'Payé');
+    const total = paid.reduce((s, c) => s + (c.amount || 0), 0);
+    return (
+      <>
+        <Hero tint={t} icon={IC.receipt} isMobile={isMobile}
+          title="Factures"
+          sub="Les encaissements enregistrés pour ce patient, consultation par consultation."
+          chips={[
+            { value: paid.length, label: paid.length > 1 ? 'encaissements' : 'encaissement' },
+            { value: total.toLocaleString('fr-FR'), label: 'MAD au total', color: '#0E7C52' },
+          ]}
+          right={
+            <button onClick={() => go('dbill')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 15px', borderRadius: 11, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: `0 8px 18px -10px ${t.c}` }}>
+              {IC.receipt} Ouvrir la facturation
+            </button>
+          } />
+        <Panel tint={t} icon={IC.receipt} title="Encaissements" pad={paid.length ? 0 : 16}>
+          {paid.length === 0
+            ? <div style={{ fontSize: 13, color: MUTED }}>Aucun encaissement enregistré pour ce patient.</div>
+            : paid.map((c) => (
+              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', borderBottom: '1px solid #F2F6F4', flexWrap: 'wrap' }}>
+                <span style={{ width: 34, height: 34, borderRadius: 11, background: t.bg, color: t.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{IC.receipt}</span>
+                <span style={{ minWidth: 0, flex: 1 }}>
+                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: DARK }}>{c.service}</span>
+                  <span style={{ display: 'block', fontSize: 11.5, color: MUTED, marginTop: 1 }}>{new Date(`${c.date}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}{c.pay ? ` · ${c.pay}` : ''}</span>
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: '#0E7C52', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{(c.amount || 0).toLocaleString('fr-FR')} MAD</span>
+              </div>
+            ))}
+        </Panel>
       </>
     );
   };
@@ -1593,26 +2004,12 @@ export default function PatientFile({ state, setState, go }) {
     histo: renderHisto,
     antec: renderAntec,
     ttt: renderTtt,
-    suivi: () => renderSimple('Données de suivi', <>{renderSuiviFields()}<div style={{ display: 'flex', justifyContent: 'flex-end' }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.chart, sub: 'Taille, poids, IMC et pression artérielle.' }),
+    suivi: renderSuivi,
     bio: renderBioTool,
-    docs: () => <PatientDocs state={state} setState={setState} patient={patient} pkey={pkey} isMobile={isMobile} card={card} CardHead={CardHead} IC_FILE={IC.file} />,
-    prev: () => renderSimple('Prévention', <><label style={lbl}>Notes de prévention (dépistages, rappels…)</label><textarea value={mh.prevention || ''} onChange={(e) => patchMh({ prevention: e.target.value })} rows={4} style={{ ...inp, resize: 'vertical' }} /><div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}><button onClick={() => saveMh()} style={{ padding: '7px 14px', borderRadius: 9, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Enregistrer</button></div></>, { icon: IC.shield, sub: 'Dépistages, rappels et conseils de prévention.' }),
-    vaccin: () => renderSimple('Carnet de vaccination', <><ItemList items={mh.vaccins || []} placeholder="Ex. Tétanos — rappel 03/2024"
-      onAdd={(v) => { const next = { ...mh, vaccins: [...(mh.vaccins || []), v] }; setMh(next); saveMh(next); }}
-      onRemove={(i) => { const next = { ...mh, vaccins: (mh.vaccins || []).filter((_, k) => k !== i) }; setMh(next); saveMh(next); }} /></>, { icon: IC.vaccin, sub: 'Vaccins effectués et rappels à prévoir.' }),
-    factures: () => renderSimple('Factures', (() => {
-      const paid = consults.filter((c) => c.status === 'Payé');
-      return paid.length === 0
-        ? <div style={{ fontSize: 13, color: MUTED }}>Aucun encaissement enregistré pour ce patient.</div>
-        : <div>{paid.map((c) => (
-            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: `1px solid ${BORDER}`, fontSize: 13 }}>
-              <span style={{ color: MUTED, minWidth: 90 }}>{new Date(`${c.date}T12:00:00`).toLocaleDateString('fr-FR')}</span>
-              <span style={{ flex: 1, fontWeight: 600, color: DARK }}>{c.service}</span>
-              <span style={{ color: MUTED }}>{c.pay}</span>
-              <span style={{ fontWeight: 700, color: TEAL }}>{(c.amount || 0).toLocaleString('fr-FR')} MAD</span>
-            </div>
-          ))}</div>;
-    })(), { icon: IC.receipt, sub: 'Encaissements enregistrés pour ce patient.' }),
+    docs: () => <PatientDocs state={state} setState={setState} patient={patient} pkey={pkey} isMobile={isMobile} card={card} CardHead={CardHead} IC_FILE={IC.file} Hero={Hero} Panel={Panel} tint={SEC.docs} />,
+    prev: renderPrev,
+    vaccin: renderVaccin,
+    factures: renderFactures,
   };
 
   return (
@@ -1647,13 +2044,14 @@ export default function PatientFile({ state, setState, go }) {
         <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: 2, overflowX: isMobile ? 'auto' : 'visible' }}>
           {SECTIONS.map((s) => {
             const active = section === s.id;
+            const t = secOf(s.id);
             return (
               <button key={s.id} onClick={() => setSection(s.id)}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F2F7F4'; }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#F5F9F7'; }}
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', background: active ? '#E9F5F0' : 'transparent', border: 'none', borderRadius: 11, padding: isMobile ? '8px 13px' : '9px 12px', fontSize: 12.5, fontWeight: active ? 600 : 500, color: active ? TEAL : '#3E4F49', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'background .12s', fontFamily: 'inherit', boxShadow: active ? '0 1px 2px rgba(15,110,86,0.12)' : 'none' }}>
-                <span style={{ display: 'flex', color: active ? TEAL : '#8FA69D', flexShrink: 0 }}>{IC[s.icon]}</span>
-                <span style={{ flex: isMobile ? 'none' : 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
+                style={{ display: 'flex', alignItems: 'center', gap: 9, textAlign: 'left', width: isMobile ? 'auto' : '100%', minWidth: 0, boxSizing: 'border-box', background: active ? `linear-gradient(100deg, ${t.bg}, #FFFFFF 85%)` : 'transparent', border: 'none', borderInlineStart: `3px solid ${active ? t.c : 'transparent'}`, borderRadius: 11, padding: isMobile ? '8px 13px' : '8px 10px', fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? DARK : '#3E4F49', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'background .12s', fontFamily: 'inherit', boxShadow: active ? `0 6px 14px -10px ${t.c}` : 'none' }}>
+                <span style={{ width: 26, height: 26, borderRadius: 9, background: active ? '#fff' : t.bg, color: t.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: active ? `0 4px 10px -6px ${t.c}` : 'none' }}>{IC[s.icon]}</span>
+                <span style={{ flex: isMobile ? 'none' : 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
                 {s.id === 'consult' && timerOn && (
                   <span title="Consultation en cours" style={{ width: 8, height: 8, borderRadius: '50%', background: '#16A06A', flexShrink: 0, animation: 'pfPulse 1.6s infinite' }} />
                 )}

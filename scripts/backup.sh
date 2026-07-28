@@ -36,7 +36,7 @@ fi
 
 BACKUP_DIR="${BACKUP_DIR:-$REPO_ROOT/backups}"
 RETENTION="${RETENTION:-7}"                     # how many backups to keep
-BUCKETS=(${BUCKETS:-documents avatars credentials chat-media})
+BUCKETS=(${BUCKETS:-documents avatars credentials chat-media confrere-media})
 SUPABASE_URL="${SUPABASE_URL%/}"                # strip trailing slash
 
 # ── Preconditions ────────────────────────────────────────────────────────────

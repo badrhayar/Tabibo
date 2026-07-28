@@ -73,7 +73,7 @@ export default function DoctorBlocked() {
 
         {/* Pay-by-transfer instructions */}
         <div style={{ background: BG, borderRadius: 12, padding: '14px 16px', marginBottom: 18 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Régler par virement</div>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 8 }}>Régler par virement</div>
           {rib ? (
             <>
               <div style={{ fontSize: 13.5, color: DARK }}><strong>RIB :</strong> <span style={{ fontFamily: 'monospace' }}>{rib}</span></div>
@@ -89,7 +89,7 @@ export default function DoctorBlocked() {
         </div>
 
         {/* Dues */}
-        <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>Paiements à régler</div>
+        <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>Paiements à régler</div>
         {dues.length === 0 && (
           sub.blocked ? (
             <div style={{ fontSize: 13, color: MUTED, marginBottom: 16 }}>Aucun paiement en attente. Contactez l'administration Tabibo.</div>

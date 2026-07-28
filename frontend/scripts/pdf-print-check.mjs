@@ -80,8 +80,11 @@ if (await printBtn.count()) {
   for (const p of opened) await p.close().catch(() => {});
 } else results.push(['Imprimer la journée', 'bouton absent']);
 
-// 3) Facture
-await tryClick('dbill', 'button:has-text("Imprimer"), button:has-text("PDF")', 'Facturation → document');
+// 3) Facturation — le bordereau AMO vit dans son propre onglet de l'écran.
+await go('dbill');
+await page.locator('button:has-text("Facturation AMO")').first().click({ timeout: 4000 }).catch(() => {});
+await page.waitForTimeout(700);
+await tryClick('dbill', 'button:has-text("Générer le bordereau"), button:has-text("Imprimer"), button:has-text("PDF")', 'Facturation → bordereau AMO');
 
 console.log('\n── sorties fichier (en-têtes de production) ──');
 for (const [k, v] of results) console.log(` • ${k} : ${v}`);

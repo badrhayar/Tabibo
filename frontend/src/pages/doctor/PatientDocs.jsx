@@ -71,7 +71,7 @@ export async function fetchPatientDocs({ state, patient, pkey }) {
     }));
 }
 
-export default function PatientDocs({ state, setState, patient, pkey, isMobile, card, CardHead, IC_FILE }) {
+export default function PatientDocs({ state, setState, patient, pkey, isMobile, card, CardHead, IC_FILE, Hero, tint }) {
   const doctorId = state?.myDoctor?.id;
   const uid = state?.appUser?.id;
   const isDemo = !doctorId;
@@ -188,21 +188,36 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
   const paneH = isMobile ? 'auto' : 560;
   const btn = (bg, color, border) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '8px 14px', borderRadius: 10, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: bg, color, border: border || 'none', fontFamily: 'inherit' });
 
+  const importBtn = (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <input ref={fileRef} type="file" multiple hidden onChange={onPick}
+        accept="image/*,application/pdf,.doc,.docx,.txt" />
+      <button onClick={() => fileRef.current?.click()} disabled={busy}
+        style={{ ...btn(`linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, '#fff'), padding: '9px 16px', borderRadius: 11, fontWeight: 700, boxShadow: '0 8px 18px -10px #14795C' }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        {busy ? 'Import…' : 'Importer un document'}
+      </button>
+    </div>
+  );
+
   return (
+    <>
+      {Hero ? (
+        <Hero tint={tint} icon={IC_FILE} isMobile={isMobile}
+          title="Documents du patient"
+          sub="Importez, prévisualisez et classez tous les documents de ce patient."
+          right={importBtn}
+          chips={[
+            { value: withMeta.length, label: withMeta.length > 1 ? 'documents' : 'document' },
+            { value: withMeta.filter((d) => d.status === 'pending').length, label: 'à classer', color: '#9A6510' },
+            { value: new Set(withMeta.map((d) => d.category)).size, label: 'catégories', color: '#6B57A6' },
+          ]} />
+      ) : null}
     <div style={card}>
-      <CardHead icon={IC_FILE} title="Documents du patient"
-        sub="Importez, prévisualisez et classez tous les documents de ce patient."
-        right={
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <input ref={fileRef} type="file" multiple hidden onChange={onPick}
-              accept="image/*,application/pdf,.doc,.docx,.txt" />
-            <button onClick={() => fileRef.current?.click()} disabled={busy}
-              style={btn(`linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)`, '#fff')}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-              {busy ? 'Import…' : 'Importer un document'}
-            </button>
-          </div>
-        } />
+      {!Hero && (
+        <CardHead icon={IC_FILE} title="Documents du patient"
+          sub="Importez, prévisualisez et classez tous les documents de ce patient." right={importBtn} />
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '270px minmax(0,1fr) 260px', gap: 14, alignItems: 'start' }}>
         {/* ── Left: document list ── */}
@@ -342,13 +357,14 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
           </div>
           <div style={{ padding: 14, borderTop: `1px solid ${BORDER}`, background: '#FAFDFB' }}>
             <button onClick={saveClassification} disabled={!sel}
-              style={{ ...btn(sel ? `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)` : '#C9D6D1', '#fff'), width: '100%', padding: '11px 14px', fontSize: 13, fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase' }}>
+              style={{ ...btn(sel ? `linear-gradient(135deg, #14795C 0%, ${DEEP} 100%)` : '#C9D6D1', '#fff'), width: '100%', padding: '11px 14px', fontSize: 13, fontWeight: 700 }}>
               Enregistrer
             </button>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 }
 

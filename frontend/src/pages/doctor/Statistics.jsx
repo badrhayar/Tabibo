@@ -617,7 +617,7 @@ export default function Statistics({ state, setState, go, openNewAppt, openAddPa
                   {r.comment && <p style={{ margin: '8px 0 0', fontSize: 13.5, color: '#3A4A45', lineHeight: 1.6 }}>{r.comment}</p>}
                   {!editing && r.reply && (
                     <div style={{ marginTop: 10, background: '#F0F9F4', border: '1px solid #CDE7DA', borderRadius: 10, padding: '10px 13px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#0E7C52', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 }}>Votre réponse</div>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#0E7C52', marginBottom: 4 }}>Votre réponse</div>
                       <div style={{ fontSize: 13, color: '#0E5C40', lineHeight: 1.55 }}>{r.reply}</div>
                     </div>
                   )}

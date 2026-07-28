@@ -100,7 +100,7 @@ export default function CommandPalette({ state, setState, go, isMobile, dark = f
 
   const Section = ({ title, children }) => (
     <div>
-      <div style={{ padding: '8px 16px 5px', fontSize: 10.5, fontWeight: 800, color: '#9AA8A2', textTransform: 'uppercase', letterSpacing: 0.6 }}>{title}</div>
+      <div style={{ padding: '8px 16px 5px', fontSize: 10.5, fontWeight: 800, color: '#9AA8A2' }}>{title}</div>
       {children}
     </div>
   );

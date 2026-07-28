@@ -258,14 +258,14 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
         {/* Ligne de filtres étiquetés — même présentation que Rendez-vous et Consultations */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Statut</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Statut</div>
             <select value={activeFilter} onChange={e => setActiveFilter(e.target.value)}
               style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
               {filters.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Prochain RDV</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Prochain RDV</div>
             <select value={fNext} onChange={e => setFNext(e.target.value)}
               style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: fNext ? DARK : MUTED, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
               <option value="">Tous</option>
@@ -274,12 +274,12 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Dernière visite — du</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Dernière visite — du</div>
             <input type="date" value={fFrom} max={fTo || undefined} onChange={e => setFFrom(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Au</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
             <input type="date" value={fTo} min={fFrom || undefined} onChange={e => setFTo(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
@@ -304,7 +304,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
                 {['Patient', 'CIN', 'Téléphone', 'Dernière visite', 'Prochain RDV', 'Statut', 'Actions'].map(col => (
                   <th key={col} style={{
                     padding: '12px 16px', textAlign: 'left', fontWeight: 600,
-                    color: MUTED, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em',
+                    color: MUTED, fontSize: 12,
                     whiteSpace: 'nowrap',
                   }}>{col}</th>
                 ))}
@@ -592,7 +592,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
               {/* Medical flags — what a doctor must see at a glance */}
               {(viewPatient.blood || viewPatient.allergies || viewPatient.chronic) && (
                 <div style={{ background: '#FEF9EE', border: '1px solid #F3E3BC', borderRadius: 12, padding: '12px 14px', marginBottom: 18 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: '#9A6510', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Informations médicales</div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#9A6510', marginBottom: 8 }}>Informations médicales</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {viewPatient.blood && <span style={{ fontSize: 12.5, fontWeight: 700, color: '#C2466A', background: '#FCE7EE', borderRadius: 99, padding: '4px 12px' }}>Groupe {viewPatient.blood}</span>}
                     {viewPatient.allergies && <span style={{ fontSize: 12.5, fontWeight: 700, color: '#9A6510', background: '#FEF3DC', borderRadius: 99, padding: '4px 12px' }}>Allergies : {viewPatient.allergies}</span>}
@@ -602,7 +602,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
               )}
 
               {/* Visit history */}
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>
                 Historique des consultations {patientHistory.length > 0 && <span style={{ color: PRIMARY }}>({patientHistory.length})</span>}
               </div>
               {patientHistory.length === 0 ? (
@@ -630,7 +630,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
               )}
 
               {/* Prescriptions */}
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>
                 Ordonnances {pRx.length > 0 && <span style={{ color: PRIMARY }}>({pRx.length})</span>}
               </div>
               {pRx.length === 0 ? (
@@ -650,7 +650,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
               )}
 
               {/* Private notes — quick jot, saved to the roster */}
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Notes du praticien</div>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 8 }}>Notes du praticien</div>
               <textarea
                 value={pNotes}
                 onChange={(e) => setPNotes(e.target.value)}

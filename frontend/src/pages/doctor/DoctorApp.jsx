@@ -144,7 +144,7 @@ const IC = {
 // a SECOND rail (lighter green) listing the group's screens.
 const IC_TASKS = <svg {...S}><path fillRule="evenodd" d="M12 2.2a9.8 9.8 0 1 0 0 19.6 9.8 9.8 0 0 0 0-19.6zm4.72 7.05a1.1 1.1 0 0 0-1.56-1.56l-4.6 4.6-1.72-1.72a1.1 1.1 0 1 0-1.56 1.56l2.5 2.5a1.1 1.1 0 0 0 1.56 0z"/></svg>;
 const IC_BILL = <svg {...S}><path d="M14.9 3.4a1.3 1.3 0 0 1 0 2.6h-2.1c-2 0-3.7 1.2-4.5 3h6.6a1.3 1.3 0 0 1 0 2.6H7.9a5.4 5.4 0 0 0 0 .8h7a1.3 1.3 0 0 1 0 2.6H8.3c.8 1.8 2.5 3 4.5 3h2.1a1.3 1.3 0 0 1 0 2.6h-2.1c-3.6 0-6.6-2.3-7.5-5.6H4.3a1.3 1.3 0 0 1 0-2.6h.9a7.7 7.7 0 0 1 0-.8h-.9a1.3 1.3 0 0 1 0-2.6h1c.9-3.3 3.9-5.6 7.5-5.6z"/></svg>;
-const IC_SILA = <svg {...S}><circle cx="12" cy="7.6" r="3.5"/><path d="M12 12.6c-3.35 0-6.05 2.05-6.05 4.75 0 .72.58 1.3 1.3 1.3h9.5c.72 0 1.3-.58 1.3-1.3 0-2.7-2.7-4.75-6.05-4.75z"/><circle cx="4.5" cy="9.6" r="2.7"/><path d="M4.5 13.7c-2.4 0-4.3 1.45-4.3 3.4 0 .55.45 1 1 1h2.62a7.1 7.1 0 0 1 2.3-4.24 6.6 6.6 0 0 0-1.62-.16z"/><circle cx="19.5" cy="9.6" r="2.7"/><path d="M19.5 13.7c-.57 0-1.11.06-1.62.16a7.1 7.1 0 0 1 2.3 4.24h2.62c.55 0 1-.45 1-1 0-1.95-1.9-3.4-4.3-3.4z"/></svg>;
+const IC_NETWORK = <svg {...S}><circle cx="12" cy="7.6" r="3.5"/><path d="M12 12.6c-3.35 0-6.05 2.05-6.05 4.75 0 .72.58 1.3 1.3 1.3h9.5c.72 0 1.3-.58 1.3-1.3 0-2.7-2.7-4.75-6.05-4.75z"/><circle cx="4.5" cy="9.6" r="2.7"/><path d="M4.5 13.7c-2.4 0-4.3 1.45-4.3 3.4 0 .55.45 1 1 1h2.62a7.1 7.1 0 0 1 2.3-4.24 6.6 6.6 0 0 0-1.62-.16z"/><circle cx="19.5" cy="9.6" r="2.7"/><path d="M19.5 13.7c-.57 0-1.11.06-1.62.16a7.1 7.1 0 0 1 2.3 4.24h2.62c.55 0 1-.45 1-1 0-1.95-1.9-3.4-4.3-3.4z"/></svg>;
 const IC_NAV = <svg {...S}><circle cx="9.4" cy="7.3" r="3.9"/><path d="M9.4 12.9c-4 0-7.2 2.4-7.2 5.55 0 .8.65 1.45 1.45 1.45h8.2a6.55 6.55 0 0 1 2.2-6.44 11.6 11.6 0 0 0-4.65-.56z"/><path fillRule="evenodd" d="M17.5 13.1a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4zm2.36 3.06a.95.95 0 0 0-1.34-.11l-2.13 1.8-.72-.72a.95.95 0 1 0-1.34 1.34l1.33 1.33a.95.95 0 0 0 1.28.05l2.8-2.36a.95.95 0 0 0 .12-1.33z"/></svg>;
 const NAV = [
   { key:'doctor',   screen:'doctor', icon:IC.doctor, label:'Accueil' },
@@ -161,7 +161,7 @@ const NAV = [
     { screen:'dhist',      icon:IC.dhist,      label:'Consultations' },
     { screen:'dshare',     icon:IC.dshare,     label:'Inviter mes patients' },
   ] },
-  { key:'dsila',    screen:'dsila',  icon:IC_SILA,   label:'Réseau Sila' },
+  { key:'dnetwork',    screen:'dnetwork',  icon:IC_NETWORK,   label:'Tabibo Network' },
   { key:'dstaff',   screen:'dstaff', icon:IC.dstaff, label:'Équipe' },
   { key:'dchat',    screen:'dchat',  icon:IC.dchat,  label:'Messagerie', badge:'chat' },
   { key:'dbill',    screen:'dbill',  icon:IC_BILL,   label:'Facturation' },
@@ -292,7 +292,7 @@ export default function DoctorApp() {
     dpatients: Patients, ddocs: Documents, davail: Availability,
     dnotif: Notifications, dstats: Statistics, dabo: Subscription, dsettings: Settings,
     dchat: Chat, dshare: BookingShare, dprescribe: Prescriptions, dstaff: Staff,
-    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails, dstations: Stations, dsila: Network,
+    dpfile: PatientFile, dtasks: Tasks, dnav: Navigator, dreq: Requests, dbill: Billing, dplans: PlanDetails, dstations: Stations, dnetwork: Network,
   };
   const SubScreen = (state.isStaff && STAFF_HIDDEN.has(screen)) ? Dashboard : (SUB[screen] || Dashboard);
 
@@ -457,7 +457,7 @@ export default function DoctorApp() {
           <nav style={{ flex:1, padding:'2px 10px 14px', display:'flex', flexDirection:'column', gap:2 }}>
             {navItems.map((g) => g.items ? (
               <div key={g.key}>
-                <div style={{ padding:'12px 12px 5px', fontSize:10.5, fontWeight:800, color:'rgba(255,255,255,0.72)', textTransform:'uppercase', letterSpacing:0.6 }}>{g.label}</div>
+                <div style={{ padding:'12px 12px 5px', fontSize:10.5, fontWeight:800, color:'rgba(255,255,255,0.72)' }}>{g.label}</div>
                 {g.items.map(({ screen:sc, icon, label }) => {
                   const active = screen === sc;
                   return (
@@ -699,13 +699,13 @@ export default function DoctorApp() {
                 <button onClick={closeNewAppt} style={{ background:BG, border:`1px solid ${BORDER}`, cursor:'pointer', width:32, height:32, borderRadius:9, color:MUT, fontSize:15, flexShrink:0 }}>✕</button>
               </div>
               <div style={{ padding: isMobile ? '18px 16px' : '22px 26px' }}>
-                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, marginBottom:12 }}>Patient</div>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', marginBottom:12 }}>Patient</div>
                 <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Nom complet</label>
                 <div style={{ position:'relative', marginBottom:14 }}>
                   <input value={newAppt.name || ''} onChange={e => { setNA('name', e.target.value); setState({ naMatch:null, naSuggestOpen:true }); }} placeholder="Commencez à taper un nom…" style={{ width:'100%', padding:'11px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', boxSizing:'border-box' }} />
                   {naSuggests.length > 0 && !naMatched && (
                     <div style={{ position:'absolute', left:0, right:0, top:46, background:'#fff', border:`1px solid ${BORDER}`, borderRadius:11, boxShadow:'0 14px 34px rgba(21,49,74,.16)', overflow:'hidden', zIndex:20 }}>
-                      <div style={{ padding:'7px 13px', fontSize:10.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, background:'#F8FBF9', borderBottom:'1px solid #F0F3F2' }}>Patients enregistrés</div>
+                      <div style={{ padding:'7px 13px', fontSize:10.5, fontWeight:800, color:'#9AA8A2', background:'#F8FBF9', borderBottom:'1px solid #F0F3F2' }}>Patients enregistrés</div>
                       {naSuggests.map((sg, i) => {
                         const [bg, fg] = tint(i);
                         return (
@@ -759,7 +759,7 @@ export default function DoctorApp() {
                     <input type="date" max={todayISO} value={newAppt.dob || ''} onChange={e => setNA('dob', e.target.value)} style={{ width:'100%', padding:'10px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', boxSizing:'border-box' }} />
                   </div>
                 </div>
-                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, marginBottom:12 }}>Rendez-vous</div>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', marginBottom:12 }}>Rendez-vous</div>
                 <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Motif de consultation</label>
                 <select value={newAppt.motif || motifOpts[0]} onChange={e => setNA('motif', e.target.value)} style={{ width:'100%', padding:'11px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', cursor:'pointer', marginBottom:14, boxSizing:'border-box' }}>
                   {motifOpts.map(o => <option key={o} value={o}>{o}</option>)}
@@ -827,7 +827,7 @@ export default function DoctorApp() {
               </div>
               <div style={{ padding:'22px 26px', maxHeight:'62vh', overflowY:'auto' }}>
                 {/* Identité */}
-                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, marginBottom:12 }}>Identité</div>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', marginBottom:12 }}>Identité</div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:18 }}>
                   <div style={{ gridColumn:'1 / -1' }}>
                     <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Nom complet *</label>
@@ -849,7 +849,7 @@ export default function DoctorApp() {
                   </div>
                 </div>
                 {/* Coordonnées */}
-                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, marginBottom:12 }}>Coordonnées</div>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', marginBottom:12 }}>Coordonnées</div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:18 }}>
                   <div>
                     <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Téléphone</label>
@@ -871,7 +871,7 @@ export default function DoctorApp() {
                   </div>
                 </div>
                 {/* Médical */}
-                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', textTransform:'uppercase', letterSpacing:.5, marginBottom:12 }}>Informations médicales</div>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'#9AA8A2', marginBottom:12 }}>Informations médicales</div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
                   <div>
                     <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>Groupe sanguin</label>

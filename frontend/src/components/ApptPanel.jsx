@@ -176,7 +176,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
     setState({ toast: 'Paiement enregistré ✓', toastShow: true });
   };
 
-  // ── Save (MODIFIER LE RENDEZ-VOUS) ─────────────────────────────────────────
+  // ── Save (Modifier le rendez-vous) ─────────────────────────────────────────
   const save = async () => {
     const dur = Math.max(15, Number(draft.duration) || 30);
     const dt = moroccoToUTCISO(draft.date, draft.time);
@@ -366,7 +366,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
 
             {/* Historique */}
             <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 14, marginBottom: 10 }}>
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>Historique</div>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>Historique</div>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: TEAL, background: '#E9F5F0', borderRadius: 8, padding: '8px 12px', marginBottom: 8 }}>
                 {upcoming.length} rendez-vous à venir
               </div>
@@ -385,7 +385,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
 
           {/* Right column : statuts + actions */}
           <div style={{ flex: 1, borderLeft: isMobile ? 'none' : `1px solid ${BORDER}`, borderTop: isMobile ? `1px solid ${BORDER}` : 'none', padding: isMobile ? '14px 16px' : '20px 18px', background: BG, minWidth: 0 }}>
-            <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>Statuts</div>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>Statuts</div>
             {STATUTS.map((s) => {
               const active = activeStatus === s.key;
               return (
@@ -397,7 +397,7 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
                 </button>
               );
             })}
-            <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, margin: '16px 0 10px' }}>Actions</div>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, margin: '16px 0 10px' }}>Actions</div>
             {ACTIONS.map((a) => (
               <button key={a.label} onClick={a.onClick}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', background: 'none', border: 'none', borderRadius: 8, padding: '9px 10px', fontSize: 13, fontWeight: 600, color: DARK, cursor: 'pointer' }}
@@ -412,9 +412,9 @@ export default function ApptPanel({ state, setState, go, openNewAppt }) {
 
         {/* ── Footer ── */}
         <div style={{ padding: isMobile ? '12px 16px' : '14px 24px', borderTop: `1px solid ${BORDER}`, display: 'flex', gap: 10, justifyContent: 'flex-end', flexShrink: 0, background: '#fff' }}>
-          <button onClick={close} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid #D8E2DD`, background: '#fff', color: DARK, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>ANNULER</button>
+          <button onClick={close} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid #D8E2DD`, background: '#fff', color: DARK, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
           <button onClick={save} disabled={saving} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: BTN_GREEN, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 1px 2px rgba(12,74,55,0.16)' }}>
-            {saving ? 'ENREGISTREMENT…' : 'MODIFIER LE RENDEZ-VOUS'}
+            {saving ? 'Enregistrement…' : 'Modifier le rendez-vous'}
           </button>
         </div>
       </div>

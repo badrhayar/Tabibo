@@ -309,11 +309,11 @@ function RequestDrawer({ r, me, isMobile, onClose, onReply, onToggleClosed }) {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
             <button onClick={() => onReply(r, body, { draft: true })} disabled={!body.trim()}
-              style={{ padding: '10px 16px', borderRadius: 11, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.2px', textTransform: 'uppercase', cursor: body.trim() ? 'pointer' : 'default', opacity: body.trim() ? 1 : 0.5, fontFamily: 'inherit' }}>
+              style={{ padding: '10px 16px', borderRadius: 11, border: `1px solid ${TEAL}`, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 700, cursor: body.trim() ? 'pointer' : 'default', opacity: body.trim() ? 1 : 0.5, fontFamily: 'inherit' }}>
               Enregistrer le brouillon
             </button>
             <button onClick={() => onReply(r, body)} disabled={!body.trim()}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 11, border: 'none', background: body.trim() ? BTN_GREEN : '#C9D6D1', color: '#fff', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.2px', textTransform: 'uppercase', cursor: body.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '10px 20px', borderRadius: 11, border: 'none', background: body.trim() ? BTN_GREEN : '#C9D6D1', color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: body.trim() ? 'pointer' : 'default', fontFamily: 'inherit' }}>
               {IC.send} Envoyer
             </button>
           </div>

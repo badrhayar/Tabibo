@@ -175,8 +175,6 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
     fontWeight: 700,
     color: MUTED,
     marginBottom: 5,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   };
 
   return (
@@ -331,7 +329,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Service</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Service</div>
           <select
             value={filterService}
             onChange={e => setFilterService(e.target.value)}
@@ -342,7 +340,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
           </select>
         </div>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Paiement</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Paiement</div>
           <select
             value={filterPay}
             onChange={e => setFilterPay(e.target.value)}
@@ -355,7 +353,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
           </select>
         </div>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Statut</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Statut</div>
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
@@ -368,12 +366,12 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
           </select>
         </div>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Du</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Du</div>
           <input type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
             style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
         </div>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Au</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
           <input type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
             style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
         </div>
@@ -393,7 +391,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
           <thead>
             <tr style={{ background: HEADER_BG }}>
               {['Patient', 'Âge / Sexe', 'Service', 'Date & Heure', 'Montant', 'Paiement', 'Statut', 'Actions'].map(col => (
-                <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.6, borderBottom: `1px solid ${BORDER_STRONG}`, whiteSpace: 'nowrap' }}>
+                <th key={col} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: MUTED, borderBottom: `1px solid ${BORDER_STRONG}`, whiteSpace: 'nowrap' }}>
                   {col}
                 </th>
               ))}

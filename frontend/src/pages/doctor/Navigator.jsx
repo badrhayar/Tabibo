@@ -210,7 +210,7 @@ export default function Navigator({ state, setState, go }) {
                 {a.patientName || 'Patient'}
               </button>
               {urgent && <span title="Urgence signalée" style={{ display: 'inline-flex', color: URGENT, flexShrink: 0 }}>{IC.alert}</span>}
-              {a.walkin && <span style={{ fontSize: 9.5, fontWeight: 800, color: '#9A6510', background: '#FEF4DD', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>WALK-IN</span>}
+              {a.walkin && <span style={{ fontSize: 9.5, fontWeight: 800, color: '#9A6510', background: '#FEF4DD', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>Walk-in</span>}
               {!inConsultAt(a) && bookedName(a) && (
                 <span title="Poste choisi à la réservation" style={{ fontSize: 9.5, fontWeight: 800, color: TEAL, background: '#E9F5F0', borderRadius: 5, padding: '1px 6px', flexShrink: 0, whiteSpace: 'nowrap' }}>
                   {bookedName(a)}

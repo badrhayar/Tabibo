@@ -299,11 +299,11 @@ export default function Tasks({ state, setState, go }) {
       {/* ── Actions ── */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
         <button onClick={() => setAddOpen(true)}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 16px -8px rgba(12,74,55,0.7)' }}>
           {IC.plus} Ajouter une tâche
         </button>
         <button onClick={() => { setFDue(todayISO); setTab('all'); }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', color: TEAL, border: `1px solid ${TEAL}`, borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', color: TEAL, border: `1px solid ${TEAL}`, borderRadius: 11, padding: '11px 18px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           Tâches du jour
         </button>
         {activeFilters && (
@@ -379,7 +379,7 @@ export default function Tasks({ state, setState, go }) {
                     <td style={td}>
                       {t.patientName ? (
                         <button onClick={() => openPatient(t.patientName)}
-                          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: LINK, fontSize: 13, fontWeight: 700, fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '0.2px', whiteSpace: 'nowrap' }}>
+                          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: LINK, fontSize: 13, fontWeight: 700, fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
                           {t.patientName}
                         </button>
                       ) : <span style={{ color: '#B7C2BD' }}>—</span>}

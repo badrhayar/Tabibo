@@ -281,7 +281,7 @@ export default function MarketingHeader({ activeKey, audience = 'patient' }) {
               </div>
             )}
 
-            <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '2px 0 8px' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, margin: '2px 0 8px' }}>
               {tr('Langue', 'Language', 'اللغة')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

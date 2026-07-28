@@ -218,7 +218,7 @@ export default function Admin() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img src="/icons/icon-192.png" alt="Tabibo" style={{ width: 30, height: 30, borderRadius: 8 }} />
           <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: DARK }}>Tabib<span style={{ color: PRIMARY }}>o</span></span>
-          <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: '#C2466A', background: '#FCE7EE', borderRadius: 99, padding: '3px 9px' }}>ADMIN</span>
+          <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: '#C2466A', background: '#FCE7EE', borderRadius: 99, padding: '3px 9px' }}>Admin</span>
         </div>
         <button onClick={() => authSignOut()} style={{ display: 'flex', alignItems: 'center', gap: 7, background: BG, border: `1px solid ${BORDER}`, borderRadius: 9, padding: '8px 14px', fontSize: 13, fontWeight: 600, color: DARK, cursor: 'pointer' }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -266,7 +266,7 @@ export default function Admin() {
                   <thead>
                     <tr style={{ background: BG }}>
                       {['Compte', 'Contact', 'Rôle', 'CIN / INPE', 'Actions'].map((h) => (
-                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{h}</th>
+                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -373,7 +373,7 @@ export default function Admin() {
                   <thead>
                     <tr style={{ background: BG }}>
                       {['Médecin', 'Essai / abonnement', 'Horaires', 'Photo', 'Lien', 'RDV reçus', 'État'].map((h) => (
-                        <th key={h} style={{ textAlign: 'start', padding: '9px 12px', fontSize: 11, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.4, whiteSpace: 'nowrap' }}>{h}</th>
+                        <th key={h} style={{ textAlign: 'start', padding: '9px 12px', fontSize: 11, fontWeight: 800, color: MUTED, whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -427,7 +427,7 @@ export default function Admin() {
                   <thead>
                     <tr style={{ background: BG }}>
                       {['Médecin', 'Spécialité / Ville', 'Documents', 'Statut', 'Décision'].map((h) => (
-                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{h}</th>
+                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -476,13 +476,13 @@ export default function Admin() {
                     <button onClick={() => setDetailId(null)} style={{ background: BG, border: `1px solid ${BORDER}`, width: 30, height: 30, borderRadius: 8, cursor: 'pointer', color: MUTED }}>✕</button>
                   </div>
                   <div style={{ padding: '18px 22px' }}>
-                    <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>Informations</div>
+                    <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 10 }}>Informations</div>
                     {[['Email', detail.user?.email], ['Téléphone', detail.user?.phone], ['INPE', detail.user?.cin_or_inpe], ['Ordre (CNOM)', detail.cnom], ['Cabinet', detail.clinic_address]].map(([k, v]) => (
                       <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13.5, padding: '5px 0' }}>
                         <span style={{ color: MUTED }}>{k}</span><span style={{ color: DARK, fontWeight: 600, direction: 'ltr', textAlign: 'end' }}>{v || '—'}</span>
                       </div>
                     ))}
-                    <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, margin: '18px 0 10px' }}>Documents soumis</div>
+                    <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, margin: '18px 0 10px' }}>Documents soumis</div>
                     {(detail.docs || []).length === 0 && <div style={{ fontSize: 13, color: MUTED }}>Aucun document soumis.</div>}
                     {(detail.docs || []).map((dc) => (
                       <button key={dc.id} onClick={() => openDoc(dc.file_url)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: BG, border: `1px solid ${BORDER}`, borderRadius: 10, padding: '11px 14px', marginBottom: 8, cursor: 'pointer', textAlign: 'start' }}>
@@ -505,7 +505,7 @@ export default function Admin() {
                       return (
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '18px 0 10px' }}>
-                            <span style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>Abonnement &amp; paiements</span>
+                            <span style={{ fontSize: 11.5, fontWeight: 800, color: MUTED }}>Abonnement &amp; paiements</span>
                             <span style={{ background: pill.bg, color: pill.c, borderRadius: 20, padding: '3px 11px', fontSize: 12, fontWeight: 700 }}>{pill.t}</span>
                           </div>
                           {rnw && !s.expired && (
@@ -614,7 +614,7 @@ export default function Admin() {
                 <thead>
                   <tr style={{ background: BG }}>
                     {['Médecin', 'État', 'Paiement signalé', 'Action'].map((h) => (
-                      <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>

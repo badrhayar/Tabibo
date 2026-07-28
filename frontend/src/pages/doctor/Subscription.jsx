@@ -264,7 +264,7 @@ export default function Subscription({ state, setState, go }) {
               <span style={{ fontSize: 14, fontWeight: 600, color: MUTED }}>MAD / mois</span>
             </div>
             <div style={{ background: BG, borderRadius: 12, padding: '14px 16px', marginBottom: 18 }}>
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Virement à effectuer</div>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: MUTED, marginBottom: 8 }}>Virement à effectuer</div>
               <div style={{ fontSize: 13.5, color: DARK }}><strong>RIB :</strong> <span style={{ fontFamily: 'monospace' }}>{RIB}</span></div>
               <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2 }}>{BANK}</div>
               <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${BORDER}`, fontSize: 13, color: DARK }}>
@@ -291,7 +291,7 @@ export default function Subscription({ state, setState, go }) {
             <thead>
               <tr style={{ background: BG }}>
                 {['Période', 'Date', 'Montant', 'Statut', 'Facture'].map(h => (
-                  <th key={h} style={{ padding: '12px 22px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={h} style={{ padding: '12px 22px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: MUTED, whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -330,7 +330,7 @@ export default function Subscription({ state, setState, go }) {
                 <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>Plateforme médicale digitale</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: DARK, letterSpacing: 1 }}>FACTURE</div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: DARK, letterSpacing: 1 }}>Facture</div>
                 <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>N° {selectedInvoice.id}</div>
                 <div style={{ fontSize: 13, color: MUTED }}>Date : {selectedInvoice.date}</div>
               </div>
@@ -340,7 +340,7 @@ export default function Subscription({ state, setState, go }) {
             {/* From / To */}
             <div style={{ display: 'flex', gap: 32, marginBottom: 30, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Émetteur</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 8 }}>Émetteur</div>
                 <div style={{ fontWeight: 700, color: DARK, fontSize: 15 }}>Tabibo SAS</div>
                 <div style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>Casablanca, Maroc</div>
                 <div style={{ color: MUTED, fontSize: 13 }}>contact@tabibo.ma</div>
@@ -348,7 +348,7 @@ export default function Subscription({ state, setState, go }) {
                 <div style={{ color: MUTED, fontSize: 12 }}>{BANK}</div>
               </div>
               <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Facturé à</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 8 }}>Facturé à</div>
                 <div style={{ fontWeight: 700, color: DARK, fontSize: 15 }}>{docName}</div>
                 {docSpec && <div style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>{docSpec}</div>}
                 {docAddr && <div style={{ color: MUTED, fontSize: 13 }}>{docAddr}</div>}
@@ -362,7 +362,7 @@ export default function Subscription({ state, setState, go }) {
               <thead>
                 <tr style={{ background: BG }}>
                   {['Description', 'Qté', 'Prix unitaire', 'Total'].map(h => (
-                    <th key={h} style={{ padding: '12px 14px', textAlign: h === 'Description' ? 'left' : 'right', fontSize: 12, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</th>
+                    <th key={h} style={{ padding: '12px 14px', textAlign: h === 'Description' ? 'left' : 'right', fontSize: 12, fontWeight: 600, color: MUTED }}>{h}</th>
                   ))}
                 </tr>
               </thead>

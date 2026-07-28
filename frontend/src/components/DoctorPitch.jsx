@@ -7,7 +7,7 @@ import { pdfOpen } from '../lib/pdf.js';
 // La présentation de Tabibo aux médecins.
 //
 // Structure : bandeau de repères → « Un cabinet mieux organisé » → parole de
-// l'éditeur → « Une communication patient simplifiée » → « Sila, le réseau des
+// l'éditeur → « Une communication patient simplifiée » → « Tabibo Network, le réseau des
 // confrères » → « Vos données, protégées ». Chaque bloc alterne une vignette de
 // l'écran RÉEL et un texte à puces.
 //
@@ -122,7 +122,7 @@ const VisualProfile = ({ lang }) => (
         </span>
       </div>
       <div style={{ fontSize: 9, fontWeight: 800, color: MUTED, marginBottom: 6, letterSpacing: '0.3px' }}>
-        {tr(lang, 'PROCHAINS CRÉNEAUX', 'NEXT SLOTS', 'المواعيد القادمة')}
+        {tr(lang, 'Prochains créneaux', 'Next slots', 'المواعيد القادمة')}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
         {['09:00', '09:30', '11:00', '14:30', '15:00', '16:00', '16:30', '17:00'].map((t, i) => (
@@ -204,7 +204,7 @@ const VisualCampaign = ({ lang }) => (
         </div>
       </div>
       <div style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: 9, background: '#fff' }}>
-        <div style={{ fontSize: 8, fontWeight: 800, color: MUTED, marginBottom: 7 }}>{tr(lang, 'APERÇU', 'PREVIEW', 'معاينة')}</div>
+        <div style={{ fontSize: 8, fontWeight: 800, color: MUTED, marginBottom: 7 }}>{tr(lang, 'Aperçu', 'Preview', 'معاينة')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <Row c="#B9CDC5" w="60%" h={5.5} />
           <Row c="#D6E3DE" w="94%" h={4.5} /><Row c="#DFEAE6" w="88%" h={4.5} /><Row c="#E4EDE9" w="52%" h={4.5} />
@@ -241,10 +241,10 @@ const VisualVideo = ({ lang }) => (
   </Frame>
 );
 
-/** Sila : deux cabinets reliés et un patient adressé. */
-const VisualSila = ({ lang }) => (
+/** Tabibo Network : deux cabinets reliés et un patient adressé. */
+const VisualNetwork = ({ lang }) => (
   <Frame tone="deep">
-    <Bar label={tr(lang, 'Sila — réseau des confrères', 'Sila — colleague network', 'صِلة — شبكة الزملاء')} />
+    <Bar label={tr(lang, 'Tabibo Network', 'Tabibo Network', 'Tabibo Network')} />
     <div style={{ padding: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
         {['#0F6E56', '#9333EA'].map((c, i) => (
@@ -262,7 +262,7 @@ const VisualSila = ({ lang }) => (
       <div style={{ border: `1px solid ${BORDER}`, borderInlineStart: '3px solid #C2263F', borderRadius: 9, padding: 10, background: '#F7FBF9' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
           <Row c="#B9CDC5" w={82} h={6} />
-          <span style={{ background: '#FCE7EE', color: '#C2263F', borderRadius: 5, padding: '2px 6px', fontSize: 7.5, fontWeight: 800 }}>URGENT</span>
+          <span style={{ background: '#FCE7EE', color: '#C2263F', borderRadius: 5, padding: '2px 6px', fontSize: 7.5, fontWeight: 800 }}>Urgent</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <Row c="#D2E0DA" w="88%" h={4.5} /><Row c="#E1EAE6" w="64%" h={4.5} />
@@ -537,7 +537,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
         </div>
       </section>
 
-      {/* ── Sila ─────────────────────────────────────────────────────────── */}
+      {/* ── Tabibo Network ─────────────────────────────────────────────────────────── */}
       <section style={{ background: BG, padding: isMobile ? '44px 0' : '76px 0' }}>
         <div style={wrap}>
           <div style={{ textAlign: 'center', marginBottom: isMobile ? 30 : 48 }}>
@@ -546,16 +546,16 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
               {t('Nouveau', 'New', 'جديد')}
             </div>
             <h2 style={{ fontSize: isMobile ? 25 : 36, fontWeight: 800, color: DARK, margin: '0 0 12px', letterSpacing: '-0.7px', lineHeight: 1.2 }}>
-              {t('Sila — le réseau des confrères', 'Sila — the colleague network', 'صِلة — شبكة الزملاء')}
+              {t('Tabibo Network — le réseau des confrères', 'Tabibo Network — the colleague network', 'Tabibo Network — شبكة الزملاء')}
             </h2>
             <p style={{ fontSize: isMobile ? 14.5 : 16, color: BODY, maxWidth: 640, margin: '0 auto', lineHeight: 1.65 }}>
-              {t('« Sila » (صِلة), c’est le lien. Reliez votre cabinet à celui de vos confrères et cessez d’adresser un patient sur un bout de papier.',
-                 '“Sila” (صِلة) means the link. Connect your practice to your colleagues’ and stop referring patients on a scrap of paper.',
-                 '«صِلة» هي الرابط. اربطوا عيادتكم بعيادات زملائكم وتوقفوا عن التحويل بورقة صغيرة.')}
+              {t('Reliez votre cabinet à celui de vos confrères : parlez-leur directement et cessez d’adresser un patient sur un bout de papier.',
+                 'Connect your practice to your colleagues’: talk to them directly and stop referring patients on a scrap of paper.',
+                 'اربطوا عيادتكم بعيادات زملائكم: تحدثوا إليهم مباشرة وتوقفوا عن التحويل بورقة صغيرة.')}
             </p>
           </div>
 
-          <Block isMobile={isMobile} lang={lang} visual={<VisualSila lang={lang} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<VisualNetwork lang={lang} />} groups={[{
             eyebrow: t('Trouver et se relier', 'Find and connect', 'البحث والارتباط'),
             points: [
               t('Cherchez un confrère par spécialité et par ville dans l’annuaire des cabinets Tabibo, et demandez le lien. Il accepte — vous êtes reliés.',
@@ -573,11 +573,21 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
                 'التحويل العاجل يُعلَّم بذلك، ويُرى من النظرة الأولى.'),
             ],
           }, {
+            eyebrow: t('Se parler, vraiment', 'Actually talk', 'تواصل حقيقي'),
+            points: [
+              t('Une messagerie entre confrères reliés : un message, une photo, un document — et un appel audio ou vidéo qui s’ouvre d’un bouton, sans rendez-vous ni logiciel à installer.',
+                'A messenger between connected colleagues: a message, a photo, a document — and an audio or video call one button away, with no appointment and nothing to install.',
+                'مراسلة بين الزملاء المرتبطين: رسالة، صورة، وثيقة — ومكالمة صوتية أو مرئية بنقرة واحدة، دون موعد ودون برنامج يُثبَّت.'),
+              t('Une pièce jointe n’est lisible que par les deux confrères de la conversation, par une adresse qui expire.',
+                'An attachment is readable only by the two colleagues in the conversation, through an expiring link.',
+                'المرفق لا يقرأه إلا الزميلان في المحادثة، عبر رابط ينتهي مفعوله.'),
+            ],
+          }, {
             eyebrow: t('Ce qui ne circule pas', 'What never travels', 'ما لا ينتقل'),
             points: [
-              t('Le dossier du patient. Un adressage porte un nom, un téléphone et un motif — l’observation, l’ordonnance et les documents restent dans le cabinet qui les a constitués.',
-                'The patient record. A referral carries a name, a phone number and a reason — notes, prescriptions and documents stay in the practice that created them.',
-                'ملف المريض. يحمل التحويل اسماً ورقماً وسبباً — أما الملاحظات والوصفات والوثائق فتبقى في العيادة التي أنشأتها.'),
+              t('Le dossier du patient. Un adressage porte un nom, un téléphone et un motif — l’observation, l’ordonnance et les documents restent dans le cabinet qui les a constitués, sauf si vous décidez vous-même d’en envoyer un.',
+                'The patient record. A referral carries a name, a phone number and a reason — notes, prescriptions and documents stay in the practice that created them, unless you choose to send one yourself.',
+                'ملف المريض. يحمل التحويل اسماً ورقماً وسبباً — أما الملاحظات والوصفات والوثائق فتبقى في العيادة التي أنشأتها، إلا إذا قررتم أنتم إرسال واحدة.'),
             ],
           }]} />
         </div>

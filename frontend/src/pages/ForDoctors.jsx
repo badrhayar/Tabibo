@@ -521,7 +521,7 @@ export default function ForDoctors() {
       </section>
 
       {/* La présentation du produit : repères, organisation du cabinet,
-          communication patient, réseau Sila, protection des données. */}
+          communication patient, Tabibo Network, protection des données. */}
       <DoctorPitch lang={lang} isMobile={isMobile} go={go} />
 
       {/* Pricing — transparent, no surprises (the #1 objection killer) */}
@@ -625,7 +625,7 @@ export default function ForDoctors() {
             ['Will my older patients manage to book online?', 'Online booking does not replace the phone, it adds to it: both routes stay open. Older patients often book themselves, or are helped by a relative from their own account — booking for a family member is built in.'],
             ['How does Tabibo reduce no-shows?', 'Three mechanisms: immediate confirmation on booking, an automatic reminder before the appointment by email and WhatsApp, and instant release of a cancelled slot, which becomes bookable again.'],
             ['Will my receptionist have access?', 'Yes, with their own named account and rights limited to their role: they manage the calendar, the front desk and requests, but see neither the practice\'s billing nor prescriptions.'],
-            ['Can I refer a patient to a colleague?', 'Yes, with Sila: connect your practice to a colleague\'s, refer a patient in three fields, and follow what happens. The record itself does not travel — it stays with you.'],
+            ['Can I refer a patient to a colleague?', 'Yes, with Tabibo Network: connect your practice to a colleague\'s, refer a patient in three fields, and follow what happens. The record itself does not travel — it stays with you.'],
             ['What happens to my data if I stop?', 'It stays yours. You export it in a readable format at any time, without asking, and you can then request its deletion.'],
           ] : [
             ['Mes patients actuels peuvent-ils réserver via Tabibo ?', 'Oui — vous recevez un lien de réservation personnel (tabibo.ma/dr-votrenom) et une affiche QR pour votre salle d\'attente. Vos patients réservent directement, fini le téléphone qui sonne.'],
@@ -636,7 +636,7 @@ export default function ForDoctors() {
             ['Mes patients âgés arriveront-ils à réserver en ligne ?', 'La réservation en ligne ne remplace pas le téléphone, elle s\'y ajoute : les deux voies restent ouvertes. Un patient âgé réserve souvent lui-même, ou se fait aider par un proche depuis son propre compte — c\'est prévu, on peut réserver pour un membre de sa famille.'],
             ['Comment Tabibo réduit-il les rendez-vous non honorés ?', 'Par trois mécanismes : la confirmation immédiate à la réservation, le rappel automatique avant l\'échéance par e-mail et WhatsApp, et la libération instantanée du créneau annulé, qui redevient réservable pour un autre patient.'],
             ['Ma secrétaire y aura-t-elle accès ?', 'Oui, avec son propre compte nominatif et des droits limités à sa fonction : elle gère l\'agenda, l\'accueil et les demandes, mais ne voit ni la facturation du cabinet ni les ordonnances.'],
-            ['Puis-je adresser un patient à un confrère ?', 'Oui, avec Sila : vous reliez votre cabinet à celui d\'un confrère, vous lui adressez un patient en trois champs, et vous suivez ce qu\'il devient. Le dossier, lui, ne circule pas — il reste chez vous.'],
+            ['Puis-je adresser un patient à un confrère ?', 'Oui, avec Tabibo Network : vous reliez votre cabinet à celui d\'un confrère, vous lui adressez un patient en trois champs, et vous suivez ce qu\'il devient. Le dossier, lui, ne circule pas — il reste chez vous.'],
             ['Que deviennent mes données si j\'arrête ?', 'Elles restent les vôtres. Vous les exportez dans un format lisible à tout moment, sans avoir à le demander, et vous pouvez ensuite en demander la suppression.'],
           ]).map(([q, a]) => (
             <details key={q} style={{ borderBottom: `1px solid ${BORDER}`, padding: '4px 0' }}>

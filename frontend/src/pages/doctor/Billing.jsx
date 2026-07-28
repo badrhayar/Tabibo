@@ -158,7 +158,7 @@ export default function Billing({ state, setState, go }) {
     w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bordereau AMO — ${esc(amoRange.label)}</title>
       <style>body{font-family:'Helvetica Neue',Arial,sans-serif;color:#1b2b26;max-width:760px;margin:0 auto;padding:36px;font-size:13px}
       h1{font-size:20px;color:#0C4A37;margin:0 0 4px}.s{color:#5A6B65;font-size:12.5px;margin-bottom:18px}
-      table{width:100%;border-collapse:collapse;margin-top:12px}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#0F6E56;border-bottom:2px solid #0F6E56;padding:7px 6px}
+      table{width:100%;border-collapse:collapse;margin-top:12px}th{text-align:left;font-size:11px;color:#0F6E56;border-bottom:2px solid #0F6E56;padding:7px 6px}
       td{padding:7px 6px;border-bottom:1px solid #eef3f0}.r{text-align:right;font-weight:700}
       .tot{margin-top:18px;text-align:right;font-size:15px;font-weight:800;color:#0C4A37}
       .ft{margin-top:30px;padding-top:12px;border-top:1px solid #e0e8e4;font-size:11px;color:#8a988f}</style></head><body>
@@ -376,7 +376,7 @@ export default function Billing({ state, setState, go }) {
                   <thead>
                     <tr>
                       {['', 'N°', 'Patient', 'Envoyée à', 'Type', 'Historique de la facture', 'Statut', 'Somme', ''].map((h, i) => (
-                        <th key={i} style={{ textAlign: i === 7 ? 'right' : 'left', padding: '13px 12px', fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${BORDER}`, whiteSpace: 'nowrap', background: '#FBFDFC' }}>{h}</th>
+                        <th key={i} style={{ textAlign: i === 7 ? 'right' : 'left', padding: '13px 12px', fontSize: 11, fontWeight: 700, color: MUTED, borderBottom: `1px solid ${BORDER}`, whiteSpace: 'nowrap', background: '#FBFDFC' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -484,7 +484,7 @@ export default function Billing({ state, setState, go }) {
                   <thead>
                     <tr>
                       {['N°', 'Date', 'Patient', 'Organisme', 'Acte', 'Statut', 'Montant'].map((h, i) => (
-                        <th key={h} style={{ textAlign: i === 6 ? 'right' : 'left', padding: '13px 12px', fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${BORDER}`, background: '#FBFDFC', whiteSpace: 'nowrap' }}>{h}</th>
+                        <th key={h} style={{ textAlign: i === 6 ? 'right' : 'left', padding: '13px 12px', fontSize: 11, fontWeight: 700, color: MUTED, borderBottom: `1px solid ${BORDER}`, background: '#FBFDFC', whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -573,7 +573,7 @@ export default function Billing({ state, setState, go }) {
                 ))}
               </div>
               <div style={card}>
-                <div style={{ fontSize: 12, fontWeight: 800, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Historique de la facture</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: TEAL, marginBottom: 10 }}>Historique de la facture</div>
                 {(detail.history || []).map((h, i) => (
                   <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '7px 0' }}>
                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: i === 0 ? TEAL : '#C9D8D1', flexShrink: 0 }} />
