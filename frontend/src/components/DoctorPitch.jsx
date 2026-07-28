@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { BTN_GREEN } from '../shared.jsx';
+import { buildPrivacyPaper, PAPER_FILE } from '../lib/privacyPaper.js';
+import { pdfOpen } from '../lib/pdf.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // La présentation de Tabibo aux médecins.
@@ -179,6 +182,65 @@ const VisualReminder = ({ lang }) => (
   </Frame>
 );
 
+
+/** Campagne de rappel : le message type prêt à partir. */
+const VisualCampaign = ({ lang }) => (
+  <Frame>
+    <Bar label={tr(lang, 'Nouvelle campagne', 'New campaign', 'حملة جديدة')} />
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 10, padding: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {[
+          tr(lang, 'Patients concernés', 'Target patients', 'المرضى المعنيون'),
+          tr(lang, 'Tranche d’âge', 'Age range', 'الفئة العمرية'),
+          tr(lang, 'Dernière visite', 'Last visit', 'آخر زيارة'),
+        ].map((t) => (
+          <div key={t} style={{ border: `1px solid ${BORDER}`, borderRadius: 7, padding: '6px 8px', background: '#F7FBF9' }}>
+            <div style={{ fontSize: 7.5, fontWeight: 800, color: MUTED, marginBottom: 4 }}>{t}</div>
+            <Row c="#CBD9D3" w="72%" h={4.5} />
+          </div>
+        ))}
+        <div style={{ background: MINT, color: GREEN, borderRadius: 7, padding: '6px 8px', fontSize: 8, fontWeight: 800, textAlign: 'center' }}>
+          {tr(lang, '132 patients', '132 patients', '132 مريضاً')}
+        </div>
+      </div>
+      <div style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: 9, background: '#fff' }}>
+        <div style={{ fontSize: 8, fontWeight: 800, color: MUTED, marginBottom: 7 }}>{tr(lang, 'APERÇU', 'PREVIEW', 'معاينة')}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <Row c="#B9CDC5" w="60%" h={5.5} />
+          <Row c="#D6E3DE" w="94%" h={4.5} /><Row c="#DFEAE6" w="88%" h={4.5} /><Row c="#E4EDE9" w="52%" h={4.5} />
+        </div>
+        <div style={{ marginTop: 10, textAlign: 'center', background: BTN_GREEN, color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 8, fontWeight: 800 }}>
+          {tr(lang, 'Envoyer', 'Send', 'إرسال')}
+        </div>
+      </div>
+    </div>
+  </Frame>
+);
+
+/** Téléconsultation : la vidéo posée sur l'agenda. */
+const VisualVideo = ({ lang }) => (
+  <Frame tone="deep">
+    <Bar label={tr(lang, 'Téléconsultation', 'Teleconsultation', 'استشارة عن بُعد')} />
+    <div style={{ position: 'relative', padding: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5, opacity: 0.55 }}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} style={{ height: 17, borderRadius: 4, background: i % 3 === 0 ? '#E7F6EE' : '#F2F7F4' }} />
+        ))}
+      </div>
+      <div style={{ position: 'absolute', insetInlineStart: 26, top: 22, width: 128, borderRadius: 10, overflow: 'hidden', boxShadow: '0 14px 30px -14px rgba(9,50,38,0.6)', background: '#0C4A37' }}>
+        <div style={{ height: 68, background: 'linear-gradient(150deg, #14795C, #0C4A37)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.22)' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 5, justifyContent: 'center', padding: '7px 0', background: '#0A3D2D' }}>
+          {['#fff', '#C2263F', '#fff'].map((c, i) => (
+            <span key={i} style={{ width: 15, height: 15, borderRadius: '50%', background: c, opacity: c === '#fff' ? 0.28 : 1 }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  </Frame>
+);
+
 /** Sila : deux cabinets reliés et un patient adressé. */
 const VisualSila = ({ lang }) => (
   <Frame tone="deep">
@@ -291,6 +353,15 @@ const SectionTitle = ({ children, isMobile }) => (
 export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
   const t = (fr, en, ar) => tr(lang, fr, en, ar);
   const wrap = { maxWidth: 1120, margin: '0 auto', padding: isMobile ? '0 16px' : '0 24px' };
+
+  // Le livre blanc est composé dans le navigateur : aucun fichier à héberger,
+  // et le document porte toujours la date du jour où il a été téléchargé.
+  const [busy, setBusy] = useState(false);
+  const downloadPaper = async () => {
+    setBusy(true);
+    try { pdfOpen(buildPrivacyPaper(), PAPER_FILE); }
+    finally { setBusy(false); }
+  };
 
   // Des repères FACTUELS sur le produit — jamais des chiffres d'adoption.
   const MARKERS = [
@@ -431,6 +502,38 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
                 'لا رسائل SMS مدفوعة بالوحدة: البريد وواتساب فقط.'),
             ],
           }]} />
+
+          <Block isMobile={isMobile} lang={lang} visual={<VisualCampaign lang={lang} />} groups={[{
+            title: t('Prévention et suivi', 'Prevention and follow-up', 'الوقاية والتتبع'),
+            eyebrow: t('Relances et campagnes', 'Recalls and campaigns', 'الاستدعاءات والحملات'),
+            points: [
+              t('Relancez d’un seul geste les patients qu’il faut revoir : rappel de vaccination, contrôle annuel, dépistage, renouvellement d’un traitement de fond.',
+                'Recall the patients who need to come back, in one move: vaccination reminders, annual check-ups, screening, long-term treatment renewals.',
+                'استدعوا بضغطة واحدة المرضى الذين يجب إعادة رؤيتهم: تذكير باللقاح، فحص سنوي، كشف مبكر، تجديد علاج مزمن.'),
+              t('Vous composez la liste depuis votre propre patientèle — tranche d’âge, date de dernière visite, motif — et vous voyez combien de patients elle représente avant d’envoyer.',
+                'You build the list from your own patient base — age range, last visit, reason — and see how many patients it covers before sending.',
+                'تُكوّنون القائمة من مرضاكم — الفئة العمرية، تاريخ آخر زيارة، السبب — وترون عددهم قبل الإرسال.'),
+              t('Le message part d’un modèle que vous ajustez, et l’envoi est décompté du forfait de rappels de votre formule — sans surprise.',
+                'The message starts from a template you adjust, and the send is counted against your plan’s reminder allowance — no surprises.',
+                'تنطلق الرسالة من نموذج تعدّلونه، ويُحتسب الإرسال من رصيد التذكيرات في صيغتكم — دون مفاجآت.'),
+            ],
+          }]} />
+
+          <Block isMobile={isMobile} lang={lang} flip visual={<VisualVideo lang={lang} />} groups={[{
+            title: t('Soigner à distance', 'Care at a distance', 'العلاج عن بُعد'),
+            eyebrow: t('Téléconsultation vidéo', 'Video teleconsultation', 'الاستشارة بالفيديو'),
+            points: [
+              t('Une première évaluation, un contrôle, l’explication d’un résultat : autant de motifs qui ne réclament pas un déplacement.',
+                'A first assessment, a check-up, explaining a result: reasons that do not require travel.',
+                'تقييم أولي، مراقبة، شرح نتيجة: أسباب لا تستدعي التنقل.'),
+              t('L’appel se lance depuis le rendez-vous, dans le navigateur — rien à installer pour le patient, qui reçoit un simple lien. Le dossier reste affiché pendant l’appel.',
+                'The call starts from the appointment, in the browser — nothing to install for the patient, who simply receives a link. The record stays on screen during the call.',
+                'تنطلق المكالمة من الموعد داخل المتصفح — لا شيء يُثبَّت لدى المريض، يتوصل برابط فقط. ويبقى الملف معروضاً أثناء المكالمة.'),
+              t('La téléconsultation se facture comme une consultation ordinaire et entre dans vos statistiques au même titre. Pour vos patients éloignés, c’est une attente en moins.',
+                'A teleconsultation is billed like an ordinary visit and counts in your statistics all the same. For distant patients, it is one less wait.',
+                'تُفوتَر الاستشارة عن بُعد كاستشارة عادية وتدخل في إحصائياتكم. ولمرضاكم البعيدين، انتظار أقل.'),
+            ],
+          }]} />
         </div>
       </section>
 
@@ -515,6 +618,56 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
                 'كل ذلك في إطار القانون 09-08 وتحت إشراف CNDP.'),
             ],
           }]} />
+
+          {/* Le livre blanc : le même contenu, en document imprimable. */}
+          <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 18, padding: isMobile ? 22 : 30, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'auto 1fr auto', gap: isMobile ? 16 : 24, alignItems: 'center', marginTop: isMobile ? 4 : 12 }}>
+            <span style={{ width: 54, height: 54, borderRadius: 14, background: '#fff', border: `1px solid ${BORDER}`, color: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3v5h5" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 14h6M9 17h4" />
+              </svg>
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: DARK, letterSpacing: '-0.2px' }}>
+                {t('La protection des données chez Tabibo', 'Data protection at Tabibo', 'حماية البيانات لدى Tabibo')}
+              </div>
+              <p style={{ margin: '5px 0 0', fontSize: 13.5, color: BODY, lineHeight: 1.6 }}>
+                {t('Le livre blanc : le cadre de la loi 09-08, les mesures réellement en place, et ce qui reste de la responsabilité du cabinet — scénario par scénario, de l’inscription à la demande d’accès d’un patient.',
+                   'The white paper: the Law 09-08 framework, the measures actually in place, and what remains the practice’s responsibility — scenario by scenario, from sign-up to a patient’s access request.',
+                   'الكتاب الأبيض: إطار القانون 09-08، والتدابير المطبّقة فعلاً، وما يبقى من مسؤولية العيادة — سيناريو بسيناريو، من التسجيل إلى طلب الاطلاع.')}
+              </p>
+            </div>
+            <button onClick={downloadPaper} disabled={busy}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 11, height: 46, padding: '0 20px', fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', fontFamily: 'inherit', opacity: busy ? 0.7 : 1, whiteSpace: 'nowrap' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>
+              {busy ? t('Préparation…', 'Preparing…', 'جارٍ التحضير…') : t('Télécharger le PDF', 'Download the PDF', 'تحميل الملف')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Appel final ──────────────────────────────────────────────────── */}
+      <section style={{ background: '#fff', padding: isMobile ? '10px 0 48px' : '24px 0 80px' }}>
+        <div style={wrap}>
+          <div style={{ border: `1px solid ${BORDER}`, borderRadius: 20, padding: isMobile ? '30px 20px' : '46px 40px', textAlign: 'center', background: 'linear-gradient(160deg, #F6FBF8 0%, #EAF4EF 100%)' }}>
+            <h2 style={{ fontSize: isMobile ? 24 : 33, fontWeight: 800, color: DARK, margin: '0 0 12px', letterSpacing: '-0.6px', lineHeight: 1.2 }}>
+              {t('Parce que demain, c’est déjà aujourd’hui.', 'Because tomorrow is already today.', 'لأن الغد قد بدأ اليوم.')}
+            </h2>
+            <p style={{ fontSize: isMobile ? 14.5 : 16, color: BODY, margin: '0 auto 26px', maxWidth: 560, lineHeight: 1.65 }}>
+              {t('Ouvrez votre cabinet numérique en quatorze jours d’essai, sans carte bancaire et sans engagement.',
+                 'Open your digital practice with a fourteen-day trial, no card and no commitment.',
+                 'افتحوا عيادتكم الرقمية بتجربة أربعة عشر يوماً، دون بطاقة بنكية ودون التزام.')}
+            </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => go && go('docregister')}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: BTN_GREEN, color: '#fff', border: '1.5px solid transparent', borderRadius: 11, height: 50, padding: '0 26px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                {t('Commencer l’essai gratuit', 'Start the free trial', 'ابدأ التجربة المجانية')}
+              </button>
+              <button onClick={() => go && go('contact')}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: GREEN, border: `1.5px solid ${GREEN}`, borderRadius: 11, height: 50, padding: '0 26px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                {t('Parler à quelqu’un', 'Talk to someone', 'تحدّثوا إلينا')}
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </>

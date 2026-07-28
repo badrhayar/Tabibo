@@ -354,7 +354,9 @@ export default function BookingInfo() {
           </div>
 
           {/* Poste de soins — proposé seulement si le cabinet en a déclaré */}
-          {stationOpts.length > 1 && (
+          {/* Le poste apparaît dès que le cabinet en a déclaré un, exactement
+              comme le motif. Les libellés sont ceux écrits par le médecin. */}
+          {stationOpts.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>
                 {tr('Poste de soins', 'Care station', 'وحدة الرعاية')}{' '}

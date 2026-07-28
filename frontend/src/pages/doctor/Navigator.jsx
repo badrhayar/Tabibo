@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
-import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff } from '../../lib/api';
-import { loadStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
+import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations } from '../../lib/api';
+import { activeStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigateur patients — the front-desk board for the whole day.
@@ -59,8 +59,30 @@ export default function Navigator({ state, setState, go }) {
   const [stationsOpen, setStationsOpen] = useState(false);
 
   // Postes de soins du cabinet (configurables par le médecin).
-  const [stations, setStations] = useState(() => loadStations(state, state?.appUser?.full_name || (state?.demoDoctor ? 'Dr. Démonstration' : 'Médecin')));
-  const persistStations = (l) => { setStations(l); saveStations(state, l); };
+  const [stations, setStations] = useState(() => activeStations(state, state?.appUser?.full_name || (state?.demoDoctor ? 'Dr. Démonstration' : 'Médecin')));
+  // Enregistrer les postes depuis le navigateur écrit AU MÊME ENDROIT que la
+  // page Paramètres : la base d'abord (c'est elle que lit le patient), le cache
+  // local ensuite. Sans cela, le secrétariat et le patient verraient deux
+  // listes différentes.
+  const persistStations = async (l) => {
+    setStations(l);
+    saveStations(state, l);
+    if (!doctorId) return;
+    try {
+      const saved = await saveDoctorStations(doctorId, l);
+      setState({ myDoctor: { ...state.myDoctor, stations: saved } });
+    } catch (_) {
+      setState({ toast: 'Postes non enregistrés — vérifiez la connexion.', toastShow: true });
+    }
+  };
+
+  // Le médecin vient de modifier ses postes ailleurs (page Paramètres) :
+  // le tableau se réaligne sans rechargement.
+  const dbStations = state?.myDoctor?.stations;
+  useEffect(() => {
+    if (Array.isArray(dbStations)) setStations(dbStations.filter((x) => x && x.name));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(dbStations)]);
 
   // Practitioners = the doctor + active staff (each gets a consultation column).
   const [staff, setStaff] = useState([]);

@@ -34,13 +34,24 @@ export default function Stations({ state, setState, go }) {
   const doctorId = state?.myDoctor?.id;
   const me = state?.myDoctor?.name || state?.appUser?.full_name || 'Médecin';
 
-  const [list, setList] = useState(() => loadStations(state, me));
+  // Ce qui est réellement enregistré (donc ce que voit le patient).
+  const saved = Array.isArray(state?.myDoctor?.stations) ? state.myDoctor.stations.filter((x) => x && x.name) : null;
+  // Cabinet qui n'a encore rien configuré : on PROPOSE une organisation type,
+  // marquée comme non enregistrée. Tant qu'elle ne l'est pas, ni le
+  // secrétariat ni le patient ne la voient — et l'écran le dit.
+  const [list, setList] = useState(() => (saved && saved.length ? saved : loadStations(state, me)));
+  const [neverSaved, setNeverSaved] = useState(() => !!(saved && saved.length === 0));
   const [name, setName] = useState('');
   const [kind, setKind] = useState('doctor');
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
 
-  useEffect(() => { setList(loadStations(state, me)); /* eslint-disable-next-line */ }, [state?.myDoctor?.id]);
+  useEffect(() => {
+    const db = Array.isArray(state?.myDoctor?.stations) ? state.myDoctor.stations.filter((x) => x && x.name) : null;
+    setList(db && db.length ? db : loadStations(state, me));
+    setNeverSaved(!!(db && db.length === 0));
+    /* eslint-disable-next-line */
+  }, [state?.myDoctor?.id]);
 
   const patch = (next) => { setList(next); setDirty(true); };
 
@@ -78,6 +89,7 @@ export default function Stations({ state, setState, go }) {
       saveStations(state, clean);
       setList(clean);
       setDirty(false);
+      setNeverSaved(false);
       setState({ toast: 'Postes de soins enregistrés ✓', toastShow: true });
     } catch (e) {
       setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
@@ -109,6 +121,17 @@ export default function Stations({ state, setState, go }) {
               style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 9, padding: '8px 13px', fontSize: 12.5, fontWeight: 600, color: MUTED, cursor: 'pointer', fontFamily: 'inherit' }}>
               Réinitialiser
             </button>
+          </div>
+
+          {/* Tant que rien n'est enregistré, la liste ci-dessous n'est qu'une
+              proposition : elle n'apparaît ni au secrétariat ni au patient. */}
+          {neverSaved && (
+            <div style={{ background: '#FEF3DC', border: '1px solid #F0DCAE', borderRadius: 11, padding: '11px 14px', marginBottom: 14, fontSize: 12.5, color: '#8A6210', lineHeight: 1.55 }}>
+              <strong>Configuration proposée, pas encore enregistrée.</strong> Adaptez les noms à votre cabinet puis enregistrez :
+              c’est seulement à ce moment-là que ces postes apparaîtront au secrétariat et à vos patients au moment de réserver.
+            </div>
+          )}
+          <div style={{ display: 'none' }}>
           </div>
 
           {list.map((s, i) => {

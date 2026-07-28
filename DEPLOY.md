@@ -48,8 +48,26 @@ npm run test:all
 | `npm run test:slow` | Réseau lent : l'annuaire répond après 1,8 s. Un lien de médecin partagé doit patienter puis s'afficher — jamais planter ni renvoyer le visiteur ailleurs. |
 | `npm run test:green` | **Un seul vert d'action.** Relève tout bouton ou interrupteur dont le fond n'est pas exactement `BTN_GREEN` (le dégradé du bouton « Rechercher »). Doit rendre 0. |
 | `npm run test:layout` | **Tournée de présentation.** Cartes voisines de hauteurs différentes, boutons mal alignés, texte tronqué. `W=390` pour le contrôle téléphone. Doit rendre 0. |
+| `npm run test:stations` | **Postes de soins : une seule liste.** Vérifie que le patient (page de réservation) et le secrétariat (fenêtre « Nouveau rendez-vous ») affichent exactement les libellés enregistrés par le médecin. |
 
 `npm run test:crawl` (long, ~40 min) va plus loin : il clique **chaque bouton de chaque écran** dans la démonstration et signale les erreurs et les contrôles sans effet.
+
+### Les postes de soins
+
+La liste des postes est **unique** et vit dans `doctors.stations`. Trois écrans
+la lisent, et un seul l'écrit :
+
+| Écran | Fonction utilisée | Source |
+|---|---|---|
+| Paramètres › Postes de soins | `loadStations` (pré-remplissage) puis `saveDoctorStations` | écrit la base |
+| Fenêtre « Nouveau rendez-vous » (secrétariat) | `activeStations` | lit la base |
+| Navigateur patients | `activeStations` | lit la base |
+| Page de réservation (patient) | `stationsOf(doctor)` | lit `doctor_directory.stations` |
+
+`activeStations` ne renvoie **que ce qui est enregistré**. Tant que le médecin
+n'a rien validé, aucun poste n'est proposé nulle part — plutôt que de proposer
+au secrétariat des postes que le patient ne verrait jamais. L'éditeur affiche
+alors une configuration type, clairement marquée « pas encore enregistrée ».
 
 ### La règle du vert
 

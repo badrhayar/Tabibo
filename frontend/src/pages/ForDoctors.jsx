@@ -611,18 +611,33 @@ export default function ForDoctors() {
             ['هل أحتاج بطاقة بنكية للتجربة؟', 'لا. 14 يوماً مجاناً دون أي دفع. بعد التجربة، الاشتراك بالتحويل البنكي الشهري.'],
             ['هل بيانات مرضاي آمنة؟', 'نعم — البيانات مشفّرة ومستضافة بشكل آمن، ولا يصل إليها إلا أنت. Tabibo مصمم وفق قانون 09-08 (CNDP).'],
             ['ماذا لو أردت التوقف؟', 'لا يوجد أي التزام: يتوقف اشتراكك في نهاية الشهر المدفوع، وتبقى بياناتك قابلة للتصدير.'],
+            ['هل سيتمكن مرضاي المسنّون من الحجز عبر الإنترنت؟', 'الحجز عبر الإنترنت لا يعوّض الهاتف بل يضاف إليه: الطريقان يبقيان مفتوحين. غالباً ما يحجز المسنّ بنفسه أو بمساعدة أحد أقاربه من حسابه الخاص — فالحجز لفرد من العائلة متاح.'],
+            ['كيف يقلّص Tabibo المواعيد غير المحترمة؟', 'بثلاث آليات: تأكيد فوري عند الحجز، تذكير تلقائي قبل الموعد بالبريد وواتساب، وتحرير فوري للموعد المُلغى ليصبح متاحاً من جديد.'],
+            ['هل ستتمكن سكرتيرتي من الولوج؟', 'نعم، بحساب باسمها وبحقوق محدودة بوظيفتها: تدير الأجندة والاستقبال والطلبات، دون أن ترى فوترة العيادة ولا الوصفات.'],
+            ['هل يمكنني تحويل مريض إلى زميل؟', 'نعم، عبر صِلة: تربطون عيادتكم بعيادة زميل، وتحوّلون مريضاً في ثلاثة حقول، وتتابعون مساره. أما الملف فلا ينتقل — يبقى عندكم.'],
+            ['ماذا يحدث لبياناتي إذا توقفت؟', 'تبقى ملككم. تصدّرونها في صيغة مقروءة في أي وقت دون طلب، ويمكنكم بعد ذلك طلب حذفها.'],
           ] : lang === 'en' ? [
             ['Can my existing patients book through Tabibo?', 'Yes — you get a personal booking link (tabibo.ma/dr-yourname) and a QR poster for your waiting room. Your patients book directly, no more phone tag.'],
             ['How long does onboarding take?', 'Under 10 minutes: create your account, upload your professional documents, and your account is activated after verification — usually the same day.'],
             ['Do I need a card for the trial?', 'No. 14 days completely free, no payment details. After the trial, you pay monthly by bank transfer.'],
             ['Is my patients\' data safe?', 'Yes — data is encrypted and securely hosted, and only you can access your patients\' records. Tabibo is built to comply with Law 09-08 (CNDP).'],
             ['What if I want to stop?', 'No commitment: your subscription simply ends at the end of the paid month, and your data stays exportable.'],
+            ['Will my older patients manage to book online?', 'Online booking does not replace the phone, it adds to it: both routes stay open. Older patients often book themselves, or are helped by a relative from their own account — booking for a family member is built in.'],
+            ['How does Tabibo reduce no-shows?', 'Three mechanisms: immediate confirmation on booking, an automatic reminder before the appointment by email and WhatsApp, and instant release of a cancelled slot, which becomes bookable again.'],
+            ['Will my receptionist have access?', 'Yes, with their own named account and rights limited to their role: they manage the calendar, the front desk and requests, but see neither the practice\'s billing nor prescriptions.'],
+            ['Can I refer a patient to a colleague?', 'Yes, with Sila: connect your practice to a colleague\'s, refer a patient in three fields, and follow what happens. The record itself does not travel — it stays with you.'],
+            ['What happens to my data if I stop?', 'It stays yours. You export it in a readable format at any time, without asking, and you can then request its deletion.'],
           ] : [
             ['Mes patients actuels peuvent-ils réserver via Tabibo ?', 'Oui — vous recevez un lien de réservation personnel (tabibo.ma/dr-votrenom) et une affiche QR pour votre salle d\'attente. Vos patients réservent directement, fini le téléphone qui sonne.'],
             ['Combien de temps prend l\'inscription ?', 'Moins de 10 minutes : créez votre compte, téléversez vos documents professionnels, et votre compte est activé après vérification — souvent le jour même.'],
             ['Faut-il une carte bancaire pour l\'essai ?', 'Non. 14 jours entièrement gratuits, sans aucune donnée de paiement. Après l\'essai, règlement mensuel par simple virement bancaire.'],
             ['Les données de mes patients sont-elles protégées ?', 'Oui — données chiffrées et hébergées de façon sécurisée, accessibles par vous seul. Tabibo est conçu en conformité avec la loi 09-08 (CNDP).'],
             ['Et si je veux arrêter ?', 'Aucun engagement : votre abonnement s\'arrête simplement à la fin du mois réglé, et vos données restent exportables.'],
+            ['Mes patients âgés arriveront-ils à réserver en ligne ?', 'La réservation en ligne ne remplace pas le téléphone, elle s\'y ajoute : les deux voies restent ouvertes. Un patient âgé réserve souvent lui-même, ou se fait aider par un proche depuis son propre compte — c\'est prévu, on peut réserver pour un membre de sa famille.'],
+            ['Comment Tabibo réduit-il les rendez-vous non honorés ?', 'Par trois mécanismes : la confirmation immédiate à la réservation, le rappel automatique avant l\'échéance par e-mail et WhatsApp, et la libération instantanée du créneau annulé, qui redevient réservable pour un autre patient.'],
+            ['Ma secrétaire y aura-t-elle accès ?', 'Oui, avec son propre compte nominatif et des droits limités à sa fonction : elle gère l\'agenda, l\'accueil et les demandes, mais ne voit ni la facturation du cabinet ni les ordonnances.'],
+            ['Puis-je adresser un patient à un confrère ?', 'Oui, avec Sila : vous reliez votre cabinet à celui d\'un confrère, vous lui adressez un patient en trois champs, et vous suivez ce qu\'il devient. Le dossier, lui, ne circule pas — il reste chez vous.'],
+            ['Que deviennent mes données si j\'arrête ?', 'Elles restent les vôtres. Vous les exportez dans un format lisible à tout moment, sans avoir à le demander, et vous pouvez ensuite en demander la suppression.'],
           ]).map(([q, a]) => (
             <details key={q} style={{ borderBottom: `1px solid ${BORDER}`, padding: '4px 0' }}>
               <summary style={{ fontSize: 15, fontWeight: 700, color: DARK, padding: '14px 4px', cursor: 'pointer', listStylePosition: 'inside' }}>{q}</summary>

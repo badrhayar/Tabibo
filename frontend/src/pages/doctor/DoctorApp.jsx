@@ -65,7 +65,7 @@ import Billing from './Billing';
 import PlanDetails from './PlanDetails';
 import Stations from './Stations';
 import Network from './Network';
-import { loadStations } from '../../lib/stations';
+import { activeStations } from '../../lib/stations';
 import { taskBadge } from '../../lib/tasks';
 
 const G = '#16A06A';
@@ -428,7 +428,8 @@ export default function DoctorApp() {
   const openKey = popMore === '__none' ? null : (popMore || groupOfScreen);
   const openGroupDef = navItems.find(g => g.key === openKey && g.items) || null;
   // Les postes du cabinet — proposés à la création d'un rendez-vous.
-  const apptStations = loadStations(state, docName);
+  // La MÊME liste que celle enregistrée par le médecin et vue par le patient.
+  const apptStations = activeStations(state, docName);
   const tasksCount = taskBadge(state);
   const badgeOf = (b) => b === 'chat' ? unreadChat : b === 'tasks' ? tasksCount : 0;
   const clickNav = (g) => {
@@ -763,7 +764,8 @@ export default function DoctorApp() {
                 <select value={newAppt.motif || motifOpts[0]} onChange={e => setNA('motif', e.target.value)} style={{ width:'100%', padding:'11px 13px', border:'1px solid #DCE5E0', borderRadius:9, fontSize:13.5, background:'#F8FBF9', outline:'none', cursor:'pointer', marginBottom:14, boxSizing:'border-box' }}>
                   {motifOpts.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
-                {apptStations.length > 1 && (
+                {/* Mêmes postes que ceux vus par le patient : une seule liste. */}
+                {apptStations.length > 0 && (
                   <>
                     <label style={{ display:'block', fontSize:12.5, fontWeight:600, color:DARK, marginBottom:6 }}>
                       Poste de soins <span style={{ color:'#9AA8A2', fontWeight:500 }}>(optionnel)</span>
