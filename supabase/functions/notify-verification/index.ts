@@ -17,9 +17,27 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 // auto-injected legacy service-role key.
 const SERVICE_KEY = Deno.env.get("SB_SECRET_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// Origines autorisées à lire nos réponses depuis un navigateur. « * » laissait
+// n'importe quelle page tierce appeler ces fonctions avec le jeton de la victime
+// et LIRE le résultat. Le jeton étant porté en en-tête (pas en cookie), ce
+// n'était pas une faille CSRF — mais restreindre l'origine coûte trois lignes et
+// ferme la porte. ALLOWED_ORIGINS permet d'ajouter un domaine sans redéployer.
+const ORIGINS = new Set(
+  (Deno.env.get("ALLOWED_ORIGINS") ?? "https://tabibo.ma,https://www.tabibo.ma")
+    .split(",").map((s) => s.trim()).filter(Boolean),
+);
+function corsFor(req: Request) {
+  const o = req.headers.get("origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": ORIGINS.has(o) ? o : [...ORIGINS][0],
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
+}
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": [...ORIGINS][0],
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
 
 const G = "#16A06A";
@@ -122,7 +140,7 @@ async function authorize(req: Request, admin: ReturnType<typeof createClient>) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsFor(req) });
   try {
     const p = await req.json().catch(() => ({}));
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);

@@ -126,6 +126,13 @@ export default function PatientAccount() {
   const { isMobile } = useViewport();
   const { patient, now, cancelDone, reviewOpen, reviewStars, reviewDoctor, reviewText, reviewDone, pdocs, pNewDoc } = state;
 
+  // La signature affichée sous un avis publié. Reproduit exactement ce que la
+  // vue doctor_reviews calcule côté base : prénom + initiale du second mot.
+  const reviewSignature = (() => {
+    const parts = String(state.appUser?.full_name || patient?.name || 'Patient').trim().split(/\s+/);
+    return parts[1] ? `${parts[0]} ${parts[1][0]}.` : parts[0];
+  })();
+
   const [patientMsgInput, setPatientMsgInput] = useState('');
   const composeRef = useRef(null);
   const chatImgRef = useRef(null);
@@ -971,16 +978,27 @@ export default function PatientAccount() {
           <div style={{ background:'#fff', borderRadius:18, padding:30, maxWidth:400, width:'100%', boxShadow:'0 24px 60px rgba(21,49,74,.28)', animation:'saPop .3s ease' }}>
             <div style={{ fontSize:12, fontWeight:700, color:G, marginBottom:6 }}>{tr('Laisser un avis', 'Leave a review', 'اترك رأيك')}</div>
             <h2 style={{ margin:'0 0 4px', fontSize:19, fontWeight:800, color:DARK }}>{reviewDoctor}</h2>
-            <p style={{ margin:'0 0 18px', fontSize:13, color:MUT }}>Votre avis aide les autres patients à choisir.</p>
+            <p style={{ margin:'0 0 10px', fontSize:13, color:MUT }}>
+              {tr('Votre avis aide les autres patients à choisir.',
+                  'Your review helps other patients choose.',
+                  'رأيك يساعد المرضى الآخرين على الاختيار.')}
+            </p>
+            {/* L'avis est public et signé du prénom : le patient doit le savoir
+                AVANT d'écrire, pas le découvrir sur la page du médecin. */}
+            <p style={{ margin:'0 0 16px', fontSize:11.5, color:'#8A988F', lineHeight:1.5 }}>
+              {tr(`Votre avis sera publié sur la page du médecin, signé « ${reviewSignature} ». Le motif de votre consultation n'est jamais affiché.`,
+                  `Your review will be published on the doctor's page, signed “${reviewSignature}”. The reason for your visit is never shown.`,
+                  `سيُنشر رأيك في صفحة الطبيب باسم « ${reviewSignature} ». لا يُعرض سبب استشارتك أبدًا.`)}
+            </p>
             <div style={{ display:'flex', gap:8, justifyContent:'center', marginBottom:18 }}>
               {[1,2,3,4,5].map(s => (
                 <button key={s} onClick={() => setState({ reviewStars: s })} style={{ background:'none', border:'none', cursor:'pointer', fontSize:34, lineHeight:1, padding:0, color: s <= reviewStars ? '#F2B33D' : '#D3DDD9' }}>★</button>
               ))}
             </div>
-            <textarea value={reviewText} onChange={e => setState({ reviewText: e.target.value })} placeholder="Partagez votre expérience (optionnel)…" style={{ width:'100%', minHeight:84, padding:'12px 13px', border:'1px solid #DCE5E0', borderRadius:11, fontSize:13.5, background:'#F8FBF9', outline:'none', resize:'vertical', marginBottom:18, boxSizing:'border-box' }} />
+            <textarea value={reviewText} onChange={e => setState({ reviewText: e.target.value })} placeholder={tr('Partagez votre expérience (optionnel)…', 'Share your experience (optional)…', 'شارك تجربتك (اختياري)…')} style={{ width:'100%', minHeight:84, padding:'12px 13px', border:'1px solid #DCE5E0', borderRadius:11, fontSize:13.5, background:'#F8FBF9', outline:'none', resize:'vertical', marginBottom:18, boxSizing:'border-box' }} />
             <div style={{ display:'flex', gap:10 }}>
-              <button onClick={() => setState({ reviewOpen:false })} style={{ flex:1, background:BG, color:'#5A6B65', border:`1px solid ${BORDER}`, cursor:'pointer', padding:12, borderRadius:11, fontSize:14, fontWeight:700 }}>Annuler</button>
-              <button onClick={publishReview} style={{ flex:1.4, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>Publier mon avis</button>
+              <button onClick={() => setState({ reviewOpen:false })} style={{ flex:1, background:BG, color:'#5A6B65', border:`1px solid ${BORDER}`, cursor:'pointer', padding:12, borderRadius:11, fontSize:14, fontWeight:700 }}>{tr('Annuler', 'Cancel', 'إلغاء')}</button>
+              <button onClick={publishReview} style={{ flex:1.4, background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding:'9px 12px', borderRadius:9, fontSize:13, fontWeight:600 }}>{tr('Publier mon avis', 'Publish my review', 'نشر رأيي')}</button>
             </div>
           </div>
         </div>

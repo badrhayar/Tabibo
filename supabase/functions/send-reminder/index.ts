@@ -170,9 +170,27 @@ async function sendEmailReminder(to: string, params: string[], label: string) {
   return { ok: res.ok, error: res.ok ? null : await res.text() };
 }
 
+// Origines autorisées à lire nos réponses depuis un navigateur. « * » laissait
+// n'importe quelle page tierce appeler ces fonctions avec le jeton de la victime
+// et LIRE le résultat. Le jeton étant porté en en-tête (pas en cookie), ce
+// n'était pas une faille CSRF — mais restreindre l'origine coûte trois lignes et
+// ferme la porte. ALLOWED_ORIGINS permet d'ajouter un domaine sans redéployer.
+const ORIGINS = new Set(
+  (Deno.env.get("ALLOWED_ORIGINS") ?? "https://tabibo.ma,https://www.tabibo.ma")
+    .split(",").map((s) => s.trim()).filter(Boolean),
+);
+function corsFor(req: Request) {
+  const o = req.headers.get("origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": ORIGINS.has(o) ? o : [...ORIGINS][0],
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
+}
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": [...ORIGINS][0],
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
 const json = (obj: unknown, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -317,25 +335,29 @@ async function dueAppointments(admin: ReturnType<typeof createClient>, fromISO: 
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsFor(req) });
   try {
     const p = await req.json().catch(() => ({}));
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
-    // Unauthenticated deployment/health probe — confirms THIS code is live and
-    // which secrets are configured. Never returns the secret values themselves.
+    const authz = await authorize(req, admin);
+    if (!authz.ok) return json({ ok: false, error: "unauthorized" }, 401);
+
+    // Deployment/health probe — which secrets are configured, and which build is
+    // live. Never returns the values themselves. It used to answer BEFORE any
+    // authorisation, which handed an anonymous caller a free inventory of the
+    // notification chain (WhatsApp on/off, cron secret present, code version) —
+    // exactly the reconnaissance you want to deny. Now it is admin/service only.
     if (p?.type === "ping" || new URL(req.url).searchParams.get("ping") === "1") {
+      if (!authz.isAdmin && !authz.isService) return json({ ok: false, error: "forbidden" }, 403);
       return json({
         ok: true,
-        version: "cron-secret-v2",
+        version: "cron-secret-v3",
         cronSecretSet: CRON_SECRET.length > 0,
         resendSet: RESEND_API_KEY.length > 0,
         waConfigured: !!(WA_TOKEN && WA_PHONE_ID),
       });
     }
-
-    const authz = await authorize(req, admin);
-    if (!authz.ok) return json({ ok: false, error: "unauthorized" }, 401);
 
     // ── test ─────────────────────────────────────────────────────────────────
     // Optional `template`: 'reminder' (default) | 'confirmation' (booked) |
@@ -375,6 +397,27 @@ Deno.serve(async (req) => {
         const { data: s } = await admin.from("reminder_settings").select("confirmation, followup").eq("doctor_id", a.doctor_id).maybeSingle();
         const on = s ? (s as any)[template] : template === "confirmation"; // default: confirmation ON, followup OFF
         if (!on) return json({ ok: true, skipped: "disabled" });
+      }
+
+      // Un appelant humain ne peut ni rejouer un envoi déjà délivré, ni
+      // marteler la fonction : le journal fait foi. L'action « dispatch »
+      // déduplique déjà de son côté ; « send » ne le faisait pas, si bien
+      // qu'une partie au rendez-vous pouvait déclencher en boucle des WhatsApp
+      // et courriels réels vers l'AUTRE partie — harcèlement du praticien et
+      // consommation du quota WhatsApp payant.
+      if (!authz.isService) {
+        const { count: already } = await admin.from("reminder_log")
+          .select("id", { count: "exact", head: true })
+          .eq("appointment_id", a.id).eq("template", template).neq("status", "failed");
+        if ((already ?? 0) > 0) return json({ ok: true, skipped: "already_sent" });
+
+        // Le compteur horaire inclut les échecs (sendOne journalise toujours),
+        // sinon il suffirait de provoquer des erreurs pour rester sous le seuil.
+        const hourAgo = new Date(Date.now() - 3600e3).toISOString();
+        const { count: recent } = await admin.from("reminder_log")
+          .select("id", { count: "exact", head: true })
+          .eq("appointment_id", a.id).gt("created_at", hourAgo);
+        if ((recent ?? 0) >= 5) return json({ ok: false, error: "rate_limited" }, 429);
       }
 
       const r = await sendOne(admin, {

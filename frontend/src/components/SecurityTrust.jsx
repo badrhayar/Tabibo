@@ -25,7 +25,15 @@ const IC = {
 };
 
 const POINTS = [
-  { icon: IC.lock,    title: 'Chiffrement de bout en bout', text: 'Toutes vos données sont chiffrées en transit (HTTPS) et au repos.' },
+  // « Bout en bout » désigne un chiffrement dont seules les deux parties
+  // détiennent les clés. Ce n'est pas ce que fait l'application : le transport
+  // est en HTTPS et le stockage chiffré côté hébergeur, ce qui est exact et
+  // suffisant à dire. Le corps du texte était juste, seul le titre promettait
+  // davantage. Formulation alignée sur Confidentialite.jsx:19.
+  // Ne pas réintroduire « bout en bout » tant qu'aucun chiffrement à clés
+  // détenues par les terminaux n'existe (aucune dépendance de ce type dans
+  // frontend/package.json ; les messages sont stockés en clair).
+  { icon: IC.lock,    title: 'Données chiffrées',           text: 'Toutes vos données sont chiffrées en transit (HTTPS) et au repos.' },
   { icon: IC.shield,  title: 'Contrôle d’accès strict',      text: 'Chaque compte n’accède qu’à ses propres données — jamais à celles des autres.' },
   { icon: IC.scale,   title: 'Conforme à la loi 09-08',      text: 'Traitement des données déclaré et conforme à la réglementation marocaine (CNDP).' },
   { icon: IC.steth,   title: 'Secret médical respecté',      text: 'Vos informations de santé restent strictement confidentielles.' },

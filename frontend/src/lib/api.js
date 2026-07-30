@@ -768,7 +768,10 @@ export async function adminDeleteUser(id) {
 // ── Doctor credentialing / verification ──────────────────────────────────────
 /** Upload one credential file to the private "credentials" bucket + index it. */
 export async function uploadCredential({ file, userId, doctorId, docType }) {
-  const ext = (file.name.split('.').pop() || 'pdf').toLowerCase();
+  // Pièces d'identité et diplômes : rien n'était vérifié ici — ni le type, ni la
+  // taille. Un fichier actif (HTML, SVG) déposé dans ce casier serait ouvert
+  // plus tard par un administrateur lors de la vérification du médecin.
+  const ext = checkUpload(file, { exts: DOC_EXTS, maxBytes: 15 * MB, label: 'images, PDF ou documents' });
   // Storage RLS keys the folder on auth.uid() (the auth user id), NOT the
   // public.users id — they differ, so the folder MUST be auth.uid().
   const { data: auth } = await supabase.auth.getUser();
@@ -1335,15 +1338,15 @@ export async function downloadDocument(path, filename) {
   setTimeout(() => URL.revokeObjectURL(objUrl), 2000);
 }
 
-// ── Chat: conversations + messages ────────────────────────────────────────────
-/** Resolve a phone number to the account's login email (for phone-or-email login). */
-export async function emailForPhone(phone) {
-  if (!phone) return null;
-  const { data, error } = await supabase.rpc('email_for_phone', { p: phone });
-  if (error) { console.warn('[Tabibo] email_for_phone failed', error); return null; }
-  return data || null;
-}
+// NOTE — `emailForPhone()` a été retirée ici. Elle appelait la fonction
+// `email_for_phone`, révoquée par `20260629170000_phone_login_lockdown.sql`
+// parce qu'elle constituait un oracle « téléphone → adresse du compte » ouvert
+// à tout le monde. L'appel échouait donc systématiquement, en silence.
+// La connexion par téléphone passe par la fonction Edge `phone-login`, qui fait
+// la résolution côté serveur sans jamais renvoyer l'adresse (voir lib/auth.js).
+// `npm run test:contract` empêche désormais ce genre d'appel de survivre.
 
+// ── Chat: conversations + messages ────────────────────────────────────────────
 /** The existing conversation between a patient and a doctor, or null (no insert). */
 export async function findConversation(patientId, doctorId) {
   if (!patientId || !doctorId) return null;
@@ -1786,15 +1789,32 @@ export async function fetchStaff(doctorId) {
   }));
 }
 
-/** Invite an EXISTING Tabibo account (by email) as a secretary for this cabinet. */
+/**
+ * Rattache un compte Tabibo existant (par son adresse) au cabinet, comme
+ * secrétariat.
+ *
+ * Tout se passe côté serveur : `invite_staff_by_email` vérifie que l'appelant
+ * est bien titulaire du cabinet, retrouve le compte, crée le rattachement — et
+ * ne renvoie jamais d'identifiant. Le navigateur ne peut donc pas s'en servir
+ * pour découvrir si telle adresse a un compte Tabibo.
+ *
+ * (L'ancienne version appelait `user_id_for_email`, révoquée au rôle
+ * `authenticated` lors d'un audit de sécurité : l'invitation échouait depuis.)
+ */
 export async function inviteStaff(doctorId, email) {
-  const { data: uid, error: e1 } = await supabase.rpc('user_id_for_email', { p_email: (email || '').trim() });
-  if (e1) throw e1;
-  if (!uid) { const err = new Error('Aucun compte Tabibo avec cet email. Demandez à la personne de créer un compte, puis réessayez.'); err.code = 'no_user'; throw err; }
-  const { error } = await supabase.from('doctor_staff').insert({ doctor_id: doctorId, user_id: uid, role: 'secretary', active: true });
-  if (error) {
-    if (error.code === '23505') { const err = new Error('Cette personne fait déjà partie de votre équipe.'); err.code = 'dup'; throw err; }
-    throw error;
+  const { data, error } = await supabase.rpc('invite_staff_by_email', {
+    p_doctor_id: doctorId, p_email: (email || '').trim(),
+  });
+  if (error) throw error;
+  if (data === 'no_user') {
+    const err = new Error('Aucun compte Tabibo avec cet email. Demandez à la personne de créer un compte, puis réessayez.');
+    err.code = 'no_user'; throw err;
+  }
+  if (data === 'dup') {
+    const err = new Error('Cette personne fait déjà partie de votre équipe.'); err.code = 'dup'; throw err;
+  }
+  if (data === 'is_owner') {
+    const err = new Error('Vous êtes déjà le titulaire de ce cabinet.'); err.code = 'is_owner'; throw err;
   }
   return true;
 }

@@ -67,8 +67,17 @@ const dayLabel = (iso) => {
 };
 const fmtSize = (b) => (!b ? '' : b >= 1048576 ? `${(b / 1048576).toFixed(1)} Mo` : `${Math.max(1, Math.round(b / 1024))} Ko`);
 const isImageFile = (f) => !!f && (/^image\//.test(f.type || '') || /\.(png|jpe?g|gif|webp|heic|jfif)$/i.test(f.name || ''));
-/** Un salon d'appel stable pour une paire de confrères — le même des deux côtés. */
-const callRoomFor = (a, b) => `tabibo-confreres-${[String(a), String(b)].sort().join('-').replace(/[^a-zA-Z0-9-]/g, '').slice(0, 70)}`;
+/** Un salon d'appel imprévisible, tiré à la création de l'appel.
+ *
+ *  L'ancienne version dérivait le nom des deux identifiants de médecins
+ *  (`tabibo-confreres-<idA>-<idB>`, tri + concaténation). Or `network_directory`
+ *  distribue ces identifiants à tout compte connecté : n'importe qui pouvait
+ *  donc recalculer le nom et entrer dans la consultation, meet.jit.si n'ayant ni
+ *  mot de passe de salon ni jeton. Le confrère appelé n'a jamais eu besoin de
+ *  deviner le nom — il le reçoit dans le message `kind: 'call'`, dont la ligne
+ *  est protégée par `doctor_notes_select`. Le nom peut donc être un secret. */
+const newCallRoom = () =>
+  `tabibo-confreres-${crypto.randomUUID().replace(/-/g, '')}${crypto.randomUUID().replace(/-/g, '')}`;
 
 // ── Données de démonstration ────────────────────────────────────────────────
 // Clairement fictives, cohérentes entre elles, et jamais enregistrées : elles
@@ -655,7 +664,7 @@ export default function Network({ state, setState, go }) {
   // le confrère absent le retrouve.
   const startCall = async (mode, existingRoom = null) => {
     if (!chatWith) return;
-    const room = existingRoom || callRoomFor(myDoctorId || 'demo', chatWith);
+    const room = existingRoom || newCallRoom();
     const url = `https://meet.jit.si/${room}${mode === 'audio' ? '#config.startWithVideoMuted=true' : ''}`;
     if (!existingRoom) {
       const body = mode === 'audio' ? 'Appel audio' : 'Appel vidéo';
@@ -665,7 +674,13 @@ export default function Network({ state, setState, go }) {
           const n = await sendColleagueNote(myDoctorId, chatWith, { body, callRoom: room });
           setMessages((m) => [...m, n]);
           setThreads((t) => ({ ...t, [chatWith]: { last: n, unread: 0 } }));
-        } catch { /* l'appel s'ouvre quand même */ }
+        } catch {
+          // Le nom du salon étant désormais aléatoire, le message EST le seul
+          // moyen pour le confrère de le connaître. S'il n'est pas parti,
+          // ouvrir la fenêtre créerait un salon où personne ne viendra.
+          toast('Appel impossible : le confrère ne recevrait pas le lien.');
+          return;
+        }
       }
     }
     window.open(url, '_blank', 'noopener');

@@ -32,9 +32,27 @@ const WA_TPL_OTP = Deno.env.get("WHATSAPP_TEMPLATE_OTP") ?? "";
 const WA_LANG = Deno.env.get("WHATSAPP_LANG") ?? "fr";
 const waEnabled = !!(WA_TOKEN && WA_PHONE_ID && WA_TPL_OTP);
 
+// Origines autorisées à lire nos réponses depuis un navigateur. « * » laissait
+// n'importe quelle page tierce appeler ces fonctions avec le jeton de la victime
+// et LIRE le résultat. Le jeton étant porté en en-tête (pas en cookie), ce
+// n'était pas une faille CSRF — mais restreindre l'origine coûte trois lignes et
+// ferme la porte. ALLOWED_ORIGINS permet d'ajouter un domaine sans redéployer.
+const ORIGINS = new Set(
+  (Deno.env.get("ALLOWED_ORIGINS") ?? "https://tabibo.ma,https://www.tabibo.ma")
+    .split(",").map((s) => s.trim()).filter(Boolean),
+);
+function corsFor(req: Request) {
+  const o = req.headers.get("origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": ORIGINS.has(o) ? o : [...ORIGINS][0],
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
+}
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": [...ORIGINS][0],
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
 const json = (obj: unknown, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -97,26 +115,30 @@ async function cabinetClosedOnDate(admin: ReturnType<typeof createClient>, docto
 async function bookingRefusal(admin: ReturnType<typeof createClient>, doctorId: string, phone: string, datetime?: string): Promise<string | null> {
   const closed = await cabinetClosedOnDate(admin, doctorId, datetime);
   if (closed) return closed;
-  // Blocklist: any roster entry for this cabinet with this phone and status 'Bloqué'.
+  // Comparaisons sur les colonnes NORMALISÉES (phone_e164 / patient_phone_e164,
+  // migration 20260805120000). L'interface stocke « +212 612345678 » via
+  // PhoneField.joinPhone, qui insère une espace, alors que normPhone() produit
+  // « +212612345678 » : l'égalité sur les colonnes brutes était TOUJOURS fausse,
+  // et ces trois garde-fous ne s'appliquaient donc jamais.
   const { data: blocked } = await admin.from("doctor_patients")
-    .select("id").eq("doctor_id", doctorId).eq("status", "Bloqué").eq("phone", phone).limit(1);
+    .select("id").eq("doctor_id", doctorId).eq("status", "Bloqué").eq("phone_e164", phone).limit(1);
   if (blocked && blocked.length) return "La réservation en ligne n'est pas disponible pour ce numéro auprès de ce cabinet.";
   // Repeat no-shows at this cabinet.
   const { count: noShows } = await admin.from("appointments")
     .select("id", { count: "exact", head: true })
-    .eq("doctor_id", doctorId).eq("patient_phone", phone).eq("status", "no_show");
+    .eq("doctor_id", doctorId).eq("patient_phone_e164", phone).eq("status", "no_show");
   if ((noShows ?? 0) >= 3) return "Réservation en ligne indisponible — contactez directement le cabinet.";
   // One active upcoming booking per phone per doctor.
   const { count: active } = await admin.from("appointments")
     .select("id", { count: "exact", head: true })
-    .eq("doctor_id", doctorId).eq("patient_phone", phone)
+    .eq("doctor_id", doctorId).eq("patient_phone_e164", phone)
     .gt("datetime", new Date().toISOString()).in("status", ["pending", "confirmed"]);
   if ((active ?? 0) >= 1) return "Vous avez déjà un rendez-vous à venir chez ce praticien.";
   return null;
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsFor(req) });
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const p = await req.json().catch(() => ({}));
@@ -188,16 +210,20 @@ Deno.serve(async (req) => {
       const code = String(p.code || "").replace(/\D/g, "");
       if (!phone || code.length !== 6) return json({ ok: false, error: "Code invalide." }, 400);
 
-      const { data: rows } = await admin.from("booking_otps")
-        .select("*").eq("phone", phone).eq("used", false)
-        .gt("expires_at", new Date().toISOString())
-        .order("created_at", { ascending: false }).limit(1);
-      const otp = rows?.[0];
+      // Un SEUL aller-retour, qui incrémente le compteur ET rend la ligne. La
+      // version précédente lisait `attempts` puis réécrivait `attempts + 1` :
+      // des `verify` concurrents lisaient la même valeur et franchissaient tous
+      // le test des 5 essais. Comme rien d'autre ne borne `verify` (les quotas
+      // ne portent que sur `start`), le plafond était contournable par
+      // parallélisme — dix minutes de devinettes sur 10^6 possibilités.
+      // otp_claim_attempt() fait l'incrément et la sélection dans une seule
+      // instruction : la course n'existe plus.
+      const { data: claimed } = await admin.rpc("otp_claim_attempt", { p_phone: phone });
+      const otp = Array.isArray(claimed) ? claimed[0] : claimed;
+      // Épuisé, introuvable ou expiré : réponse unique, on ne distingue pas.
       if (!otp) return json({ ok: false, error: "Code expiré — recommencez la réservation." }, 400);
-      if (otp.attempts >= 5) return json({ ok: false, error: "Trop d'essais — recommencez la réservation." }, 429);
 
       if (otp.code_hash !== (await sha256(code + phone))) {
-        await admin.from("booking_otps").update({ attempts: otp.attempts + 1 }).eq("id", otp.id);
         return json({ ok: false, error: "Code incorrect." }, 400);
       }
 

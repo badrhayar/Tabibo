@@ -19,7 +19,7 @@ export default function ResetPassword() {
 
   const submit = async () => {
     setError('');
-    if (pass.length < 6) { setError('Le mot de passe doit contenir au moins 6 caractères.'); return; }
+    if (pass.length < 8) { setError('Le mot de passe doit contenir au moins 8 caractères.'); return; }
     if (pass !== pass2) { setError('Les deux mots de passe ne correspondent pas.'); return; }
     setBusy(true);
     try {

@@ -238,14 +238,14 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Statut</div>
-            <select value={activeFilter} onChange={e => setActiveFilter(e.target.value)}
+            <select aria-label="Filtrer les patients" value={activeFilter} onChange={e => setActiveFilter(e.target.value)}
               style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
               {filters.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Prochain RDV</div>
-            <select value={fNext} onChange={e => setFNext(e.target.value)}
+            <select aria-label="Filtrer par prochain rendez-vous" value={fNext} onChange={e => setFNext(e.target.value)}
               style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: fNext ? DARK : MUTED, outline: 'none', cursor: 'pointer', minWidth: 150 }}>
               <option value="">Tous</option>
               <option value="avec">Avec rendez-vous</option>
@@ -254,12 +254,12 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Dernière visite — du</div>
-            <input type="date" value={fFrom} max={fTo || undefined} onChange={e => setFFrom(e.target.value)}
+            <input aria-label="Période — du" type="date" value={fFrom} max={fTo || undefined} onChange={e => setFFrom(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
-            <input type="date" value={fTo} min={fFrom || undefined} onChange={e => setFTo(e.target.value)}
+            <input aria-label="Période — au" type="date" value={fTo} min={fFrom || undefined} onChange={e => setFTo(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           {(() => {
@@ -473,11 +473,11 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
                     <Field label="Téléphone" k="phone" type="tel" />
                     <div>
                       <label style={lab}>Date de naissance {editForm.dob && <span style={{ color: PRIMARY, fontWeight: 700 }}>· {ageFromDob(editForm.dob)} ans</span>}</label>
-                      <input type="date" value={editForm.dob || ''} onChange={e => setEF('dob', e.target.value)} style={inp} />
+                      <input aria-label="Date de naissance" type="date" value={editForm.dob || ''} onChange={e => setEF('dob', e.target.value)} style={inp} />
                     </div>
                     <div>
                       <label style={lab}>Sexe</label>
-                      <select value={editForm.sex || ''} onChange={e => setEF('sex', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+                      <select aria-label="Sexe" value={editForm.sex || ''} onChange={e => setEF('sex', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                         <option value="">—</option><option>Femme</option><option>Homme</option>
                       </select>
                     </div>
@@ -485,14 +485,14 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
                     <Field label="Adresse" k="address" full />
                     <div>
                       <label style={lab}>Ville</label>
-                      <select value={editForm.city || ''} onChange={e => setEF('city', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+                      <select aria-label="Ville" value={editForm.city || ''} onChange={e => setEF('city', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                         <option value="">—</option>
                         {CITY_OPTS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
                       </select>
                     </div>
                     <div>
                       <label style={lab}>Assurance</label>
-                      <select value={editForm.insurance || ''} onChange={e => setEF('insurance', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+                      <select aria-label="Assurance" value={editForm.insurance || ''} onChange={e => setEF('insurance', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                         <option value="">—</option>{['CNSS','CNOPS','Mutuelle privée','Sans assurance'].map(o => <option key={o}>{o}</option>)}
                       </select>
                     </div>

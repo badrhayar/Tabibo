@@ -131,12 +131,12 @@ export default function Requests({ state, setState, go }) {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher un patient…"
             style={{ width: '100%', boxSizing: 'border-box', padding: '11px 12px 11px 38px', border: `1px solid ${BORDER}`, borderRadius: 11, fontSize: 13.5, color: DARK, background: '#fff', outline: 'none', fontFamily: 'inherit' }} />
         </div>
-        <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={sel}>
+        <select aria-label="Filtrer par statut" value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={sel}>
           <option value="open">Ouvertes</option>
           <option value="closed">Traitées</option>
           <option value="all">Toutes</option>
         </select>
-        <select value={fCat} onChange={(e) => setFCat(e.target.value)} style={sel}>
+        <select aria-label="Filtrer par catégorie" value={fCat} onChange={(e) => setFCat(e.target.value)} style={sel}>
           <option value="">Toutes les catégories</option>
           {CATS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
         </select>

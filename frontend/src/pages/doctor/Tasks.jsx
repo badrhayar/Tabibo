@@ -273,7 +273,7 @@ export default function Tasks({ state, setState, go }) {
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(6, minmax(0,1fr))', gap: 12, marginBottom: 14 }}>
         <div>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#5A6B65', marginBottom: 6 }}>Catégories</label>
-          <select value={fCat} onChange={(e) => setFCat(e.target.value)} style={sel}>
+          <select aria-label="Filtrer par catégorie" value={fCat} onChange={(e) => setFCat(e.target.value)} style={sel}>
             <option value="">Toutes les catégories</option>
             {TASK_CATS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
           </select>
@@ -292,11 +292,11 @@ export default function Tasks({ state, setState, go }) {
         </div>
         <div>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#5A6B65', marginBottom: 6 }}>Date d’échéance</label>
-          <input type="date" value={fDue} onChange={(e) => setFDue(e.target.value)} style={sel} />
+          <input aria-label="Filtrer par échéance" type="date" value={fDue} onChange={(e) => setFDue(e.target.value)} style={sel} />
         </div>
         <div>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#5A6B65', marginBottom: 6 }}>Statut</label>
-          <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={sel}>
+          <select aria-label="Filtrer par statut" value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={sel}>
             <option value="open">Tâches ouvertes</option>
             <option value="done">Tâches terminées</option>
             <option value="all">Toutes</option>
@@ -450,33 +450,33 @@ function AddTaskModal({ onClose, onSave, people, roster, me, todayISO, isMobile 
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
             <div>
               <label style={lbl}>Catégorie</label>
-              <select value={f.category} onChange={(e) => set('category', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+              <select aria-label="Catégorie" value={f.category} onChange={(e) => set('category', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                 {TASK_CATS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
             </div>
             <div>
               <label style={lbl}>Patient (optionnel)</label>
-              <select value={f.patientName} onChange={(e) => set('patientName', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+              <select aria-label="Patient concerné" value={f.patientName} onChange={(e) => set('patientName', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                 <option value="">— Aucun —</option>
                 {roster.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
               </select>
             </div>
             <div>
               <label style={lbl}>Responsable</label>
-              <select value={f.assignee} onChange={(e) => set('assignee', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+              <select aria-label="Attribuée à" value={f.assignee} onChange={(e) => set('assignee', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                 <option value="">— Non assignée —</option>
                 {people.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
               <label style={lbl}>Agenda</label>
-              <select value={f.calendar} onChange={(e) => set('calendar', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+              <select aria-label="Agenda" value={f.calendar} onChange={(e) => set('calendar', e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
                 {people.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
               <label style={lbl}>Date d’échéance</label>
-              <input type="date" value={f.due} onChange={(e) => set('due', e.target.value)} style={inp} />
+              <input aria-label="Échéance" type="date" value={f.due} onChange={(e) => set('due', e.target.value)} style={inp} />
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, color: DARK, cursor: 'pointer', padding: '11px 0' }}>

@@ -606,7 +606,7 @@ export default function DoctorApp() {
 
           {/* Avatar */}
           <div style={{ position:'relative', zIndex:40, marginLeft:2 }}>
-            <button onClick={() => setPopAvatar(a=>!a)} style={{ width:36, height:36, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.55)', marginLeft:5, padding:0, cursor:'pointer', background:'linear-gradient(150deg,#D7EFE3,#BFE6D2)', display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' }}>
+            <button onClick={() => setPopAvatar(a=>!a)} aria-label="Mon compte" title="Mon compte" style={{ width:36, height:36, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.55)', marginLeft:5, padding:0, cursor:'pointer', background:'linear-gradient(150deg,#D7EFE3,#BFE6D2)', display:'flex', alignItems:'flex-end', justifyContent:'center', overflow:'hidden' }}>
               {docAvatar
                 ? <img src={docAvatar} alt={docName} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 : <svg width="26" height="30" viewBox="0 0 26 30" fill="#16A06A" opacity=".35"><circle cx="13" cy="10" r="7"/><path d="M2 30c0-7 5-11 11-11s11 4 11 11z"/></svg>}

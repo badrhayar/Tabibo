@@ -5,6 +5,7 @@ import {
   fetchPrescriptions, markAppointmentPaid, updateAppointmentStatus, patientKeyOf,
 } from '../../lib/api';
 import { moroccoNow } from '../../lib/time';
+import { sanitizeHtml } from '../../lib/sanitizeHtml';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, initials, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import PatientDocs, { fetchPatientDocs, loadDocMeta, docCat } from './PatientDocs';
@@ -379,11 +380,18 @@ function YesNo({ value, onChange }) {
 }
 
 // Minimal rich-text editor (bold/italic/underline/strike + lists).
+// Le contenu passe par sanitizeHtml() dans les deux sens : ce champ est écrit
+// par tout le cabinet (secrétariat compris) et réinjecté avec innerHTML dans le
+// navigateur du médecin — voir lib/sanitizeHtml.js.
 function RichText({ value, onChange, placeholder, minHeight = 84 }) {
   const ref = useRef(null);
   const [focused, setFocused] = useState(false);
-  useEffect(() => { if (ref.current && ref.current.innerHTML !== (value || '')) ref.current.innerHTML = value || ''; }, []); // eslint-disable-line
-  const cmd = (c, a) => { document.execCommand(c, false, a); ref.current?.focus(); onChange(ref.current?.innerHTML || ''); };
+  const emit = () => onChange(sanitizeHtml(ref.current?.innerHTML || ''));
+  useEffect(() => {
+    const clean = sanitizeHtml(value || '');
+    if (ref.current && ref.current.innerHTML !== clean) ref.current.innerHTML = clean;
+  }, []); // eslint-disable-line
+  const cmd = (c, a) => { document.execCommand(c, false, a); ref.current?.focus(); emit(); };
   const B = ({ label, style: st, onClick, title }) => (
     <button onMouseDown={(e) => e.preventDefault()} onClick={onClick} title={title} style={{ minWidth: 24, height: 24, border: 'none', background: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, color: '#5A6B65', fontWeight: 600, ...st }}
       onMouseEnter={(e) => e.currentTarget.style.background = '#EAF2EE'} onMouseLeave={(e) => e.currentTarget.style.background = 'none'}>{label}</button>
@@ -405,8 +413,16 @@ function RichText({ value, onChange, placeholder, minHeight = 84 }) {
       </div>
       <div ref={ref} contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true"
         data-placeholder={placeholder}
-        onFocus={() => setFocused(true)} onBlur={() => { setFocused(false); onChange(ref.current?.innerHTML || ''); }}
-        onInput={() => onChange(ref.current?.innerHTML || '')}
+        onFocus={() => setFocused(true)} onBlur={() => { setFocused(false); emit(); }}
+        onInput={emit}
+        onPaste={(e) => {
+          // Coller en texte brut : ni balise étrangère dans le dossier, ni
+          // police d'un autre site dans le compte rendu imprimé.
+          e.preventDefault();
+          const t = (e.clipboardData || window.clipboardData)?.getData('text/plain') || '';
+          document.execCommand('insertText', false, t);
+          emit();
+        }}
         style={{ minHeight, padding: '10px 12px', fontSize: 13.5, color: DARK, outline: 'none', lineHeight: 1.6 }} />
       <style>{`[contenteditable][data-placeholder]:empty:before{content:attr(data-placeholder);color:#9AA8A2;pointer-events:none}`}</style>
     </div>

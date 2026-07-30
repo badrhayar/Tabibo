@@ -49,7 +49,7 @@ export default function DoctorRegister() {
     if (!dreg.name || !dreg.spec || !dreg.inpe || !dreg.city || !dreg.phone || !dreg.address || !dreg.email || !dreg.pass) {
       setError('Veuillez remplir tous les champs obligatoires (marqués d’un *).'); return;
     }
-    if (dreg.pass.length < 6) { setError('Le mot de passe doit contenir au moins 6 caractères.'); return; }
+    if (dreg.pass.length < 8) { setError('Le mot de passe doit contenir au moins 8 caractères.'); return; }
     if (dreg.pass !== dreg.pass2) { setError('Les deux mots de passe ne correspondent pas.'); return; }
     const missing = CREDENTIAL_DOCS.filter((d) => d.required && !docFiles[d.key]);
     if (missing.length) { setError('Documents obligatoires manquants : ' + missing.map((d) => d.label).join(', ')); return; }

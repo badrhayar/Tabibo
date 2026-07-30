@@ -101,7 +101,7 @@ export default function Stations({ state, setState, go }) {
     <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       <Hero tint={SEC.histo} icon={ICONS.station} isMobile={isMobile}
         title="Postes de soins"
-        sub="L’accueil, chaque praticien, la salle de soins, le laboratoire… Ils deviennent les colonnes du navigateur, et le patient peut choisir son poste dès la réservation."
+        sub="L’accueil, chaque praticien, la salle de soins, le laboratoire… Ils deviennent les colonnes du navigateur, et le patient choisit son poste dès la réservation — les noms que vous écrivez ici sont donc visibles publiquement sur votre page."
         chips={[{ value: list.length, label: list.length > 1 ? 'postes définis' : 'poste défini' }]} />
 
       {/* `stretch` : les deux colonnes s'arrêtent à la même ligne, sinon la carte
@@ -140,7 +140,7 @@ export default function Stations({ state, setState, go }) {
                 </span>
                 <input value={s.name} onChange={(e) => rename(s.id, e.target.value)} placeholder="Nom du poste"
                   style={{ ...inp, flex: 1, minWidth: 150 }} />
-                <select value={s.kind} onChange={(e) => setKindOf(s.id, e.target.value)} style={{ ...inp, cursor: 'pointer', minWidth: 190 }}>
+                <select aria-label={`Type du poste « ${s.label || 'sans nom'} »`} value={s.kind} onChange={(e) => setKindOf(s.id, e.target.value)} style={{ ...inp, cursor: 'pointer', minWidth: 190 }}>
                   {STATION_KINDS.map((x) => <option key={x.key} value={x.key}>{x.label}</option>)}
                 </select>
                 <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
@@ -159,7 +159,7 @@ export default function Stations({ state, setState, go }) {
           <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap', alignItems: 'center' }}>
             <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()}
               placeholder="Ex. Dr Alami · Laboratoire · Échographie" style={{ ...inp, flex: 1, minWidth: 180 }} />
-            <select value={kind} onChange={(e) => setKind(e.target.value)} style={{ ...inp, cursor: 'pointer', minWidth: 190 }}>
+            <select aria-label="Type du nouveau poste" value={kind} onChange={(e) => setKind(e.target.value)} style={{ ...inp, cursor: 'pointer', minWidth: 190 }}>
               {STATION_KINDS.map((x) => <option key={x.key} value={x.key}>{x.label}</option>)}
             </select>
             <button onClick={add} disabled={!name.trim()}

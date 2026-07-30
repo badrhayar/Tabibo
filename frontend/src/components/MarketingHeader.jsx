@@ -101,6 +101,7 @@ export default function MarketingHeader({ activeKey, audience = 'patient' }) {
         {/* Logo */}
         <button
           onClick={() => go('home')}
+          aria-label="Tabibo — accueil"
           style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
         >
           <BrandMark plain size={34} />

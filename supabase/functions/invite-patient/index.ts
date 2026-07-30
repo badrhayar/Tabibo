@@ -38,9 +38,27 @@ const MUT = "#6B7B76";
 const BG = "#F4F8F5";
 const LINE = "#EAEFEC";
 
+// Origines autorisées à lire nos réponses depuis un navigateur. « * » laissait
+// n'importe quelle page tierce appeler ces fonctions avec le jeton de la victime
+// et LIRE le résultat. Le jeton étant porté en en-tête (pas en cookie), ce
+// n'était pas une faille CSRF — mais restreindre l'origine coûte trois lignes et
+// ferme la porte. ALLOWED_ORIGINS permet d'ajouter un domaine sans redéployer.
+const ORIGINS = new Set(
+  (Deno.env.get("ALLOWED_ORIGINS") ?? "https://tabibo.ma,https://www.tabibo.ma")
+    .split(",").map((s) => s.trim()).filter(Boolean),
+);
+function corsFor(req: Request) {
+  const o = req.headers.get("origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": ORIGINS.has(o) ? o : [...ORIGINS][0],
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
+}
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": [...ORIGINS][0],
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Vary": "Origin",
 };
 const json = (obj: unknown, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { ...cors, "Content-Type": "application/json" } });
@@ -63,7 +81,16 @@ async function authorize(req: Request, admin: ReturnType<typeof createClient>) {
   if (!user) return deny;
   const { data: me } = await admin.from("users").select("id, role, full_name").eq("auth_id", user.id).maybeSingle();
   if (!me) return deny;
-  return { ok: true, isAdmin: (me as any).role === "admin", me: me as any };
+  // Le rôle « doctor » s'obtient à la simple inscription (handle_new_user).
+  // Faire partir un courriel ou un WhatsApp portant la marque Tabibo suppose
+  // un dossier réellement validé par un administrateur.
+  let approved = false;
+  if ((me as any).role === "doctor") {
+    const { data: d } = await admin.from("doctors")
+      .select("verification_status").eq("user_id", (me as any).id).maybeSingle();
+    approved = (d as any)?.verification_status === "approved";
+  }
+  return { ok: true, isAdmin: (me as any).role === "admin", approved, me: me as any };
 }
 
 // Moroccan numbers → E.164 digits with no "+": 06.. → 2126.., +212.. → 212..
@@ -81,7 +108,13 @@ function normalizePhone(raw: string): string {
 async function accountExists(admin: ReturnType<typeof createClient>, email?: string, phone?: string) {
   try {
     if (email) {
-      const { data } = await admin.from("users").select("id").ilike("email", email.trim()).maybeSingle();
+      // `.ilike()` interprète % et _ comme des jokers. Passer l'adresse fournie
+      // par l'appelant telle quelle transformait cette recherche en oracle :
+      // « %@cabinet-concurrent.ma » aurait révélé qu'un compte existe, sans
+      // qu'aucun courriel ne parte pour alerter la personne. On échappe les
+      // jokers ; la recherche redevient une simple égalité insensible à la casse.
+      const needle = email.trim().replace(/[\\%_]/g, (c) => "\\" + c);
+      const { data } = await admin.from("users").select("id").ilike("email", needle).maybeSingle();
       if (data) return true;
     }
     if (phone) {
@@ -264,14 +297,14 @@ async function sendWhatsAppInvite(to: string, params: string[]) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsFor(req) });
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
     // Only a signed-in doctor or admin may send invitations.
     const authz = await authorize(req, admin);
     if (!authz.ok) return json({ ok: false, error: "unauthorized" }, 401);
-    if (!authz.isAdmin && authz.me?.role !== "doctor") return json({ ok: false, error: "forbidden" }, 403);
+    if (!authz.isAdmin && !authz.approved) return json({ ok: false, error: "forbidden" }, 403);
 
     const p = await req.json().catch(() => ({}));
     const email = typeof p.email === "string" ? p.email.trim() : "";
@@ -282,6 +315,32 @@ Deno.serve(async (req) => {
     // Don't invite someone who already has a Tabibo account under this email/phone.
     if (await accountExists(admin, email, phone)) {
       return json({ ok: true, skipped: "already_registered", emailed: false, wa: false });
+    }
+
+    // Plafond de fréquence — même patron que phone-login. Sans cela, un compte
+    // médecin compromis pouvait relancer indéfiniment la même cible : chaque
+    // appel part en courriel Resend et en WhatsApp réels, sous la marque
+    // Tabibo. La cible ne créant jamais de compte, `accountExists` ci-dessus
+    // ne freinait rien.
+    const target = (email || normalizePhone(phone)).toLowerCase().slice(0, 190);
+    const dayAgo = new Date(Date.now() - 24 * 3600e3).toISOString();
+    try {
+      const { count: perTarget } = await admin.from("invite_throttle")
+        .select("id", { count: "exact", head: true })
+        .eq("target", target).gt("created_at", dayAgo);
+      if ((perTarget ?? 0) >= 3) {
+        return json({ ok: false, error: "Cette personne a déjà été invitée récemment." }, 429);
+      }
+      const { count: perSender } = await admin.from("invite_throttle")
+        .select("id", { count: "exact", head: true })
+        .eq("sender", authz.me?.id ?? null).gt("created_at", dayAgo);
+      if ((perSender ?? 0) >= 60) {
+        return json({ ok: false, error: "Trop d'invitations aujourd'hui — réessayez demain." }, 429);
+      }
+      await admin.from("invite_throttle").insert({ sender: authz.me?.id ?? null, target });
+    } catch (_) {
+      // Journal indisponible : on laisse passer plutôt que de bloquer un usage
+      // légitime. Le plafond protège d'un abus répété, pas d'un envoi unique.
     }
 
     // The doctor's name personalises the invite (caller may override; otherwise

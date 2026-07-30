@@ -3,6 +3,7 @@ import { fetchDoctors, getCurrentAppUser, fetchMyAppointments, apptToConsultatio
 import { signIn as sbSignIn, signUp as sbSignUp, signOut as sbSignOut, getSession, onAuthChange, phoneLogin as sbPhoneLogin } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { setPageMeta, SCREEN_META } from '../lib/seo.js';
+import { purgeLocalPhi } from '../lib/localPhi.js';
 import { DOCTORS as MOCK_DOCTORS, DEMO_PATIENTS } from '../shared.jsx';
 
 // Availability rows → weekly end-of-day minutes (Mon=0 … Sun=6). Breaks are
@@ -465,6 +466,10 @@ export function AppProvider({ children }) {
     // Purge any runtime-cached API data so nothing personal survives on a
     // shared device after logout (the SW also no longer caches API responses).
     try { navigator.serviceWorker?.controller?.postMessage('CLEAR_RUNTIME'); } catch (e) { /* ignore */ }
+    // Le cache runtime ci-dessus ne couvrait PAS localStorage : facturation,
+    // tâches, demandes patients et postes de soin y restaient en clair après la
+    // déconnexion, à rebours de ce que promettent plans.js et DoctorPitch.jsx.
+    try { purgeLocalPhi(); } catch (e) { /* ignore */ }
     dispatch({
       appUser: null, patient: null, myAppointments: [], consultations: [], screen: 'home',
       myDoctor: null, myDoctorLoaded: false, isStaff: false, weekEndMin: null,

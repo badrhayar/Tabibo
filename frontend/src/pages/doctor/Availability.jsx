@@ -34,9 +34,11 @@ function Toggle({ on, onChange }) {
     </div>
   );
 }
-function TimeInput({ value, onChange }) {
+// `label` n'est pas décoratif : un champ d'heure sans intitulé est annoncé
+// « zone d'édition » par un lecteur d'écran, sans dire de quel jour il s'agit.
+function TimeInput({ value, onChange, label }) {
   return (
-    <input type="time" value={value} onChange={(e) => onChange(e.target.value)}
+    <input type="time" value={value} onChange={(e) => onChange(e.target.value)} aria-label={label}
       style={{ border: `1.5px solid ${BORDER}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: DARK, background: '#fff', outline: 'none', fontFamily: 'inherit', cursor: 'pointer', minWidth: 0, width: '100%', boxSizing: 'border-box' }}
       onFocus={(e) => (e.target.style.borderColor = PRIMARY)} onBlur={(e) => (e.target.style.borderColor = BORDER)} />
   );
@@ -456,9 +458,9 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
                       <div>
                         <div style={labelMini}>Heures de travail</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <TimeInput value={dayStartTimes[i]} onChange={(v) => setArr(setDayStartTimes, i, v)} />
+                          <TimeInput label={`${day} — ouverture`} value={dayStartTimes[i]} onChange={(v) => setArr(setDayStartTimes, i, v)} />
                           <span style={{ color: MUTED, flexShrink: 0 }}>→</span>
-                          <TimeInput value={dayEndTimes[i]} onChange={(v) => setArr(setDayEndTimes, i, v)} />
+                          <TimeInput label={`${day} — fermeture`} value={dayEndTimes[i]} onChange={(v) => setArr(setDayEndTimes, i, v)} />
                         </div>
                       </div>
                       <div>
@@ -471,9 +473,9 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
                         </div>
                         {pauseToggles[i] ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <TimeInput value={pauseStartTimes[i]} onChange={(v) => setArr(setPauseStartTimes, i, v)} />
+                            <TimeInput label={`${day} — début de la pause`} value={pauseStartTimes[i]} onChange={(v) => setArr(setPauseStartTimes, i, v)} />
                             <span style={{ color: MUTED, flexShrink: 0 }}>→</span>
-                            <TimeInput value={pauseEndTimes[i]} onChange={(v) => setArr(setPauseEndTimes, i, v)} />
+                            <TimeInput label={`${day} — fin de la pause`} value={pauseEndTimes[i]} onChange={(v) => setArr(setPauseEndTimes, i, v)} />
                           </div>
                         ) : (
                           <div style={{ fontSize: 12.5, color: MUTED, fontStyle: 'italic', padding: '10px 2px' }}>Journée continue — aucune pause déjeuner.</div>
@@ -508,12 +510,12 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <div>
                 <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 }}>Du</label>
-                <input type="date" value={offStart} min={todayISO} onChange={(e) => setOffStart(e.target.value)}
+                <input type="date" aria-label="Absence — premier jour" value={offStart} min={todayISO} onChange={(e) => setOffStart(e.target.value)}
                   style={{ height: 44, border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '0 10px', fontSize: 13.5, color: DARK, background: '#fff', fontFamily: 'inherit' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: MUTED, marginBottom: 6 }}>Au (inclus)</label>
-                <input type="date" value={offEnd} min={offStart || todayISO} onChange={(e) => setOffEnd(e.target.value)}
+                <input type="date" aria-label="Absence — dernier jour" value={offEnd} min={offStart || todayISO} onChange={(e) => setOffEnd(e.target.value)}
                   style={{ height: 44, border: `1.5px solid ${BORDER}`, borderRadius: 10, padding: '0 10px', fontSize: 13.5, color: DARK, background: '#fff', fontFamily: 'inherit' }} />
               </div>
               <div style={{ flex: 1, minWidth: 160 }}>

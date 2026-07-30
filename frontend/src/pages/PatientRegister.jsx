@@ -48,7 +48,7 @@ export default function PatientRegister() {
     setError('');
     if (!isSupabaseConfigured) { setError('Supabase non configuré — vérifiez votre fichier .env.'); return; }
     if (!reg.name || !reg.phone || !reg.email || !reg.pass) { setError('Veuillez remplir tous les champs obligatoires (marqués d’un *).'); return; }
-    if (reg.pass.length < 6) { setError('Le mot de passe doit contenir au moins 6 caractères.'); return; }
+    if (reg.pass.length < 8) { setError('Le mot de passe doit contenir au moins 8 caractères.'); return; }
     if (reg.pass !== reg.pass2) { setError('Les deux mots de passe ne correspondent pas.'); return; }
     if (isCaptchaEnabled() && !captcha) { setError('Veuillez confirmer que vous n’êtes pas un robot.'); return; }
     setBusy(true);
@@ -170,7 +170,7 @@ export default function PatientRegister() {
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 16 }}>
             <div>
               <label style={labelStyle}>Sexe</label>
-              <select value={reg.sex || ''} onChange={(e) => setReg('sex', e.target.value)} style={inputStyle}>
+              <select aria-label="Sexe" value={reg.sex || ''} onChange={(e) => setReg('sex', e.target.value)} style={inputStyle}>
                 <option value="">—</option>
                 <option value="Femme">Femme</option>
                 <option value="Homme">Homme</option>
@@ -178,7 +178,7 @@ export default function PatientRegister() {
             </div>
             <div>
               <label style={labelStyle}>Date de naissance</label>
-              <input type="date" value={reg.dob || ''} onChange={(e) => setReg('dob', e.target.value)} style={inputStyle} />
+              <input aria-label="Date de naissance" type="date" value={reg.dob || ''} onChange={(e) => setReg('dob', e.target.value)} style={inputStyle} />
             </div>
           </div>
 

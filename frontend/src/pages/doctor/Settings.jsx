@@ -76,12 +76,13 @@ function InputField({ label, value, onChange, type = 'text' }) {
         {label}
       </label>
       {type === 'password' ? (
-        <PasswordInput value={value} onChange={e => onChange(e.target.value)} style={{
+        <PasswordInput aria-label={label} value={value} onChange={e => onChange(e.target.value)} style={{
           border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14,
           color: DARK, outline: 'none', background: '#fff',
         }} />
       ) : (
       <input
+        aria-label={label}
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -110,6 +111,7 @@ function SelectField({ label, value, onChange, options }) {
         {label}
       </label>
       <select
+        aria-label={label}
         value={value}
         onChange={e => onChange(e.target.value)}
         style={{
@@ -434,7 +436,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
               {/* Email = login identity; changing it requires the auth email-change flow. */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>Email professionnel</label>
-                <input type="email" value={form.email} disabled style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F4F6F5', width: '100%', boxSizing: 'border-box', direction: 'ltr' }} />
+                <input aria-label="Adresse e-mail du compte" type="email" value={form.email} disabled style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F4F6F5', width: '100%', boxSizing: 'border-box', direction: 'ltr' }} />
               </div>
             </div>
           </Card>
@@ -599,6 +601,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
                   />
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: isMobile ? '1 1 110px' : 1, minWidth: 0 }}>
                     <input
+                      aria-label={`Tarif — ${svc.name || 'prestation'}`}
                       type="number"
                       value={svc.price}
                       onChange={e => updateService(idx, 'price', Number(e.target.value))}

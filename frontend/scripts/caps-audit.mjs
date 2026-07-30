@@ -22,7 +22,7 @@ const srv = createServer((q, r) => {
 });
 await new Promise((r) => srv.listen(PORT, r));
 
-const PUBLIC = ['home', 'search', 'fordoctors', 'contact', 'login', 'signup'];
+const PUBLIC = ['profile', 'pinfo', 'plogin', 'pregister', 'paccount', 'about', 'forpatients', 'confidentialite', 'forgotpw', 'home', 'search', 'fordoctors', 'contact', 'login', 'signup'];
 const DOCTOR = ['doctor', 'dcal', 'dnav', 'dtasks', 'dpatients', 'dpfile', 'dappts', 'dprescribe',
   'ddocs', 'dreq', 'dhist', 'dshare', 'dstaff', 'dchat', 'dbill', 'dstats', 'dsettings',
   'davail', 'dstations', 'dnetwork', 'dabo', 'dnotif', 'dplans'];

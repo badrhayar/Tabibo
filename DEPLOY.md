@@ -37,7 +37,7 @@ npm run build
 npm run test:all
 ```
 
-`test:all` enchaîne cinq bancs d'essai, chacun lançable seul :
+`test:all` enchaîne douze bancs d'essai, chacun lançable seul :
 
 | Commande | Ce qu'elle vérifie |
 |---|---|
@@ -50,6 +50,9 @@ npm run test:all
 | `npm run test:layout` | **Tournée de présentation.** Cartes voisines de hauteurs différentes, boutons mal alignés, texte tronqué. `W=390` pour le contrôle téléphone. Doit rendre 0. |
 | `npm run test:stations` | **Postes de soins : une seule liste.** Vérifie que le patient (page de réservation) et le secrétariat (fenêtre « Nouveau rendez-vous ») affichent exactement les libellés enregistrés par le médecin. |
 | `npm run test:caps` | **Plus un mot en capitales.** Ouvre chaque écran et lit le texte *tel que le navigateur l'affiche* (la capitalisation CSS comprise). Un libellé garde sa majuscule initiale, jamais davantage ; seuls les sigles (CIN, AMO, CNSS…) échappent à la règle. Doit rendre 0. |
+| `npm run test:contract` | **Le client et la base parlent-ils la même langue ?** Relit les migrations *dans l'ordre*, en déduit ce que la base offre vraiment (fonctions, tables, vues, casiers, et surtout les droits d'exécution après tous les `grant`/`revoke`), puis compare avec chaque `supabase.rpc()`, `.from()` et `storage.from()` du code. C'est le banc qui aurait attrapé l'invitation de secrétaire cassée — et qui a trouvé `emailForPhone`. Ne demande aucun navigateur : il tourne en une seconde. Doit rendre 0. |
+| `npm run test:sanitize` | **Le nettoyeur de texte enrichi.** Charge `lib/sanitizeHtml.js` dans un vrai navigateur, lui donne seize charges hostiles (`<img onerror>`, `<svg onload>`, `srcdoc`, `javascript:`…) et vérifie deux choses : rien ne s'exécute, **et** rien d'interdit ne survit dans la sortie. Sept cas de mise en forme légitime vérifient qu'un compte rendu n'est pas mutilé au passage. Doit rendre 0. |
+| `npm run test:a11y` | **Rien de muet.** Ouvre chaque écran et relève les commandes sans intitulé (bouton à icône seule), les champs sans intitulé associé et les images sans `alt` — tout ce qu'un lecteur d'écran annonce « bouton » ou « zone d'édition », sans plus. Doit rendre 0. **Portée limitée**, et c'est écrit en tête du script : 1440 px seulement, état initial de l'écran seulement, ni contraste ni ordre de tabulation. Un 0 signifie « rien de muet à l'arrivée », pas « l'application est accessible ». |
 
 `npm run test:crawl` (long, ~40 min) va plus loin : il clique **chaque bouton de chaque écran** dans la démonstration et signale les erreurs et les contrôles sans effet.
 
@@ -136,15 +139,28 @@ sigles restent des sigles : CIN, AMO, CNSS, CNOPS, IMC, PDF, CNDP…
 `npm run test:caps` ouvre chaque écran, lit le rendu réel et échoue à la
 première entorse.
 
+### Fabriquer l'archive du projet
+
+```bash
+./scripts/package.sh              # → ~/tabibo-FULL-project.zip
+```
+
+Le script exclut `node_modules`, `dist`, `.git`, les sauvegardes, les artefacts
+Play Store, **et tout fichier `.env` à n'importe quelle profondeur** — puis il
+vérifie l'archive et échoue s'il reste quoi que ce soit. Le motif écrit à la
+main, lui, ne visait que la racine : `frontend/.env` passait, et le contrôle
+annonçait quand même « rien de sensible ». Ne refaites pas l'archive à la main.
+
 ### Migrations à appliquer
 
-Trois migrations attendent votre projet Supabase, dans cet ordre :
+Quatre migrations attendent votre projet Supabase, dans cet ordre :
 
 | Fichier | Ce qu'elle apporte |
 |---|---|
 | `20260801120000_care_stations.sql` | Les postes de soins (`doctors.stations`, `appointments.station_id`). Sans elle, le patient ne voit pas les postes à la réservation. |
 | `20260802120000_doctor_network.sql` | Tabibo Network : liens entre cabinets, adressages de patients, messages entre confrères, et l'annuaire `network_directory`. Sans elle, l'écran **Tabibo Network** reste vide hors démonstration. |
 | `20260803120000_network_messaging.sql` | La messagerie du réseau : pièces jointes et appels sur `doctor_notes`, plus le casier privé `confrere-media`. Sans elle, l'onglet **Messagerie** n'accepte ni fichier ni appel. |
+| `20260804120000_prelaunch_hardening.sql` | **Les douze correctifs de l'audit d'avant-lancement.** À appliquer en dernier, et impérativement avant l'ouverture — elle referme une fuite d'images cliniques entre cabinets, répare Tabibo Network (dont la RLS était entièrement morte) et l'invitation d'une secrétaire. Le détail de chaque correctif est écrit en tête du fichier. |
 
 Toutes les trois posent leurs propres règles d'accès : un médecin ne lit que les
 lignes où son cabinet figure ; on ne peut adresser un patient — ni écrire, ni
@@ -152,3 +168,52 @@ joindre un fichier — qu'à un confrère dont le lien est **accepté**, et c'es
 base qui le vérifie, pas seulement l'écran. Une pièce jointe déposée dans
 `confrere-media` n'a aucune adresse publique : elle ne s'ouvre que par un lien
 signé d'une heure, et seulement pour les deux confrères de la conversation.
+
+### Ce que l'audit d'avant-lancement a trouvé
+
+Dix-sept défauts au total, dont deux graves. Les onze premiers, plus la régression
+n°12 relevée en seconde passe, vivent dans
+`20260804120000_prelaunch_hardening.sql` ; les cinq derniers sont dans le code
+de l'application.
+
+| # | Défaut | Ce qui se passait |
+|---|---|---|
+| 1 | `chat-media` : portée de lecture | Une seule conversation avec un médecin ouvrait **tout son dossier d'images** — donc les photos cliniques envoyées à ses autres patients. |
+| 2 | `my_doctor_id()` | Comparait un `users.id` à un `auth.uid()` : la fonction renvoyait toujours NULL et **tout Tabibo Network était hors service**. |
+| 3 | `confrere-media` | Même faute de portée que 1, entre cabinets. |
+| 4 | `appts_delete` | Le patient pouvait **supprimer** le rendez-vous — donc le compte rendu, l'encaissement et son historique d'absences. |
+| 5 | `documents_update` | Permettait de re-cibler un document vers un autre cabinet après coup. |
+| 6 | `doctor_links_update` | Le destinataire d'une demande pouvait **forger un lien accepté** avec un confrère non consentant. |
+| 7 | `doctor_notes_update` | Le destinataire pouvait réécrire le message reçu. |
+| 8 | `doctors.user_id` | N'était épinglé par aucun garde : le cabinet pouvait être cédé sans contrôle. |
+| 9 | `public.users` | Le rôle n'était protégé qu'à la mise à jour, pas à l'insertion. |
+| 10 | `client_errors` | Croissance non bornée par un appelant anonyme. |
+| 11 | `invite_staff_by_email` | Remplace l'appel client à `user_id_for_email`, révoquée : **« Inviter un membre » était cassé** depuis le durcissement précédent. |
+
+Corrections hors base : mot de passe minimum porté de 6 à **8 caractères**, validation du type et de la taille sur le casier `credentials`, sonde de configuration de `send-reminder` placée derrière l'autorisation, origine CORS des six fonctions Edge restreinte à `tabibo.ma` (variable `ALLOWED_ORIGINS`), jokers `LIKE` échappés dans `invite-patient`, et mention explicite dans l'éditeur de postes que les noms saisis sont publics.
+
+**Bancs d'essai élargis** : `dreq`, `forgotpw`, `rxverify` et sept écrans patient n'étaient visités par aucun banc. C'est précisément ce trou qui a laissé passer l'invitation de secrétaire cassée. Ils sont désormais couverts.
+
+### Seconde passe — les sept dimensions restantes
+
+Le premier tour d'audit s'était arrêté à cinq dimensions sur douze. Les sept
+autres ont été reprises ensuite ; elles ont donné six correctifs de plus.
+
+| # | Défaut | Ce qui se passait |
+|---|---|---|
+| 12 | `guard_doctor_status()` — **régression introduite par le correctif n°8** | En réécrivant la fonction pour épingler `user_id`, la ligne `current_period_end` avait disparu du corps. `create or replace` remplace tout : la colonne redevenait librement modifiable. Un médecin pouvait donc reporter sa propre échéance à 2099 et rester listé sans payer. La liste des colonnes épinglées est désormais complète, et un avertissement en tête de la fonction dit pourquoi on ne la raccourcit jamais. |
+| 13 | Éditeur de texte enrichi du dossier (`innerHTML`) | Le compte rendu est stocké en HTML puis réinjecté avec `innerHTML`. Or tout le cabinet écrit dans ce champ. Une secrétaire pouvait y enregistrer `<img src=x onerror=…>` : le code s'exécutait ensuite **dans le navigateur du médecin**, avec sa session — donc avec le droit de signer une ordonnance. Le contenu passe maintenant par `lib/sanitizeHtml.js` à la lecture comme à l'écriture, et le collage est réduit au texte brut. |
+| 14 | `dompurify` (via `jspdf`) | Avis de sécurité ouvert. Le code vulnérable n'était pas atteignable (Tabibo n'utilise que l'API de dessin de jsPDF, jamais `.html()`), mais un audit de dépendances propre vaut mieux au lancement. `npm audit` rend désormais 0. |
+| 15 | Avis patients — consentement | L'avis est publié signé « Prénom N. ». Rien ne le disait au patient avant qu'il n'écrive. La fenêtre affiche maintenant la signature exacte qui sera publiée, et rappelle que le motif de consultation n'apparaît jamais. |
+| 16 | `emailForPhone()` — seconde fonction morte, même cause que la n°11 | Elle appelait `email_for_phone`, révoquée par `phone_login_lockdown.sql` parce qu'elle était un oracle « téléphone → adresse du compte » ouvert à tous. L'appel échouait donc à chaque fois, en silence. Aucun écran ne l'utilisait — la connexion par téléphone passe par la fonction Edge `phone-login` — mais elle attendait la prochaine personne pressée. Retirée, avec la raison écrite à sa place. |
+| 17 | 101 éléments muets | Boutons à icône seule (le logo, l'avatar du médecin, l'envoi d'un message) et 70 champs dont l'intitulé voisin n'était relié à rien : un lecteur d'écran annonçait « bouton » ou « zone d'édition ». Les vingt champs d'horaires de `davail` étaient les plus graves — impossible de savoir de quel jour il s'agissait. Tout est intitulé ; `npm run test:a11y` le vérifie. |
+
+**Ce qui reste ouvert, et pourquoi.** La directive `script-src` contient encore
+`'unsafe-inline'`. La refermer demande de remplacer la permission par une
+empreinte pour le script de secours de `index.html` **et** un `nonce` pour
+Turnstile — or ni Turnstile ni Jitsi ne peuvent être exercés depuis
+l'environnement de vérification, et une erreur ici bloque l'inscription en
+production sans qu'aucun banc local ne le voie. À faire sur un déploiement de
+préproduction, en vérifiant que le CAPTCHA et la téléconsultation fonctionnent
+toujours. Aucun point d'injection HTML ne subsiste dans l'application, donc
+c'est de la défense en profondeur, pas un trou ouvert.

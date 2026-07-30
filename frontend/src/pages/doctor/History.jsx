@@ -333,6 +333,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Service</div>
           <select
+            aria-label="Service"
             value={filterService}
             onChange={e => setFilterService(e.target.value)}
             style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer', minWidth: 190 }}
@@ -344,6 +345,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Paiement</div>
           <select
+            aria-label="Paiement"
             value={filterPay}
             onChange={e => setFilterPay(e.target.value)}
             style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }}
@@ -357,6 +359,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Statut</div>
           <select
+            aria-label="Statut"
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
             style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }}
@@ -369,12 +372,12 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Du</div>
-          <input type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
+          <input aria-label="Période — du" type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
             style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
-          <input type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
+          <input aria-label="Période — au" type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
             style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
         </div>
         <button

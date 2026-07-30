@@ -100,7 +100,7 @@ export default function BookingShare() {
         <div style={card}>
           <div style={{ fontSize: 12.5, fontWeight: 800, color: '#9AA8A2', marginBottom: 10 }}>Votre lien de réservation</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
-            <input readOnly value={link} onFocus={(e) => e.target.select()} style={{ flex: '1 1 280px', minWidth: 0, padding: '11px 13px', border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: 13.5, background: BG, color: DARK, direction: 'ltr' }} />
+            <input aria-label="Lien de réservation du cabinet" readOnly value={link} onFocus={(e) => e.target.select()} style={{ flex: '1 1 280px', minWidth: 0, padding: '11px 13px', border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: 13.5, background: BG, color: DARK, direction: 'ltr' }} />
             <button onClick={copy} style={btn(BTN_GREEN, '#fff')}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
               Copier

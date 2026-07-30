@@ -106,7 +106,7 @@ export default function Search() {
       {/* ── Header — premium deep-green, unified with the patient account ── */}
       <header style={{ background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.08), 0 8px 24px -12px rgba(6,32,23,0.55)', position: 'sticky', top: 0, zIndex: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 60 : 66, padding: isMobile ? '0 16px' : '0 28px', gap: isMobile ? 8 : 12 }}>
-          <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+          <button onClick={() => go('home')} aria-label="Tabibo — accueil" style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
             <BrandMark plain size={32} />
             <Wordmark size={21} />
           </button>
@@ -159,11 +159,11 @@ export default function Search() {
             </button>
           ) : (
             <>
-              <select value={scSpec} onChange={(e) => setState({ scSpec: e.target.value })} style={selectStyle}>
+              <select aria-label={tr('Spécialité', 'Specialty', 'التخصص')} value={scSpec} onChange={(e) => setState({ scSpec: e.target.value })} style={selectStyle}>
                 <option value="all">Toutes spécialités</option>
                 {SPEC_OPTS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
               </select>
-              <select value={scCity} onChange={(e) => setState({ scCity: e.target.value })} style={selectStyle}>
+              <select aria-label={tr('Ville', 'City', 'المدينة')} value={scCity} onChange={(e) => setState({ scCity: e.target.value })} style={selectStyle}>
                 <option value="all">{tr('Toutes les villes', 'All cities', 'كل المدن')}</option>
                 {CITY_OPTS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
               </select>
@@ -176,7 +176,7 @@ export default function Search() {
                 <span style={{ fontSize: 11 }}>{scConv ? '✓' : '○'}</span>
                 {tr('Conventionné', 'Insurance', 'مع التأمين')}
               </button>
-              <select value={scSort} onChange={(e) => setState({ scSort: e.target.value })} style={{ ...selectStyle, marginLeft: 'auto' }}>
+              <select aria-label={tr('Trier par', 'Sort by', 'ترتيب حسب')} value={scSort} onChange={(e) => setState({ scSort: e.target.value })} style={{ ...selectStyle, marginLeft: 'auto' }}>
                 <option value="pertinence">{tr('Pertinence', 'Relevance', 'الأنسب')}</option>
                 <option value="rating">Meilleures notes</option>
                 <option value="price_asc">{tr('Prix croissant', 'Price: low to high', 'السعر تصاعدياً')}</option>
@@ -198,13 +198,13 @@ export default function Search() {
             </div>
 
             <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: DARK, margin: '6px 0' }}>Spécialité</label>
-            <select value={scSpec} onChange={(e) => setState({ scSpec: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
+            <select aria-label={tr('Spécialité', 'Specialty', 'التخصص')} value={scSpec} onChange={(e) => setState({ scSpec: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
               <option value="all">Toutes spécialités</option>
               {SPEC_OPTS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
             </select>
 
             <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: DARK, margin: '14px 0 6px' }}>Ville</label>
-            <select value={scCity} onChange={(e) => setState({ scCity: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
+            <select aria-label={tr('Ville', 'City', 'المدينة')} value={scCity} onChange={(e) => setState({ scCity: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
               <option value="all">{tr('Toutes les villes', 'All cities', 'كل المدن')}</option>
               {CITY_OPTS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
             </select>
@@ -221,7 +221,7 @@ export default function Search() {
             </button>
 
             <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: DARK, margin: '14px 0 6px' }}>{tr('Trier par', 'Sort by', 'ترتيب حسب')}</label>
-            <select value={scSort} onChange={(e) => setState({ scSort: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
+            <select aria-label={tr('Trier par', 'Sort by', 'ترتيب حسب')} value={scSort} onChange={(e) => setState({ scSort: e.target.value })} style={{ ...selectStyle, width: '100%' }}>
               <option value="pertinence">{tr('Pertinence', 'Relevance', 'الأنسب')}</option>
               <option value="rating">Meilleures notes</option>
               <option value="price_asc">{tr('Prix croissant', 'Price: low to high', 'السعر تصاعدياً')}</option>

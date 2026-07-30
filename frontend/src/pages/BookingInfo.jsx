@@ -230,7 +230,7 @@ export default function BookingInfo() {
       {/* ── Header — premium deep-green, unified with the patient account ── */}
       <header style={{ background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)', boxShadow: '0 1px 0 rgba(255,255,255,0.08), 0 8px 24px -12px rgba(6,32,23,0.55)', position: 'sticky', top: 0, zIndex: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', height: 64, padding: '0 28px', gap: 12 }}>
-          <button onClick={() => go('home')} style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+          <button onClick={() => go('home')} aria-label="Tabibo — accueil" style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
             <BrandMark plain size={32} />
             <Wordmark size={21} />
           </button>

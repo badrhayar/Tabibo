@@ -443,7 +443,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
           ].map(f => (
             <div key={f.key}>
               <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>{f.label}</div>
-              <select value={f.value} onChange={e => f.set(e.target.value)}
+              <select aria-label={f.label} value={f.value} onChange={e => f.set(e.target.value)}
                 style={{ padding: '9px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: f.value ? DARK : MUTED, outline: 'none', cursor: 'pointer', minWidth: f.minWidth }}>
                 {f.opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
@@ -451,12 +451,12 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
           ))}
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Du</div>
-            <input type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
+            <input aria-label="Période — du" type="date" value={filterFrom} max={filterTo || undefined} onChange={e => setFilterFrom(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5 }}>Au</div>
-            <input type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
+            <input aria-label="Période — au" type="date" value={filterTo} min={filterFrom || undefined} onChange={e => setFilterTo(e.target.value)}
               style={{ padding: '8px 12px', border: `1px solid ${BORDER_STRONG}`, borderRadius: 9, fontSize: 13, background: '#fff', color: DARK, outline: 'none', cursor: 'pointer' }} />
           </div>
           <button onClick={resetFilters} disabled={!filtersActive} title="Réinitialiser les filtres"
