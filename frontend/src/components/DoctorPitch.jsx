@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BTN_GREEN } from '../shared.jsx';
 import { buildPrivacyPaper, PAPER_FILE } from '../lib/privacyPaper.js';
+import { VisibiliteVisual, RappelsVisual, TeleconsultVisual, NetworkVisual, SecuriteVisual } from './PitchMockups.jsx';
 import { pdfOpen } from '../lib/pdf.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -11,10 +12,23 @@ import { pdfOpen } from '../lib/pdf.js';
 // confrères » → « Vos données, protégées ». Chaque bloc alterne une vignette de
 // l'écran RÉEL et un texte à puces.
 //
-// Les visuels sont de VRAIES captures de l'application, produites par
-// `npm run shots` depuis la démonstration : pas de montage, pas d'écran
-// retouché, pas de photo de personne. Ce que le médecin voit sur cette page est
-// exactement ce qu'il trouvera dans l'application.
+// Les visuels sont de DEUX natures, et il faut savoir laquelle on regarde :
+//
+//   · `Shot` — de VRAIES captures de l'application, produites par
+//     `npm run shots` depuis la démonstration. Ni montage, ni retouche.
+//   · `Canvas` + PitchMockups.jsx — des RECONSTRUCTIONS vectorielles, pour les
+//     cinq écrans qui ne se capturent pas honnêtement : la page publique et les
+//     créneaux vus du téléphone du patient, le WhatsApp et le courriel reçus
+//     par le patient, l'appel vidéo, les trois faces du réseau confrères, et le
+//     schéma de cloisonnement des données.
+//
+// Aucune photo de personne dans les deux cas : les portraits de l'appel vidéo
+// sont dessinés. Une capture d'appel réel montrerait des visages, et une photo
+// de banque d'images ferait passer des inconnus pour nos patients.
+//
+// La règle qui tient l'ensemble : une reconstruction ne montre que ce qui
+// existe dans l'application. Elle peut vieillir mal — c'est le prix — mais elle
+// ne doit jamais promettre une fonction que le produit n'a pas.
 //
 // Le bandeau de repères mêle deux natures de chiffres, et le dit : les deux
 // premiers sont les effets ATTENDUS des rappels et de la réservation en ligne
@@ -56,6 +70,15 @@ const Frame = ({ children, tone = 'mint' }) => (
       {children}
     </div>
   </div>
+);
+/* Même fond que `Frame`, mais sans la carte blanche : les vignettes illustrées
+   de PitchMockups apportent leur propre habillage (téléphones, cartes, écran
+   d'appel). Les emboîter dans `Frame` ajouterait un cadre blanc parasite. */
+const Canvas = ({ children, pad = 20 }) => (
+  <div style={{
+    borderRadius: 20, padding: pad,
+    background: 'linear-gradient(150deg, #E9F6EF 0%, #DCF0E6 100%)',
+  }}>{children}</div>
 );
 const Bar = ({ label }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 12px', background: 'linear-gradient(90deg, #0C4A37 0%, #0A3D2D 100%)' }}>
@@ -244,7 +267,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} visual={<Shot src="profil-public" label="tabibo.ma/dr-…" alt={tr(lang, 'La page publique du cabinet, telle que le patient la voit', 'The practice’s public page, as the patient sees it', 'الصفحة العمومية للعيادة كما يراها المريض')} />} onMore={() => go && go('docregister')} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Canvas><VisibiliteVisual lang={lang} /></Canvas>} onMore={() => go && go('docregister')} groups={[{
             title: t('Une meilleure visibilité', 'Better visibility', 'حضور أفضل'),
             eyebrow: t('Votre page publique', 'Your public page', 'صفحتكم العمومية'),
             points: [
@@ -299,7 +322,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="rappels" label={tr(lang, 'Rappels de rendez-vous', 'Appointment reminders', 'تذكيرات المواعيد')} alt={tr(lang, 'Les rappels automatiques envoyés aux patients', 'The automatic reminders sent to patients', 'التذكيرات التلقائية المرسلة للمرضى')} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Canvas><RappelsVisual lang={lang} /></Canvas>} groups={[{
             title: t('Moins de rendez-vous manqués', 'Fewer missed appointments', 'مواعيد ضائعة أقل'),
             eyebrow: t('Confirmations et rappels', 'Confirmations and reminders', 'التأكيدات والتذكيرات'),
             points: [
@@ -331,7 +354,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             ],
           }]} />
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="consultation" label={tr(lang, 'Consultation en cours', 'Consultation in progress', 'استشارة جارية')} alt={tr(lang, 'L’écran de consultation, dossier ouvert', 'The consultation screen, record open', 'شاشة الاستشارة والملف مفتوح')} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Canvas><TeleconsultVisual lang={lang} /></Canvas>} groups={[{
             title: t('Soigner à distance', 'Care at a distance', 'العلاج عن بُعد'),
             eyebrow: t('Téléconsultation vidéo', 'Video teleconsultation', 'الاستشارة بالفيديو'),
             points: [
@@ -367,7 +390,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             </p>
           </div>
 
-          <Block isMobile={isMobile} lang={lang} visual={<Shot src="reseau" label="Tabibo Network" alt={tr(lang, 'La messagerie entre confrères', 'The colleague messenger', 'المراسلة بين الزملاء')} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} visual={<Canvas><NetworkVisual lang={lang} /></Canvas>} groups={[{
             eyebrow: t('Trouver et se relier', 'Find and connect', 'البحث والارتباط'),
             points: [
               t('Cherchez un confrère par spécialité et par ville dans l’annuaire des cabinets Tabibo, et demandez le lien. Il accepte — vous êtes reliés.',
@@ -412,7 +435,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             {t('Vos données, et celles de vos patients', 'Your data, and your patients’ data', 'بياناتكم وبيانات مرضاكم')}
           </SectionTitle>
 
-          <Block isMobile={isMobile} lang={lang} flip visual={<Shot src="donnees" label={tr(lang, 'Paramètres du cabinet', 'Practice settings', 'إعدادات العيادة')} alt={tr(lang, 'Les paramètres du cabinet et la sécurité du compte', 'Practice settings and account security', 'إعدادات العيادة وأمان الحساب')} />} groups={[{
+          <Block isMobile={isMobile} lang={lang} flip visual={<Canvas><SecuriteVisual lang={lang} /></Canvas>} groups={[{
             eyebrow: t('Chaque cabinet est cloisonné', 'Every practice is isolated', 'كل عيادة معزولة'),
             points: [
               t('Le cloisonnement est appliqué par la base de données elle-même, pas seulement par l’écran : une requête qui sortirait de votre cabinet ne renvoie rien.',
