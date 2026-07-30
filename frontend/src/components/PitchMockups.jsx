@@ -19,6 +19,7 @@
 //   Aucune image binaire : tout est vectoriel, net à toute résolution, et la
 //   page ne charge rien de plus.
 // ─────────────────────────────────────────────────────────────────────────────
+import { Fragment } from 'react';
 
 const DARK   = '#15314A';
 const BODY   = '#3A4A45';
@@ -576,14 +577,17 @@ export function SecuriteVisual({ lang = 'fr' }) {
           <div style={{ fontSize: 9, fontWeight: 900, color: DARK, marginBottom: 8 }}>
             {T('Chacun voit ce qui le concerne', 'Each person sees what concerns them', 'كل شخص يرى ما يخصّه')}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '5px 6px', alignItems: 'center' }}>
+          {/* Colonnes à parts égales : avec `1fr auto auto auto`, tout le mou
+              allait au libellé et les trois colonnes se collaient au bord
+              droit dès que le conteneur s'élargissait. */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '5px 6px', alignItems: 'center' }}>
             <span />
             {[T('Agenda', 'Agenda', 'الأجندة'), T('Dossiers', 'Records', 'الملفات'), T('Factures', 'Billing', 'الفوترة')].map((h) => (
               <span key={h} style={{ fontSize: 6.5, fontWeight: 800, color: MUTED, textAlign: 'center' }}>{h}</span>
             ))}
             {[[T('Médecin', 'Doctor', 'الطبيب'), 1, 1, 1], [T('Secrétaire', 'Secretary', 'السكرتيرة'), 1, 0, 0], [T('Patient', 'Patient', 'المريض'), 2, 2, 0]].map(([who, a, b, c]) => (
-              <>
-                <span key={who} style={{ fontSize: 7.5, fontWeight: 800, color: DARK }}>{who}</span>
+              <Fragment key={who}>
+                <span style={{ fontSize: 7.5, fontWeight: 800, color: DARK }}>{who}</span>
                 {[a, b, c].map((v, i) => (
                   <span key={who + i} style={{ textAlign: 'center' }}>
                     {v === 1
@@ -593,7 +597,7 @@ export function SecuriteVisual({ lang = 'fr' }) {
                         : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#CFD8D4" strokeWidth="3" strokeLinecap="round"><path d="M7 7l10 10M17 7L7 17" /></svg>}
                   </span>
                 ))}
-              </>
+              </Fragment>
             ))}
           </div>
           <div style={{ fontSize: 6.5, color: MUTED, fontWeight: 700, marginTop: 7 }}>
@@ -637,6 +641,229 @@ export function SecuriteVisual({ lang = 'fr' }) {
           <span style={{ fontSize: 8, fontWeight: 800, color: DARK }}>
             {T('Loi n° 09-08 · déclaré et contrôlé par la CNDP', 'Law 09-08 · declared to and overseen by the CNDP', 'القانون 09-08 · مُصرَّح به لدى CNDP')}
           </span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ═══ Briques partagées par « Pour les médecins » et « Pour les patients » ═══
+
+/* Le fond menthe des vignettes, sans carte blanche : les visuels ci-dessus
+   apportent déjà leur habillage. */
+export const Canvas = ({ children, pad = 20 }) => (
+  <div style={{ borderRadius: 20, padding: pad, background: 'linear-gradient(150deg, #E9F6EF 0%, #DCF0E6 100%)' }}>
+    {children}
+  </div>
+);
+
+/* Bandeau de repères chiffrés. Même traitement que « Pour les médecins » :
+   une teinte par carte, un halo décalé, l'icône sur pastille blanche. */
+export const MetricBand = ({ items, isMobile, note, cols }) => (
+  <>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : `repeat(${cols || items.length}, 1fr)`, gap: isMobile ? 12 : 16 }}>
+      {items.map((m) => (
+        <div key={m.big} style={{
+          position: 'relative', overflow: 'hidden', textAlign: 'center',
+          background: `linear-gradient(160deg, ${m.tint} 0%, #FFFFFF 62%)`,
+          border: `1px solid ${m.tint}`, borderRadius: 18,
+          padding: isMobile ? '18px 12px' : '22px 16px',
+          boxShadow: '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -24px rgba(16,42,32,0.22)',
+        }}>
+          <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.06 }} />
+          {m.icon && (
+            <span style={{ position: 'relative', display: 'inline-flex', width: 38, height: 38, borderRadius: 12, background: '#fff', color: m.color, alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: `0 8px 18px -10px ${m.color}` }}>{m.icon}</span>
+          )}
+          <div style={{ position: 'relative', fontSize: isMobile ? 25 : 32, fontWeight: 900, color: m.color, letterSpacing: '-1px', lineHeight: 1.1 }}>{m.big}</div>
+          <div style={{ position: 'relative', fontSize: isMobile ? 11.5 : 12.5, color: BODY, marginTop: 7, lineHeight: 1.5 }}>{m.sub}</div>
+        </div>
+      ))}
+    </div>
+    {note && (
+      <p style={{ fontSize: isMobile ? 11 : 11.5, color: MUTED, textAlign: 'center', margin: '16px auto 0', maxWidth: 720, lineHeight: 1.6 }}>{note}</p>
+    )}
+  </>
+);
+
+/* Vignette + texte à puces, alternés — le même rythme que la page médecins. */
+export const FeatureBlock = ({ visual, title, eyebrow, points, isMobile, flip }) => {
+  const Arrow = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 3 }}>
+      <path d="M4 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 22 : 56, alignItems: 'center', marginBottom: isMobile ? 44 : 78 }}>
+      <div style={{ order: isMobile ? 0 : (flip ? 1 : 0) }}>{visual}</div>
+      <div style={{ order: isMobile ? 1 : (flip ? 0 : 1) }}>
+        <h3 style={{ fontSize: isMobile ? 21 : 26, fontWeight: 800, color: DARK, margin: '0 0 14px', letterSpacing: '-0.4px', lineHeight: 1.25 }}>{title}</h3>
+        {eyebrow && <div style={{ fontSize: 13.5, fontWeight: 800, color: DARK, marginBottom: 10 }}>{eyebrow}</div>}
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 11 }}>
+          {points.map((p, j) => (
+            <li key={j} style={{ display: 'flex', gap: 10, fontSize: 14.5, color: BODY, lineHeight: 1.62 }}>
+              <Arrow /><span>{p}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+// ═══ Dossier du patient — ses documents, sur son téléphone ══════════════════
+export function DossierPatientVisual({ lang = 'fr' }) {
+  const T = (fr, en, ar) => tr(lang, fr, en, ar);
+  const doc = (icon, name, meta, tintBg, tintFg) => (
+    <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 0', borderBottom: '1px solid #F1F5F3' }}>
+      <span style={{ width: 22, height: 22, borderRadius: 6, background: tintBg, color: tintFg, display: 'grid', placeItems: 'center', fontSize: 10, flexShrink: 0 }}>{icon}</span>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 8, fontWeight: 900, color: DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+        <div style={{ fontSize: 7, color: MUTED, fontWeight: 600 }}>{meta}</div>
+      </div>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.4" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>
+    </div>
+  );
+  return (
+    <>
+      <Style />
+      <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        <Phone>
+          <PhoneHead>{T('Mon dossier', 'My record', 'ملفي')}</PhoneHead>
+          <div style={{ padding: 11 }}>
+            <div style={{ display: 'flex', gap: 9, alignItems: 'center', paddingBottom: 8, borderBottom: '1px solid #F1F5F3' }}>
+              <Avatar size={36} seed={3} />
+              <div>
+                <div style={{ fontSize: 9.5, fontWeight: 900, color: DARK }}>Fatima Zahra Benali</div>
+                <div style={{ fontSize: 7.5, color: MUTED, fontWeight: 700 }}>34 {T('ans', 'years', 'سنة')} · {T('Groupe', 'Blood', 'الفصيلة')} O+</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+              {[[T('Documents', 'Documents', 'وثائق'), '12'], [T('Ordonnances', 'Prescriptions', 'وصفات'), '4'], [T('Analyses', 'Lab results', 'تحاليل'), '7']].map(([l, n]) => (
+                <div key={l} style={{ flex: 1, background: LIGHT, borderRadius: 6, padding: '5px 3px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: GREEN, lineHeight: 1 }}>{n}</div>
+                  <div style={{ fontSize: 6.5, color: MUTED, fontWeight: 700, marginTop: 2 }}>{l}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ fontSize: 7.5, fontWeight: 900, color: DARK, margin: '9px 0 2px' }}>{T('Récents', 'Recent', 'الأحدث')}</div>
+            {doc('℞', T('Ordonnance — Dr El Amrani', 'Prescription — Dr El Amrani', 'وصفة — د. العمراني'), T('5 août · PDF', '5 Aug · PDF', '5 غشت · PDF'), '#EFEAFB', '#6B57A6')}
+            {doc('🧪', T('Bilan lipidique', 'Lipid panel', 'تحليل الدهون'), T('28 juillet · Laboratoire Ibn Sina', '28 July · Ibn Sina Lab', '28 يوليوز · مختبر ابن سينا'), '#E3F5FA', '#0891B2')}
+            {doc('📄', T('Compte rendu — échographie', 'Report — ultrasound', 'تقرير — تصوير'), T('14 juillet · 2 pages', '14 July · 2 pages', '14 يوليوز · صفحتان'), '#FDF1E0', '#B45309')}
+
+            <div style={{ background: LIGHT, borderRadius: 7, padding: 7, marginTop: 9 }}>
+              <div style={{ fontSize: 7.5, fontWeight: 900, color: GREEN }}>🔒 {T('Vous seul y accédez', 'Only you can see it', 'أنتم وحدكم ترونه')}</div>
+              <div style={{ fontSize: 7, color: BODY, fontWeight: 600, lineHeight: 1.45, marginTop: 2 }}>
+                {T('Un médecin ne voit que ce que vous lui montrez en consultation.', 'A doctor sees only what you show them in consultation.', 'الطبيب لا يرى إلا ما تعرضونه عليه أثناء الاستشارة.')}
+              </div>
+            </div>
+          </div>
+        </Phone>
+
+        <Phone>
+          <PhoneHead>{T('Mes rendez-vous', 'My appointments', 'مواعيدي')}</PhoneHead>
+          <div style={{ padding: 11 }}>
+            <div className="tb-anim" style={{ background: LIGHT, border: `1px solid #BFE3D0`, borderRadius: 8, padding: 8, animation: 'tbSlide .6s ease-out both' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Dot /><span style={{ fontSize: 7, fontWeight: 900, color: GREEN }}>{T('À venir', 'Upcoming', 'قادم')}</span>
+              </div>
+              <div style={{ fontSize: 9.5, fontWeight: 900, color: DARK, marginTop: 3 }}>Dr Nadia El Amrani</div>
+              <div style={{ fontSize: 7.5, color: MUTED, fontWeight: 700 }}>{T('Cardiologue', 'Cardiologist', 'طبيبة قلب')}</div>
+              <div style={{ fontSize: 8, fontWeight: 900, color: DARK, marginTop: 5 }}>📅 {T('Mar. 5 août · 14:30', 'Tue 5 Aug · 14:30', 'الثلاثاء 5 غشت · 14:30')}</div>
+              <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+                <span style={{ flex: 1, textAlign: 'center', background: GREEN, color: '#fff', borderRadius: 5, padding: '4px 0', fontSize: 7, fontWeight: 900 }}>{T('Itinéraire', 'Directions', 'الاتجاهات')}</span>
+                <span style={{ flex: 1, textAlign: 'center', background: '#fff', color: GREEN, border: '1px solid #BFE3D0', borderRadius: 5, padding: '4px 0', fontSize: 7, fontWeight: 900 }}>{T('Reporter', 'Reschedule', 'تأجيل')}</span>
+              </div>
+            </div>
+
+            <div style={{ fontSize: 7.5, fontWeight: 900, color: DARK, margin: '9px 0 3px' }}>{T('Pour un proche', 'For a family member', 'لأحد الأقارب')}</div>
+            {[['Youssef', '8 ' + T('ans', 'yrs', 'سنوات'), 4], ['Mme Rkia', '67 ' + T('ans', 'yrs', 'سنة'), 1]].map(([n, a, s]) => (
+              <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 0', borderBottom: '1px solid #F1F5F3' }}>
+                <Avatar size={20} seed={s} ring={false} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 8, fontWeight: 900, color: DARK }}>{n}</div>
+                  <div style={{ fontSize: 7, color: MUTED, fontWeight: 600 }}>{a}</div>
+                </div>
+                <Chip>{T('Réserver', 'Book', 'حجز')}</Chip>
+              </div>
+            ))}
+
+            <div style={{ fontSize: 7.5, fontWeight: 900, color: DARK, margin: '9px 0 3px' }}>{T('Passés', 'Past', 'سابقة')}</div>
+            <Row k="Dr K. Benali" v={T('12 juin', '12 June', '12 يونيو')} />
+            <Row k="Dr S. Idrissi" v={T('3 mai', '3 May', '3 ماي')} />
+          </div>
+        </Phone>
+      </div>
+    </>
+  );
+}
+
+// ═══ Avis vérifiés — un avis suppose une consultation terminée ══════════════
+export function AvisVerifiesVisual({ lang = 'fr' }) {
+  const T = (fr, en, ar) => tr(lang, fr, en, ar);
+  const review = (seed, name, when, stars, text) => (
+    <div key={name} style={{ padding: '8px 0', borderTop: '1px solid #F1F5F3' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <Avatar size={22} seed={seed} ring={false} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 8, fontWeight: 900, color: DARK }}>{name}</div>
+          <div style={{ fontSize: 6.5, color: MUTED, fontWeight: 700 }}>{when}</div>
+        </div>
+        <span style={{ fontSize: 8, fontWeight: 900, color: '#D9A400' }}>{'★'.repeat(stars)}</span>
+      </div>
+      <div style={{ fontSize: 7.5, color: BODY, lineHeight: 1.5, marginTop: 4 }}>{text}</div>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 6.5, fontWeight: 800, color: GREEN, background: LIGHT, borderRadius: 20, padding: '2px 6px', marginTop: 4 }}>
+        ✓ {T('Consultation vérifiée', 'Verified consultation', 'استشارة موثّقة')}
+      </span>
+    </div>
+  );
+  return (
+    <>
+      <Style />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+
+        <div style={{ background: '#fff', borderRadius: 11, padding: 12, boxShadow: '0 10px 24px -16px rgba(9,50,38,.5)' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 24, fontWeight: 900, color: DARK, lineHeight: 1 }}>4,9</span>
+            <span style={{ fontSize: 11, fontWeight: 900, color: '#D9A400' }}>★★★★★</span>
+            <span style={{ fontSize: 8, color: MUTED, fontWeight: 700 }}>128 {T('avis', 'reviews', 'رأي')}</span>
+          </div>
+          {[[5, 88], [4, 9], [3, 2], [2, 1], [1, 0]].map(([s, pct]) => (
+            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 }}>
+              <span style={{ fontSize: 7, color: MUTED, fontWeight: 800, width: 8 }}>{s}</span>
+              <span style={{ flex: 1, height: 4, borderRadius: 2, background: '#F1F5F3', overflow: 'hidden' }}>
+                <span style={{ display: 'block', width: `${pct}%`, height: '100%', background: '#D9A400', borderRadius: 2 }} />
+              </span>
+              <span style={{ fontSize: 6.5, color: MUTED, fontWeight: 700, width: 18, textAlign: 'right' }}>{pct} %</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: 11, padding: 12, boxShadow: '0 10px 24px -16px rgba(9,50,38,.5)' }}>
+          {review(3, 'Fatima Zahra B.', T('il y a 3 jours', '3 days ago', 'قبل 3 أيام'), 5,
+            T('Ponctuelle, à l’écoute, explications claires. La réservation en ligne m’a évité trois appels.',
+              'Punctual, attentive, clear explanations. Online booking saved me three phone calls.',
+              'دقيقة في المواعيد، مُنصتة، شرح واضح. الحجز عبر الإنترنت وفّر عليّ ثلاث مكالمات.'))}
+          {review(2, 'Karim T.', T('il y a 2 semaines', '2 weeks ago', 'قبل أسبوعين'), 5,
+            T('Cabinet propre, peu d’attente. Le rappel WhatsApp la veille est très pratique.',
+              'Clean practice, little waiting. The WhatsApp reminder the day before is very handy.',
+              'عيادة نظيفة، انتظار قليل. تذكير واتساب في اليوم السابق مفيد جداً.'))}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: LIGHT, borderRadius: 11, padding: '10px 12px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+            <path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6z" /><path d="M9.5 12l1.8 1.8 3.4-3.4" />
+          </svg>
+          <div>
+            <div style={{ fontSize: 8.5, fontWeight: 900, color: DARK }}>{T('Pourquoi ces avis sont fiables', 'Why these reviews are reliable', 'لماذا هذه الآراء موثوقة')}</div>
+            <div style={{ fontSize: 7.5, color: BODY, fontWeight: 600, lineHeight: 1.5, marginTop: 2 }}>
+              {T('Un avis n’est possible qu’après une consultation réellement terminée, et une seule fois par rendez-vous. La règle est appliquée par la base de données.',
+                 'A review is only possible after a consultation that actually took place, once per appointment. The rule is enforced by the database.',
+                 'لا يُمكن ترك رأي إلا بعد استشارة تمّت فعلاً، ومرة واحدة لكل موعد. القاعدة مطبَّقة في قاعدة البيانات.')}
+            </div>
+          </div>
         </div>
       </div>
     </>

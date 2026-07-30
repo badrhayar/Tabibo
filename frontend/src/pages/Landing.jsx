@@ -432,15 +432,26 @@ export default function Landing() {
 
         {/* Stats strip — 2 cols on mobile */}
         <div style={{ position: 'relative', maxWidth: 1180, margin: `${isMobile ? 36 : 60}px auto 0`, display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isPhone ? 12 : 18 }}>
+          {/* Teintes reprises du bandeau de repères de « Pour les médecins » :
+              même famille de couleurs d'un bout à l'autre du site. Seules les
+              couleurs changent ici — contour, rayon, retraits et tailles de
+              texte restent ceux d'origine. */}
           {[
-            { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية') },
-            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص') },
-            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد') },
-            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى') },
+            { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#E7F6EE', color: '#0E7C52' },
+            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#E3F5FA', color: '#0891B2' },
+            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#FDF1E0', color: '#B45309' },
+            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#EFEAFB', color: '#6B57A6' },
           ].map((s, i) => (
-            <div key={i} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isPhone ? '14px 14px' : '18px 22px', textAlign: 'center', boxShadow: '0 1px 3px rgba(13,43,30,0.05)' }}>
-              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: isPhone ? 22 : 26, fontWeight: 800, color: PRIMARY, letterSpacing: '-0.5px' }}>{s.v}</div>
-              <div style={{ fontSize: 12.5, color: MUTED, marginTop: 3, fontWeight: 500 }}>{s.l}</div>
+            <div key={i} style={{
+              position: 'relative', overflow: 'hidden',
+              background: `linear-gradient(160deg, ${s.tint} 0%, #FFFFFF 62%)`,
+              border: `1px solid ${s.tint}`, borderRadius: 16,
+              padding: isPhone ? '14px 14px' : '18px 22px', textAlign: 'center',
+              boxShadow: '0 1px 3px rgba(13,43,30,0.05)',
+            }}>
+              <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -28, top: -38, width: 100, height: 100, borderRadius: '50%', background: s.color, opacity: 0.06 }} />
+              <div style={{ position: 'relative', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: isPhone ? 22 : 26, fontWeight: 800, color: s.color, letterSpacing: '-0.5px' }}>{s.v}</div>
+              <div style={{ position: 'relative', fontSize: 12.5, color: MUTED, marginTop: 3, fontWeight: 500 }}>{s.l}</div>
             </div>
           ))}
         </div>
@@ -458,14 +469,17 @@ export default function Landing() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isPhone ? 16 : 26 }}>
+            {/* Même famille de teintes que la bande de chiffres ci-dessus.
+                Rien d'autre ne bouge : dimensions, ombres, numéro en filigrane
+                et pastille d'icône gardent leur géométrie. */}
             {[
-              { icon: 'search', title: t.s1t, sub: t.s1s, num: '01' },
-              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02' },
-              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03' },
+              { icon: 'search', title: t.s1t, sub: t.s1s, num: '01', tint: '#E7F6EE', color: '#0E7C52' },
+              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#E3F5FA', color: '#0891B2' },
+              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#EFEAFB', color: '#6B57A6' },
             ].map((step, i) => (
-              <div key={i} className="sa-lift" style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.08)' }}>
-                <div style={{ position: 'absolute', top: 14, [rtl ? 'left' : 'right']: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: '#EEF5F1', lineHeight: 1 }}>{step.num}</div>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(140deg, #E7F6EE, #D5EFE1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, marginBottom: 20, boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.7)' }}><Icon name={step.icon} size={26} /></div>
+              <div key={i} className="sa-lift" style={{ background: `linear-gradient(160deg, ${step.tint} 0%, #FFFFFF 62%)`, border: `1px solid ${step.tint}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.08)' }}>
+                <div style={{ position: 'absolute', top: 14, [rtl ? 'left' : 'right']: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: step.color, opacity: 0.13, lineHeight: 1 }}>{step.num}</div>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: step.color, marginBottom: 20, boxShadow: `0 8px 18px -10px ${step.color}` }}><Icon name={step.icon} size={26} /></div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: DARK, marginBottom: 9 }}>{step.title}</h3>
                 <p style={{ fontSize: 14.5, color: BODY, lineHeight: 1.62, margin: 0 }}>{step.sub}</p>
               </div>

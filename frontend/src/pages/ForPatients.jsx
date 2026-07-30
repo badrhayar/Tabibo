@@ -5,6 +5,8 @@ import Icon from '../components/Icon';
 import MarketingHeader from '../components/MarketingHeader';
 import MarketingFooter from '../components/MarketingFooter';
 import SecurityTrust from '../components/SecurityTrust';
+import { Canvas, MetricBand, FeatureBlock, VisibiliteVisual, RappelsVisual,
+         DossierPatientVisual, AvisVerifiesVisual, SecuriteVisual } from '../components/PitchMockups.jsx';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -21,6 +23,14 @@ const PinIcon = ({ size = 13 }) => (
     <circle cx="12" cy="10" r="3" />
   </svg>
 );
+
+const MIC = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' };
+const PIC = {
+  pin:    <svg {...MIC}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z" /><circle cx="12" cy="10" r="3" /></svg>,
+  stetho: <svg {...MIC}><path d="M6 3v6a5 5 0 0 0 10 0V3" /><path d="M4 3h3M15 3h3" /><path d="M11 14v2a5 5 0 0 0 10 0v-1" /><circle cx="21" cy="13" r="2" /></svg>,
+  clock:  <svg {...MIC}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.2V12l3.4 2.2" /></svg>,
+  wallet: <svg {...MIC}><rect x="3" y="6" width="18" height="13" rx="2.5" /><path d="M3 10h18" /><circle cx="17" cy="14.5" r="1.2" /></svg>,
+};
 
 export default function ForPatients() {
   const { state, go } = useApp();
@@ -278,6 +288,45 @@ export default function ForPatients() {
         </div>
       </section>
 
+      {/* Repères chiffrés + protection des données, sous la carte.
+          Mêmes teintes que « Pour les médecins » : une seule famille de
+          couleurs sur tout le site. */}
+      <section style={{ padding: isMobile ? '32px 16px 0' : '48px 24px 0', background: '#fff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <MetricBand
+            isMobile={isMobile}
+            cols={4}
+            items={[
+              { big: `${CITY_COUNT}`, icon: PIC.pin, tint: '#E7F6EE', color: '#0E7C52',
+                sub: lang === 'ar' ? 'مدينة مغربية مغطاة' : lang === 'en' ? 'Moroccan cities covered' : 'villes du Maroc couvertes' },
+              { big: '50+', icon: PIC.stetho, tint: '#E3F5FA', color: '#0891B2',
+                sub: lang === 'ar' ? 'تخصصاً طبياً' : lang === 'en' ? 'medical specialties' : 'spécialités médicales' },
+              { big: '24 h/24', icon: PIC.clock, tint: '#FDF1E0', color: '#B45309',
+                sub: lang === 'ar' ? 'احجزوا متى شئتم، دون اتصال' : lang === 'en' ? 'book whenever you want, without calling' : 'réservez quand vous voulez, sans appeler' },
+              { big: lang === 'ar' ? 'مجاني' : lang === 'en' ? 'Free' : 'Gratuit', icon: PIC.wallet, tint: '#EFEAFB', color: '#6B57A6',
+                sub: lang === 'ar' ? 'للمرضى — لا رسوم حجز' : lang === 'en' ? 'for patients — no booking fee' : 'pour les patients — aucun frais de réservation' },
+            ]}
+          />
+
+          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: DARK, textAlign: 'center', margin: isMobile ? '38px 0 8px' : '60px 0 10px', letterSpacing: '-0.3px' }}>
+            {lang === 'ar' ? 'بياناتكم الصحية تخصّكم' : lang === 'en' ? 'Your health data belongs to you' : 'Vos données de santé vous appartiennent'}
+          </h2>
+          <p style={{ textAlign: 'center', color: MUTED, fontSize: 15, margin: '0 auto 26px', maxWidth: 620, lineHeight: 1.6 }}>
+            {lang === 'ar'
+              ? 'ليست وعوداً: هكذا يعمل الحاجز بين العيادات، ومن يرى ماذا.'
+              : lang === 'en'
+              ? 'Not a promise — here is how the partition between practices works, and who sees what.'
+              : 'Ce ne sont pas des promesses : voici comment le cloisonnement entre cabinets fonctionne, et qui voit quoi.'}
+          </p>
+          {/* Le schéma a été dessiné pour une colonne de demi-largeur (page
+              médecins). Étiré sur 1100 px, le tableau des rôles se disloque :
+              on le borne plutôt que de le redessiner. */}
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+            <Canvas><SecuriteVisual lang={lang} /></Canvas>
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section style={{ padding: '56px 24px 72px', background: '#fff' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -287,36 +336,88 @@ export default function ForPatients() {
           <p style={{ textAlign: 'center', whiteSpace: isMobile ? 'normal' : 'nowrap', color: MUTED, fontSize: 15, marginBottom: 40 }}>
             {lang === 'ar' ? 'مزايا مصممة لتجربة صحية أفضل' : lang === 'en' ? 'Features designed for a better health experience' : 'Des fonctionnalités pensées pour une meilleure expérience santé'}
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 14 : 24 }}>
-            {features.map((f, i) => (
-              <div
-                key={i}
-                style={{
-                  background: BG, border: `1px solid ${BORDER}`,
-                  borderRadius: 16, padding: '28px 28px',
-                  display: 'flex', gap: 20, alignItems: 'flex-start',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                }}
-              >
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-                  background: '#EAF6F0',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: PRIMARY,
-                }}>
-                  <Icon name={f.icon} size={24} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: DARK, marginBottom: 8, marginTop: 2 }}>
-                    {f.title}
-                  </h3>
-                  <p style={{ fontSize: 14, color: BODY, lineHeight: 1.65, margin: 0 }}>
-                    {f.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Même rythme que « Pour les médecins » : une vignette illustrée
+              face à un texte à puces, alternés. Les quatre sujets sont ceux
+              des anciennes cartes, développés. */}
+          <FeatureBlock
+            isMobile={isMobile}
+            visual={<Canvas><VisibiliteVisual lang={lang} /></Canvas>}
+            title={features[0].title}
+            eyebrow={lang === 'ar' ? 'من هاتفكم' : lang === 'en' ? 'From your phone' : 'Depuis votre téléphone'}
+            points={[
+              features[0].desc,
+              lang === 'ar'
+                ? 'ترون قبل الحجز: السعر، اللغات المتحدَّث بها، التغطية CNSS/CNOPS والعنوان.'
+                : lang === 'en'
+                ? 'Before booking you see the fee, the languages spoken, CNSS/CNOPS coverage and the address.'
+                : 'Avant de réserver vous voyez le tarif, les langues parlées, les conventions CNSS/CNOPS et l’adresse.',
+              lang === 'ar'
+                ? 'أوقات الصلاة محجوزة في جدول الطبيب — لن تُقترح عليكم.'
+                : lang === 'en'
+                ? 'Prayer times are reserved in the doctor’s calendar — they are never offered to you.'
+                : 'Les heures de prière sont réservées dans l’agenda du médecin — elles ne vous sont jamais proposées.',
+            ]}
+          />
+
+          <FeatureBlock
+            isMobile={isMobile} flip
+            visual={<Canvas><RappelsVisual lang={lang} /></Canvas>}
+            title={features[1].title}
+            eyebrow={lang === 'ar' ? 'واتساب والبريد' : lang === 'en' ? 'WhatsApp and email' : 'WhatsApp et courriel'}
+            points={[
+              features[1].desc,
+              lang === 'ar'
+                ? 'تأكيد فوري عند الحجز، ثم تذكير قبل الموعد — على القناتين الأكثر قراءة في المغرب.'
+                : lang === 'en'
+                ? 'Immediate confirmation when you book, then a reminder before the date — on the two channels actually read in Morocco.'
+                : 'Confirmation immédiate à la réservation, puis rappel avant l’échéance — sur les deux canaux réellement lus au Maroc.',
+              lang === 'ar'
+                ? 'يمكنكم التأكيد أو التأجيل من الرسالة نفسها، دون فتح التطبيق.'
+                : lang === 'en'
+                ? 'You can confirm or reschedule straight from the message, without opening the app.'
+                : 'Vous confirmez ou reportez depuis le message lui-même, sans ouvrir l’application.',
+            ]}
+          />
+
+          <FeatureBlock
+            isMobile={isMobile}
+            visual={<Canvas><DossierPatientVisual lang={lang} /></Canvas>}
+            title={features[2].title}
+            eyebrow={lang === 'ar' ? 'وثائقكم ومواعيدكم' : lang === 'en' ? 'Your documents and appointments' : 'Vos documents et vos rendez-vous'}
+            points={[
+              features[2].desc,
+              lang === 'ar'
+                ? 'يمكنكم الحجز لأحد أقاربكم — طفل أو والد — من نفس الحساب.'
+                : lang === 'en'
+                ? 'You can book for a relative — a child, a parent — from the same account.'
+                : 'Vous pouvez réserver pour un proche — un enfant, un parent — depuis le même compte.',
+              lang === 'ar'
+                ? 'الطبيب لا يرى إلا ما تعرضونه عليه أثناء الاستشارة.'
+                : lang === 'en'
+                ? 'A doctor sees only what you show them during the consultation.'
+                : 'Un médecin ne voit que ce que vous lui montrez en consultation.',
+            ]}
+          />
+
+          <FeatureBlock
+            isMobile={isMobile} flip
+            visual={<Canvas><AvisVerifiesVisual lang={lang} /></Canvas>}
+            title={features[3].title}
+            eyebrow={lang === 'ar' ? 'رأي = استشارة تمّت' : lang === 'en' ? 'A review means a real visit' : 'Un avis suppose une visite réelle'}
+            points={[
+              features[3].desc,
+              lang === 'ar'
+                ? 'لا يمكن ترك رأي إلا بعد استشارة انتهت فعلاً، ومرة واحدة لكل موعد.'
+                : lang === 'en'
+                ? 'A review is only possible after a consultation that actually took place, once per appointment.'
+                : 'Un avis n’est possible qu’après une consultation réellement terminée, et une seule fois par rendez-vous.',
+              lang === 'ar'
+                ? 'القاعدة مطبَّقة في قاعدة البيانات، لا في الواجهة فقط — لا يمكن شراء الآراء.'
+                : lang === 'en'
+                ? 'The rule is enforced by the database, not just the screen — reviews cannot be bought.'
+                : 'La règle est appliquée par la base de données, pas seulement par l’écran — les avis ne s’achètent pas.',
+            ]}
+          />
         </div>
       </section>
 
