@@ -13,7 +13,7 @@ const DARK = '#15314A';
 const BG = '#F4F8F5';
 const BORDER = '#EAEFEC';
 const MUTED = '#6B7B76';
-const GRAD = 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)';
+const BODY = '#5A6B65';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EDIT THESE with your real company details before launch.
@@ -63,7 +63,8 @@ function InfoCard({ icon, label, value, href }) {
 }
 
 export default function Contact() {
-  const { go } = useApp();
+  const { state, go } = useApp();
+  const lang = state.lang;
   const { isMobile } = useViewport();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   // Le formulaire ouvre la messagerie du visiteur. Si aucune application n'est
@@ -109,13 +110,26 @@ export default function Contact() {
     <div style={{ fontFamily: 'Inter, sans-serif', background: BG, minHeight: '100vh' }}>
       <MarketingHeader activeKey="contact" audience="patient" />
 
-      {/* Hero */}
-      <div style={{ background: GRAD, color: '#fff', padding: isMobile ? '40px 16px' : '56px 24px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: isMobile ? 28 : 38, fontWeight: 800, margin: '0 0 10px', letterSpacing: '-0.8px' }}>Contactez-nous</h1>
-        <p style={{ fontSize: isMobile ? 14.5 : 17, color: 'rgba(255,255,255,0.9)', margin: 0, maxWidth: 560, marginInline: 'auto', lineHeight: 1.6 }}>
-          Une question, un partenariat ou besoin d’aide ? Notre équipe est à votre écoute.
-        </p>
-      </div>
+      {/* Hero — même traitement clair que les autres pages vitrine (À propos,
+          Pour les patients…). L'ancien bandeau vert plein faisait exception. */}
+      <section style={{ background: 'linear-gradient(180deg, #EAF6F0 0%, #F4F8F5 100%)', padding: isMobile ? '44px 16px 40px' : '80px 24px 64px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#D4F0E5', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 700, color: '#0D7A50', marginBottom: 20 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z" /></svg>
+            <span>{lang === 'ar' ? 'اتصلوا بنا' : lang === 'en' ? 'Contact us' : 'Nous contacter'}</span>
+          </div>
+          <h1 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 800, color: DARK, margin: '0 0 16px', letterSpacing: '-0.4px', lineHeight: 1.15 }}>
+            {lang === 'ar' ? 'اتصلوا بنا' : lang === 'en' ? 'Contact us' : 'Contactez-nous'}
+          </h1>
+          <p style={{ fontSize: 17, color: BODY, margin: '0 auto', maxWidth: 560, lineHeight: 1.65 }}>
+            {lang === 'ar'
+              ? 'سؤال، شراكة أو حاجة للمساعدة؟ فريقنا في خدمتكم.'
+              : lang === 'en'
+              ? 'A question, a partnership or need help? Our team is here for you.'
+              : 'Une question, un partenariat ou besoin d’aide ? Notre équipe est à votre écoute.'}
+          </p>
+        </div>
+      </section>
 
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: isMobile ? '28px 16px' : '48px 24px' }}>
         {/* Contact info cards */}
