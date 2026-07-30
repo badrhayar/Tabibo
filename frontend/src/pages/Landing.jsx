@@ -438,9 +438,9 @@ export default function Landing() {
               texte restent ceux d'origine. */}
           {[
             { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#E7F6EE', color: '#0E7C52' },
-            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#E3F5FA', color: '#0891B2' },
-            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#FDF1E0', color: '#B45309' },
-            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#EFEAFB', color: '#6B57A6' },
+            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#E7F6EE', color: '#0E7C52' },
+            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#E7F6EE', color: '#0E7C52' },
+            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#E7F6EE', color: '#0E7C52' },
           ].map((s, i) => (
             <div key={i} style={{
               position: 'relative', overflow: 'hidden',
@@ -474,8 +474,8 @@ export default function Landing() {
                 et pastille d'icône gardent leur géométrie. */}
             {[
               { icon: 'search', title: t.s1t, sub: t.s1s, num: '01', tint: '#E7F6EE', color: '#0E7C52' },
-              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#E3F5FA', color: '#0891B2' },
-              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#EFEAFB', color: '#6B57A6' },
+              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#E7F6EE', color: '#0E7C52' },
+              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#E7F6EE', color: '#0E7C52' },
             ].map((step, i) => (
               <div key={i} className="sa-lift" style={{ background: `linear-gradient(160deg, ${step.tint} 0%, #FFFFFF 62%)`, border: `1px solid ${step.tint}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.08)' }}>
                 <div style={{ position: 'absolute', top: 14, [rtl ? 'left' : 'right']: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: step.color, opacity: 0.13, lineHeight: 1 }}>{step.num}</div>

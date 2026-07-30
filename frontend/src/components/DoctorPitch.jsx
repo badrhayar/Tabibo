@@ -169,11 +169,11 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
   //   objectifs, et la note sous le bandeau le dit en toutes lettres. Les trois
   //   suivants sont des caractéristiques vérifiables du produit.
   const MARKERS = [
-    { big: '40 %', icon: MI.noshow, tint: '#FCE7EE', color: '#C2263F',
+    { big: '40 %', icon: MI.noshow, tint: '#E7F6EE', color: '#0E7C52',
       sub: t('de rendez-vous manqués en moins, grâce aux rappels automatiques',
              'fewer missed appointments, thanks to automatic reminders',
              'مواعيد ضائعة أقل، بفضل التذكيرات التلقائية') },
-    { big: '16 h', icon: MI.clock, tint: '#FDF1E0', color: '#B45309',
+    { big: '16 h', icon: MI.clock, tint: '#E7F6EE', color: '#0E7C52',
       sub: t('de travail administratif en moins par semaine',
              'less administrative work per week',
              'من العمل الإداري أقل في الأسبوع') },
@@ -181,11 +181,11 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       sub: t('vos patients réservent quand ils veulent, sans appeler',
              'your patients book whenever they want, without calling',
              'مرضاكم يحجزون في أي وقت، دون اتصال') },
-    { big: t('3 langues', '3 languages', '3 لغات'), icon: MI.globe, tint: '#E3F5FA', color: '#0891B2',
+    { big: t('3 langues', '3 languages', '3 لغات'), icon: MI.globe, tint: '#E7F6EE', color: '#0E7C52',
       sub: t('français, arabe, anglais — l’écran suit le patient',
              'French, Arabic, English — the screen follows the patient',
              'الفرنسية والعربية والإنجليزية — تتبع الواجهة المريض') },
-    { big: '09-08', icon: MI.shield, tint: '#EFEAFB', color: '#6B57A6',
+    { big: '09-08', icon: MI.shield, tint: '#E7F6EE', color: '#0E7C52',
       sub: t('loi marocaine sur les données, et une base cloisonnée cabinet par cabinet',
              'Moroccan data-protection law, with a database partitioned practice by practice',
              'القانون المغربي لحماية البيانات، وقاعدة بيانات معزولة لكل عيادة') },

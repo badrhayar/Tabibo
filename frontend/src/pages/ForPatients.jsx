@@ -299,11 +299,11 @@ export default function ForPatients() {
             items={[
               { big: `${CITY_COUNT}`, icon: PIC.pin, tint: '#E7F6EE', color: '#0E7C52',
                 sub: lang === 'ar' ? 'مدينة مغربية مغطاة' : lang === 'en' ? 'Moroccan cities covered' : 'villes du Maroc couvertes' },
-              { big: '50+', icon: PIC.stetho, tint: '#E3F5FA', color: '#0891B2',
+              { big: '50+', icon: PIC.stetho, tint: '#E7F6EE', color: '#0E7C52',
                 sub: lang === 'ar' ? 'تخصصاً طبياً' : lang === 'en' ? 'medical specialties' : 'spécialités médicales' },
-              { big: '24 h/24', icon: PIC.clock, tint: '#FDF1E0', color: '#B45309',
+              { big: '24 h/24', icon: PIC.clock, tint: '#E7F6EE', color: '#0E7C52',
                 sub: lang === 'ar' ? 'احجزوا متى شئتم، دون اتصال' : lang === 'en' ? 'book whenever you want, without calling' : 'réservez quand vous voulez, sans appeler' },
-              { big: lang === 'ar' ? 'مجاني' : lang === 'en' ? 'Free' : 'Gratuit', icon: PIC.wallet, tint: '#EFEAFB', color: '#6B57A6',
+              { big: lang === 'ar' ? 'مجاني' : lang === 'en' ? 'Free' : 'Gratuit', icon: PIC.wallet, tint: '#E7F6EE', color: '#0E7C52',
                 sub: lang === 'ar' ? 'للمرضى — لا رسوم حجز' : lang === 'en' ? 'for patients — no booking fee' : 'pour les patients — aucun frais de réservation' },
             ]}
           />

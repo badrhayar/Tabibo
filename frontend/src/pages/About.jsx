@@ -70,12 +70,12 @@ export default function About() {
       desc: t('Rendre la prise de rendez-vous médical au Maroc aussi simple qu’un message : trouver le bon praticien, réserver en quelques secondes, être rappelé — sans file d’attente téléphonique, à toute heure.',
               'Make booking a doctor in Morocco as simple as sending a message: find the right practitioner, book in seconds, get reminded — no phone queues, any time.',
               'جعل حجز موعد طبي في المغرب بسهولة إرسال رسالة: إيجاد الطبيب المناسب، الحجز في ثوانٍ، والتذكير — دون انتظار هاتفي، في أي وقت.') },
-    { icon: I.shield, tint: '#E3F5FA', color: '#0891B2',
+    { icon: I.shield, tint: '#E7F6EE', color: '#0E7C52',
       title: t('Confiance et sécurité', 'Trust and security', 'الثقة والأمان'),
       desc: t('Chaque profil de médecin est vérifié avant publication — INPE et diplômes contrôlés. Les données de santé sont cloisonnées cabinet par cabinet, par la base de données elle-même, dans le cadre de la loi 09-08 et sous le contrôle de la CNDP.',
               'Every doctor profile is verified before publication — INPE and diplomas checked. Health data is partitioned practice by practice, by the database itself, within Law 09-08 and under CNDP oversight.',
               'يتم التحقق من كل ملف طبيب قبل النشر — INPE والشهادات. البيانات الصحية معزولة لكل عيادة، من قاعدة البيانات نفسها، في إطار القانون 09-08 وتحت إشراف CNDP.') },
-    { icon: I.heart, tint: '#EFEAFB', color: '#6B57A6',
+    { icon: I.heart, tint: '#E7F6EE', color: '#0E7C52',
       title: t('Proximité patient', 'Patient proximity', 'القرب من المريض'),
       desc: t('Réservation pour soi ou pour un proche, en français comme en arabe, avec les heures de prière respectées dans l’agenda et le rappel envoyé sur WhatsApp — les usages réels du Maroc, pas une traduction.',
               'Book for yourself or a relative, in French or Arabic, with prayer times respected in the calendar and the reminder sent over WhatsApp — Morocco’s real habits, not a translation.',
@@ -102,9 +102,9 @@ export default function About() {
   const journey = [
     { n: '01', tint: '#E7F6EE', color: '#0E7C52', title: t('Trouver', 'Find', 'ابحث'),
       desc: t('Cherchez par spécialité et par ville. Chaque profil affiche tarifs, langues et conventions.', 'Search by specialty and city. Each profile shows fees, languages and coverage.', 'ابحث حسب التخصص والمدينة. يعرض كل ملف الأسعار واللغات والتغطية.') },
-    { n: '02', tint: '#E3F5FA', color: '#0891B2', title: t('Réserver', 'Book', 'احجز'),
+    { n: '02', tint: '#E7F6EE', color: '#0E7C52', title: t('Réserver', 'Book', 'احجز'),
       desc: t('Choisissez un créneau réellement libre, pour vous ou pour un proche, en quelques secondes.', 'Pick a genuinely free slot, for yourself or a relative, in seconds.', 'اختر موعداً متاحاً فعلاً، لك أو لأحد أقاربك، في ثوانٍ.') },
-    { n: '03', tint: '#EFEAFB', color: '#6B57A6', title: t('Être suivi', 'Be followed up', 'تابع'),
+    { n: '03', tint: '#E7F6EE', color: '#0E7C52', title: t('Être suivi', 'Be followed up', 'تابع'),
       desc: t('Confirmation immédiate, rappel avant l’échéance, et vos documents regroupés dans votre espace.', 'Immediate confirmation, a reminder before the date, and your documents in one place.', 'تأكيد فوري، تذكير قبل الموعد، ووثائقكم في مكان واحد.') },
   ];
 
@@ -139,11 +139,11 @@ export default function About() {
             items={[
               { big: `${CITY_OPTS.length}`, icon: I.building, tint: '#E7F6EE', color: '#0E7C52',
                 sub: t('villes du Maroc couvertes', 'Moroccan cities covered', 'مدينة مغربية مغطاة') },
-              { big: '50+', icon: I.stetho, tint: '#E3F5FA', color: '#0891B2',
+              { big: '50+', icon: I.stetho, tint: '#E7F6EE', color: '#0E7C52',
                 sub: t('spécialités médicales', 'medical specialties', 'تخصصاً طبياً') },
-              { big: '24 h/24', icon: I.clock, tint: '#FDF1E0', color: '#B45309',
+              { big: '24 h/24', icon: I.clock, tint: '#E7F6EE', color: '#0E7C52',
                 sub: t('réservation en ligne, sans appeler', 'online booking, without calling', 'حجز عبر الإنترنت، دون اتصال') },
-              { big: t('2 langues', '2 languages', 'لغتان'), icon: I.globe, tint: '#EFEAFB', color: '#6B57A6',
+              { big: t('2 langues', '2 languages', 'لغتان'), icon: I.globe, tint: '#E7F6EE', color: '#0E7C52',
                 sub: t('français et arabe, l’écran suit le patient', 'French and Arabic, the screen follows the patient', 'الفرنسية والعربية، تتبع الواجهة المريض') },
             ]}
             note={t('Ce sont des capacités du produit — villes desservies, spécialités, disponibilité, langues — et non des résultats d’usage : Tabibo ouvre.',
@@ -257,9 +257,9 @@ export default function About() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {[
                 { icon: I.check, tint: '#E7F6EE', color: '#0E7C52', k: t('Médecins vérifiés', 'Verified doctors', 'أطباء موثّقون'), v: t('INPE et diplômes contrôlés', 'INPE and diplomas checked', 'التحقق من INPE والشهادات') },
-                { icon: I.lock, tint: '#E3F5FA', color: '#0891B2', k: t('Cloisonnement en base', 'Database partitioning', 'العزل في القاعدة'), v: t('appliqué serveur, pas écran', 'server-enforced, not screen', 'مطبَّق في الخادم لا الشاشة') },
-                { icon: I.shield, tint: '#FDF1E0', color: '#B45309', k: t('Chiffrement', 'Encryption', 'التشفير'), v: t('en transit (HTTPS) et au repos', 'in transit (HTTPS) and at rest', 'أثناء النقل والتخزين') },
-                { icon: I.scale, tint: '#EFEAFB', color: '#6B57A6', k: t('Loi 09-08', 'Law 09-08', 'القانون 09-08'), v: t('déclaré, sous contrôle CNDP', 'declared, under CNDP oversight', 'مُصرَّح، تحت إشراف CNDP') },
+                { icon: I.lock, tint: '#E7F6EE', color: '#0E7C52', k: t('Cloisonnement en base', 'Database partitioning', 'العزل في القاعدة'), v: t('appliqué serveur, pas écran', 'server-enforced, not screen', 'مطبَّق في الخادم لا الشاشة') },
+                { icon: I.shield, tint: '#E7F6EE', color: '#0E7C52', k: t('Chiffrement', 'Encryption', 'التشفير'), v: t('en transit (HTTPS) et au repos', 'in transit (HTTPS) and at rest', 'أثناء النقل والتخزين') },
+                { icon: I.scale, tint: '#E7F6EE', color: '#0E7C52', k: t('Loi 09-08', 'Law 09-08', 'القانون 09-08'), v: t('déclaré, sous contrôle CNDP', 'declared, under CNDP oversight', 'مُصرَّح، تحت إشراف CNDP') },
               ].map((c) => (
                 <div key={c.k} style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(160deg, ${c.tint} 0%, #FFFFFF 66%)`, border: `1px solid ${c.tint}`, borderRadius: 16, padding: '16px 16px' }}>
                   <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -22, top: -30, width: 84, height: 84, borderRadius: '50%', background: c.color, opacity: 0.06 }} />
