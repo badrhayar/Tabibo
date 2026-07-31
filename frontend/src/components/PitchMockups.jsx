@@ -26,6 +26,9 @@ const BODY   = '#3A4A45';
 const MUTED  = '#6B7B76';
 const GREEN  = '#0E7C52';
 const LIGHT  = '#E9F6EF';
+// Liseré des cartes de repères : le contour reprenait la teinte du fond,
+// donc invisible sur blanc. Un vert franc redonne un bord net à la carte.
+const CARD_EDGE = '#8CCCAE';
 
 const tr = (lang, fr, en, ar) => (lang === 'en' ? en : lang === 'ar' ? ar : fr);
 
@@ -665,12 +668,12 @@ export const MetricBand = ({ items, isMobile, note, cols }) => (
       {items.map((m) => (
         <div key={m.big} style={{
           position: 'relative', overflow: 'hidden', textAlign: 'center',
-          background: `linear-gradient(160deg, ${m.tint} 0%, #FFFFFF 62%)`,
-          border: `1px solid ${m.tint}`, borderRadius: 18,
+          background: `linear-gradient(160deg, ${m.tint} 0%, #E3F5EC 100%)`,
+          border: `1px solid ${CARD_EDGE}`, borderRadius: 18,
           padding: isMobile ? '18px 12px' : '22px 16px',
-          boxShadow: '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -24px rgba(16,42,32,0.22)',
+          boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)',
         }}>
-          <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.06 }} />
+          <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.055 }} />
           {m.icon && (
             <span style={{ position: 'relative', display: 'inline-flex', width: 38, height: 38, borderRadius: 12, background: '#fff', color: m.color, alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: `0 8px 18px -10px ${m.color}` }}>{m.icon}</span>
           )}

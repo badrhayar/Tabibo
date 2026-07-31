@@ -17,6 +17,9 @@ const BG = '#F4F8F5';
 const BORDER = '#EAEFEC';
 const MUTED = '#6B7B76';
 const BODY = '#5A6B65';
+// Liseré des cartes de repères : le contour reprenait la teinte du fond,
+// donc invisible sur blanc. Un vert franc redonne un bord net à la carte.
+const CARD_EDGE = '#8CCCAE';
 const GRAD = 'linear-gradient(135deg, #1AAE74 0%, #12875A 52%, #0B6A46 100%)';
 
 // Hero search dropdown styles
@@ -24,6 +27,26 @@ const sugHead = { padding: '9px 16px 5px', fontSize: 11, fontWeight: 800, color:
 const sugRow = { display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'start', background: 'none', border: 'none', borderBottom: '1px solid #F5F7F6', padding: '10px 16px', cursor: 'pointer' };
 const sugIcon = { width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 const sugTag = { fontSize: 11, fontWeight: 700, color: '#0E7C52', background: '#E7F6EE', borderRadius: 99, padding: '2px 9px', flexShrink: 0 };
+
+// Placeholder tournant du champ de recherche : dire l'étendue de l'offre sans
+// aligner un mur de texte. Les libellés sont volontairement courts — c'est le
+// mot qu'un patient tape, pas l'intitulé officiel de la spécialité.
+const ROTATING_SPECS = [
+  ['Cardiologue', 'Cardiologist', 'طبيب القلب'],
+  ['Dentiste', 'Dentist', 'طبيب الأسنان'],
+  ['Pédiatre', 'Paediatrician', 'طبيب الأطفال'],
+  ['Dermatologue', 'Dermatologist', 'طبيب الجلد'],
+  ['Gynécologue', 'Gynaecologist', 'طبيب النساء'],
+  ['Ophtalmologue', 'Ophthalmologist', 'طبيب العيون'],
+  ['Médecin généraliste', 'General practitioner', 'طبيب عام'],
+  ['Kinésithérapeute', 'Physiotherapist', 'أخصائي العلاج الطبيعي'],
+  ['Psychiatre', 'Psychiatrist', 'طبيب نفسي'],
+  ['ORL', 'ENT specialist', 'أنف وأذن وحنجرة'],
+];
+
+// Le ruban est masqué en fondu sur les bords : les villes entrent et sortent
+// sans bord net, sinon la boucle se voit.
+const TICKER_MASK = 'linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%)';
 
 export default function Landing() {
   const { state, setState, go } = useApp();
@@ -51,6 +74,20 @@ export default function Landing() {
   const [cityKey, setCityKey] = useState('all');
   const [cityOpen, setCityOpen] = useState(false);
   const barRef = useRef(null);
+
+  // Placeholder tournant. `calm` retient le choix « moins d'animations » : dans
+  // ce cas on n'anime rien du tout et le champ garde son libellé fixe.
+  const [specIdx, setSpecIdx] = useState(0);
+  const [calm, setCalm] = useState(false);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { setCalm(true); return; }
+    const id = setInterval(() => setSpecIdx((i) => (i + 1) % ROTATING_SPECS.length), 2300);
+    return () => clearInterval(id);
+  }, []);
+  // On se tait dès que le champ sert : pendant la saisie ou le focus, une
+  // suggestion qui bouge derrière le curseur ne fait que gêner.
+  const rotatePh = !calm && !searchQ && !sugOpen;
+  const specWord = ROTATING_SPECS[specIdx][lang === 'en' ? 1 : lang === 'ar' ? 2 : 0];
   // Close the menus when the PAGE scrolls/resizes — but not when scrolling
   // inside the dropdown list itself.
   useEffect(() => {
@@ -300,15 +337,26 @@ export default function Landing() {
                 {/* Specialty / doctor / clinic input */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: isMobile ? '0 8px' : '0 18px', border: isMobile ? `1px solid ${BORDER}` : 'none', borderRadius: isMobile ? 12 : 0, minWidth: 0 }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
-                  <input
-                    type="text"
-                    placeholder={t.searchSpec}
-                    value={searchQ}
-                    onChange={(e) => { setSearchQ(e.target.value); setSugOpen(true); setCityOpen(false); }}
-                    onFocus={() => { setSugOpen(true); setCityOpen(false); }}
-                    onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
-                    style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, color: DARK, background: 'transparent', padding: isMobile ? '13px 0' : '16px 0', minWidth: 0 }}
-                  />
+                  {/* Le placeholder natif ne peut pas être animé : quand la
+                      rotation est active on le vide et on superpose un libellé
+                      inerte (pointer-events: none) qui, lui, peut se fondre. */}
+                  <div style={{ position: 'relative', flex: 1, display: 'flex', minWidth: 0 }}>
+                    <input
+                      type="text"
+                      aria-label={t.searchSpec}
+                      placeholder={rotatePh ? '' : t.searchSpec}
+                      value={searchQ}
+                      onChange={(e) => { setSearchQ(e.target.value); setSugOpen(true); setCityOpen(false); }}
+                      onFocus={() => { setSugOpen(true); setCityOpen(false); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
+                      style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, color: DARK, background: 'transparent', padding: isMobile ? '13px 0' : '16px 0', minWidth: 0 }}
+                    />
+                    {rotatePh && (
+                      <span key={specIdx} className="sa-ph" aria-hidden style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', pointerEvents: 'none', fontSize: 16, color: '#9AA8A2', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                        {specWord}…
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {!isMobile && <div style={{ width: 1, height: 30, background: BORDER }} />}
                 {/* City picker */}
@@ -437,23 +485,53 @@ export default function Landing() {
               couleurs changent ici — contour, rayon, retraits et tailles de
               texte restent ceux d'origine. */}
           {[
-            { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#E7F6EE', color: '#0E7C52' },
-            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#E7F6EE', color: '#0E7C52' },
-            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#E7F6EE', color: '#0E7C52' },
-            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#E7F6EE', color: '#0E7C52' },
+            { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#C7E9D8', color: '#0E7C52' },
+            { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#C7E9D8', color: '#0E7C52' },
+            { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#C7E9D8', color: '#0E7C52' },
+            { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#C7E9D8', color: '#0E7C52' },
           ].map((s, i) => (
             <div key={i} style={{
               position: 'relative', overflow: 'hidden',
-              background: `linear-gradient(160deg, ${s.tint} 0%, #FFFFFF 62%)`,
-              border: `1px solid ${s.tint}`, borderRadius: 16,
+              background: `linear-gradient(160deg, ${s.tint} 0%, #E3F5EC 100%)`,
+              border: `1px solid ${CARD_EDGE}`, borderRadius: 16,
               padding: isPhone ? '14px 14px' : '18px 22px', textAlign: 'center',
-              boxShadow: '0 1px 3px rgba(13,43,30,0.05)',
+              boxShadow: '0 1px 3px rgba(13,43,30,0.06), 0 12px 28px -20px rgba(11,90,60,0.45)',
             }}>
-              <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -28, top: -38, width: 100, height: 100, borderRadius: '50%', background: s.color, opacity: 0.06 }} />
+              <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -28, top: -38, width: 100, height: 100, borderRadius: '50%', background: s.color, opacity: 0.055 }} />
               <div style={{ position: 'relative', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: isPhone ? 22 : 26, fontWeight: 800, color: s.color, letterSpacing: '-0.5px' }}>{s.v}</div>
-              <div style={{ position: 'relative', fontSize: 12.5, color: MUTED, marginTop: 3, fontWeight: 500 }}>{s.l}</div>
+              {/* MUTED sur fond blanc passait tout juste ; sur la carte teintée
+                  il ne passe plus. BODY est assez sombre pour rester lisible. */}
+              <div style={{ position: 'relative', fontSize: 12.5, color: BODY, marginTop: 3, fontWeight: 500 }}>{s.l}</div>
             </div>
           ))}
+        </div>
+
+        {/* ── Ruban des villes ──────────────────────────────────────────────
+            Le chiffre « {CITY_OPTS.length} villes » juste au-dessus reste
+            abstrait ; faire défiler les noms réels le rend vérifiable. La
+            liste défile deux fois pour boucler sans raccord, et s'arrête au
+            survol pour qu'on puisse lire un nom. */}
+        <div style={{ position: 'relative', maxWidth: 1180, margin: `${isPhone ? 22 : 30}px auto 0` }}>
+          <div style={{ textAlign: 'center', fontSize: 11.5, fontWeight: 800, color: '#8FA39B', marginBottom: 10 }}>
+            {tr('Villes couvertes', 'Cities covered', 'المدن المغطاة')}
+          </div>
+          <div className="sa-ticker" style={{ overflow: 'hidden', WebkitMaskImage: TICKER_MASK, maskImage: TICKER_MASK }}>
+            <div
+              className="sa-ticker-track"
+              style={{ display: 'flex', width: 'max-content', alignItems: 'center', animationDirection: rtl ? 'reverse' : 'normal' }}
+            >
+              {[0, 1].map((copy) => (
+                <div key={copy} aria-hidden={copy === 1} style={{ display: 'flex', alignItems: 'center' }}>
+                  {CITY_OPTS.map((c) => (
+                    <span key={c.key} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#5A6B65', whiteSpace: 'nowrap' }}>{c.label}</span>
+                      <span aria-hidden style={{ width: 4, height: 4, borderRadius: '50%', background: '#BFD8CB', margin: '0 16px', flexShrink: 0 }} />
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -473,11 +551,11 @@ export default function Landing() {
                 Rien d'autre ne bouge : dimensions, ombres, numéro en filigrane
                 et pastille d'icône gardent leur géométrie. */}
             {[
-              { icon: 'search', title: t.s1t, sub: t.s1s, num: '01', tint: '#E7F6EE', color: '#0E7C52' },
-              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#E7F6EE', color: '#0E7C52' },
-              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#E7F6EE', color: '#0E7C52' },
+              { icon: 'search', title: t.s1t, sub: t.s1s, num: '01', tint: '#C7E9D8', color: '#0E7C52' },
+              { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#C7E9D8', color: '#0E7C52' },
+              { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#C7E9D8', color: '#0E7C52' },
             ].map((step, i) => (
-              <div key={i} className="sa-lift" style={{ background: `linear-gradient(160deg, ${step.tint} 0%, #FFFFFF 62%)`, border: `1px solid ${step.tint}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.08)' }}>
+              <div key={i} className="sa-lift" style={{ background: `linear-gradient(160deg, ${step.tint} 0%, #E3F5EC 100%)`, border: `1px solid ${CARD_EDGE}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.09), 0 20px 40px -30px rgba(11,90,60,0.5)' }}>
                 <div style={{ position: 'absolute', top: 14, [rtl ? 'left' : 'right']: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: step.color, opacity: 0.13, lineHeight: 1 }}>{step.num}</div>
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: step.color, marginBottom: 20, boxShadow: `0 8px 18px -10px ${step.color}` }}><Icon name={step.icon} size={26} /></div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: DARK, marginBottom: 9 }}>{step.title}</h3>

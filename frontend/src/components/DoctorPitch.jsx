@@ -43,6 +43,9 @@ const BODY   = '#3A4A45';
 const MUTED  = '#6B7B76';
 const BORDER = '#EAEFEC';
 const GREEN  = '#0E7C52';
+// Liseré des cartes de repères : le contour reprenait la teinte du fond,
+// donc invisible sur blanc. Un vert franc redonne un bord net à la carte.
+const CARD_EDGE = '#8CCCAE';
 const BG     = '#F4F8F5';
 
 const tr = (lang, fr, en, ar) => (lang === 'en' ? en : lang === 'ar' ? ar : fr);
@@ -169,23 +172,23 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
   //   objectifs, et la note sous le bandeau le dit en toutes lettres. Les trois
   //   suivants sont des caractéristiques vérifiables du produit.
   const MARKERS = [
-    { big: '40 %', icon: MI.noshow, tint: '#E7F6EE', color: '#0E7C52',
+    { big: '40 %', icon: MI.noshow, tint: '#C7E9D8', color: '#0E7C52',
       sub: t('de rendez-vous manqués en moins, grâce aux rappels automatiques',
              'fewer missed appointments, thanks to automatic reminders',
              'مواعيد ضائعة أقل، بفضل التذكيرات التلقائية') },
-    { big: '16 h', icon: MI.clock, tint: '#E7F6EE', color: '#0E7C52',
+    { big: '16 h', icon: MI.clock, tint: '#C7E9D8', color: '#0E7C52',
       sub: t('de travail administratif en moins par semaine',
              'less administrative work per week',
              'من العمل الإداري أقل في الأسبوع') },
-    { big: '24 h/24', icon: MI.book, tint: '#E7F6EE', color: '#0E7C52',
+    { big: '24 h/24', icon: MI.book, tint: '#C7E9D8', color: '#0E7C52',
       sub: t('vos patients réservent quand ils veulent, sans appeler',
              'your patients book whenever they want, without calling',
              'مرضاكم يحجزون في أي وقت، دون اتصال') },
-    { big: t('3 langues', '3 languages', '3 لغات'), icon: MI.globe, tint: '#E7F6EE', color: '#0E7C52',
+    { big: t('3 langues', '3 languages', '3 لغات'), icon: MI.globe, tint: '#C7E9D8', color: '#0E7C52',
       sub: t('français, arabe, anglais — l’écran suit le patient',
              'French, Arabic, English — the screen follows the patient',
              'الفرنسية والعربية والإنجليزية — تتبع الواجهة المريض') },
-    { big: '09-08', icon: MI.shield, tint: '#E7F6EE', color: '#0E7C52',
+    { big: '09-08', icon: MI.shield, tint: '#C7E9D8', color: '#0E7C52',
       sub: t('loi marocaine sur les données, et une base cloisonnée cabinet par cabinet',
              'Moroccan data-protection law, with a database partitioned practice by practice',
              'القانون المغربي لحماية البيانات، وقاعدة بيانات معزولة لكل عيادة') },
@@ -200,12 +203,12 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
             {MARKERS.map((m) => (
               <div key={m.big} style={{
                 position: 'relative', overflow: 'hidden', textAlign: 'center',
-                background: `linear-gradient(160deg, ${m.tint} 0%, #FFFFFF 62%)`,
-                border: `1px solid ${m.tint}`, borderRadius: 18,
+                background: `linear-gradient(160deg, ${m.tint} 0%, #E3F5EC 100%)`,
+                border: `1px solid ${CARD_EDGE}`, borderRadius: 18,
                 padding: isMobile ? '18px 12px' : '22px 16px',
-                boxShadow: '0 1px 2px rgba(16,42,32,0.04), 0 14px 34px -24px rgba(16,42,32,0.22)',
+                boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)',
               }}>
-                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.06 }} />
+                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: m.color, opacity: 0.055 }} />
                 <span style={{ position: 'relative', display: 'inline-flex', width: 38, height: 38, borderRadius: 12, background: '#fff', color: m.color, alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: `0 8px 18px -10px ${m.color}` }}>{m.icon}</span>
                 <div style={{ position: 'relative', fontSize: isMobile ? 25 : 32, fontWeight: 900, color: m.color, letterSpacing: '-1px', lineHeight: 1.1 }}>{m.big}</div>
                 <div style={{ position: 'relative', fontSize: isMobile ? 11.5 : 12.5, color: BODY, marginTop: 7, lineHeight: 1.5 }}>{m.sub}</div>

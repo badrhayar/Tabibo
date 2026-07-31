@@ -21,6 +21,9 @@ const DARK  = '#15314A';
 const BODY  = '#3A4A45';
 const MUTED = '#6B7B76';
 const GREEN = '#0E7C52';
+// Liseré des cartes de repères : le contour reprenait la teinte du fond,
+// donc invisible sur blanc. Un vert franc redonne un bord net à la carte.
+const CARD_EDGE = '#8CCCAE';
 const BG    = '#F4F8F5';
 
 const tr = (lang, fr, en, ar) => (lang === 'en' ? en : lang === 'ar' ? ar : fr);
@@ -65,17 +68,17 @@ export default function About() {
 
   // Trois piliers du produit — chacun avec son sujet et son grain de couleur.
   const pillars = [
-    { icon: I.target, tint: '#E7F6EE', color: '#0E7C52',
+    { icon: I.target, tint: '#C7E9D8', color: '#0E7C52',
       title: t('Notre mission', 'Our mission', 'مهمتنا'),
       desc: t('Rendre la prise de rendez-vous médical au Maroc aussi simple qu’un message : trouver le bon praticien, réserver en quelques secondes, être rappelé — sans file d’attente téléphonique, à toute heure.',
               'Make booking a doctor in Morocco as simple as sending a message: find the right practitioner, book in seconds, get reminded — no phone queues, any time.',
               'جعل حجز موعد طبي في المغرب بسهولة إرسال رسالة: إيجاد الطبيب المناسب، الحجز في ثوانٍ، والتذكير — دون انتظار هاتفي، في أي وقت.') },
-    { icon: I.shield, tint: '#E7F6EE', color: '#0E7C52',
+    { icon: I.shield, tint: '#C7E9D8', color: '#0E7C52',
       title: t('Confiance et sécurité', 'Trust and security', 'الثقة والأمان'),
       desc: t('Chaque profil de médecin est vérifié avant publication — INPE et diplômes contrôlés. Les données de santé sont cloisonnées cabinet par cabinet, par la base de données elle-même, dans le cadre de la loi 09-08 et sous le contrôle de la CNDP.',
               'Every doctor profile is verified before publication — INPE and diplomas checked. Health data is partitioned practice by practice, by the database itself, within Law 09-08 and under CNDP oversight.',
               'يتم التحقق من كل ملف طبيب قبل النشر — INPE والشهادات. البيانات الصحية معزولة لكل عيادة، من قاعدة البيانات نفسها، في إطار القانون 09-08 وتحت إشراف CNDP.') },
-    { icon: I.heart, tint: '#E7F6EE', color: '#0E7C52',
+    { icon: I.heart, tint: '#C7E9D8', color: '#0E7C52',
       title: t('Proximité patient', 'Patient proximity', 'القرب من المريض'),
       desc: t('Réservation pour soi ou pour un proche, en français comme en arabe, avec les heures de prière respectées dans l’agenda et le rappel envoyé sur WhatsApp — les usages réels du Maroc, pas une traduction.',
               'Book for yourself or a relative, in French or Arabic, with prayer times respected in the calendar and the reminder sent over WhatsApp — Morocco’s real habits, not a translation.',
@@ -100,11 +103,11 @@ export default function About() {
 
   // Parcours en trois temps, côté patient.
   const journey = [
-    { n: '01', tint: '#E7F6EE', color: '#0E7C52', title: t('Trouver', 'Find', 'ابحث'),
+    { n: '01', tint: '#C7E9D8', color: '#0E7C52', title: t('Trouver', 'Find', 'ابحث'),
       desc: t('Cherchez par spécialité et par ville. Chaque profil affiche tarifs, langues et conventions.', 'Search by specialty and city. Each profile shows fees, languages and coverage.', 'ابحث حسب التخصص والمدينة. يعرض كل ملف الأسعار واللغات والتغطية.') },
-    { n: '02', tint: '#E7F6EE', color: '#0E7C52', title: t('Réserver', 'Book', 'احجز'),
+    { n: '02', tint: '#C7E9D8', color: '#0E7C52', title: t('Réserver', 'Book', 'احجز'),
       desc: t('Choisissez un créneau réellement libre, pour vous ou pour un proche, en quelques secondes.', 'Pick a genuinely free slot, for yourself or a relative, in seconds.', 'اختر موعداً متاحاً فعلاً، لك أو لأحد أقاربك، في ثوانٍ.') },
-    { n: '03', tint: '#E7F6EE', color: '#0E7C52', title: t('Être suivi', 'Be followed up', 'تابع'),
+    { n: '03', tint: '#C7E9D8', color: '#0E7C52', title: t('Être suivi', 'Be followed up', 'تابع'),
       desc: t('Confirmation immédiate, rappel avant l’échéance, et vos documents regroupés dans votre espace.', 'Immediate confirmation, a reminder before the date, and your documents in one place.', 'تأكيد فوري، تذكير قبل الموعد، ووثائقكم في مكان واحد.') },
   ];
 
@@ -137,13 +140,13 @@ export default function About() {
             isMobile={isMobile}
             cols={4}
             items={[
-              { big: `${CITY_OPTS.length}`, icon: I.building, tint: '#E7F6EE', color: '#0E7C52',
+              { big: `${CITY_OPTS.length}`, icon: I.building, tint: '#C7E9D8', color: '#0E7C52',
                 sub: t('villes du Maroc couvertes', 'Moroccan cities covered', 'مدينة مغربية مغطاة') },
-              { big: '50+', icon: I.stetho, tint: '#E7F6EE', color: '#0E7C52',
+              { big: '50+', icon: I.stetho, tint: '#C7E9D8', color: '#0E7C52',
                 sub: t('spécialités médicales', 'medical specialties', 'تخصصاً طبياً') },
-              { big: '24 h/24', icon: I.clock, tint: '#E7F6EE', color: '#0E7C52',
+              { big: '24 h/24', icon: I.clock, tint: '#C7E9D8', color: '#0E7C52',
                 sub: t('réservation en ligne, sans appeler', 'online booking, without calling', 'حجز عبر الإنترنت، دون اتصال') },
-              { big: t('2 langues', '2 languages', 'لغتان'), icon: I.globe, tint: '#E7F6EE', color: '#0E7C52',
+              { big: t('2 langues', '2 languages', 'لغتان'), icon: I.globe, tint: '#C7E9D8', color: '#0E7C52',
                 sub: t('français et arabe, l’écran suit le patient', 'French and Arabic, the screen follows the patient', 'الفرنسية والعربية، تتبع الواجهة المريض') },
             ]}
             note={t('Ce sont des capacités du produit — villes desservies, spécialités, disponibilité, langues — et non des résultats d’usage : Tabibo ouvre.',
@@ -164,12 +167,12 @@ export default function About() {
             {pillars.map((p) => (
               <div key={p.title} style={{
                 position: 'relative', overflow: 'hidden',
-                background: `linear-gradient(160deg, ${p.tint} 0%, #FFFFFF 66%)`,
-                border: `1px solid ${p.tint}`, borderRadius: 20,
+                background: `linear-gradient(160deg, ${p.tint} 0%, #E3F5EC 100%)`,
+                border: `1px solid ${CARD_EDGE}`, borderRadius: 20,
                 padding: isMobile ? '24px 22px' : '30px 28px',
-                boxShadow: '0 1px 2px rgba(16,42,32,0.04), 0 18px 40px -28px rgba(16,42,32,0.28)',
+                boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 20px 44px -28px rgba(11,90,60,0.55)',
               }}>
-                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -34, top: -46, width: 130, height: 130, borderRadius: '50%', background: p.color, opacity: 0.06 }} />
+                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -34, top: -46, width: 130, height: 130, borderRadius: '50%', background: p.color, opacity: 0.055 }} />
                 <span style={{ position: 'relative', display: 'inline-flex', width: 48, height: 48, borderRadius: 14, background: '#fff', color: p.color, alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: `0 10px 22px -12px ${p.color}` }}>{p.icon}</span>
                 <h3 style={{ position: 'relative', fontSize: isMobile ? 18 : 20, fontWeight: 800, color: DARK, margin: '0 0 10px', letterSpacing: '-0.3px' }}>{p.title}</h3>
                 <p style={{ position: 'relative', fontSize: 14.5, color: BODY, lineHeight: 1.62, margin: 0 }}>{p.desc}</p>
@@ -190,10 +193,10 @@ export default function About() {
             {journey.map((j) => (
               <div key={j.n} style={{
                 position: 'relative', overflow: 'hidden',
-                background: `linear-gradient(160deg, ${j.tint} 0%, #FFFFFF 62%)`,
-                border: `1px solid ${j.tint}`, borderRadius: 20,
+                background: `linear-gradient(160deg, ${j.tint} 0%, #E3F5EC 100%)`,
+                border: `1px solid ${CARD_EDGE}`, borderRadius: 20,
                 padding: isMobile ? '26px 24px' : '34px 30px',
-                boxShadow: '0 2px 10px -4px rgba(13,43,30,0.08)',
+                boxShadow: '0 2px 10px -4px rgba(13,43,30,0.09), 0 20px 40px -30px rgba(11,90,60,0.5)',
               }}>
                 <div style={{ position: 'absolute', top: 14, insetInlineEnd: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: j.color, opacity: 0.13, lineHeight: 1 }}>{j.n}</div>
                 <span style={{ position: 'relative', display: 'inline-flex', width: 40, height: 40, borderRadius: 12, background: '#fff', color: j.color, alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: `0 8px 18px -10px ${j.color}`, fontSize: 17, fontWeight: 900 }}>{j.n.slice(1)}</span>
@@ -256,12 +259,12 @@ export default function About() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {[
-                { icon: I.check, tint: '#E7F6EE', color: '#0E7C52', k: t('Médecins vérifiés', 'Verified doctors', 'أطباء موثّقون'), v: t('INPE et diplômes contrôlés', 'INPE and diplomas checked', 'التحقق من INPE والشهادات') },
-                { icon: I.lock, tint: '#E7F6EE', color: '#0E7C52', k: t('Cloisonnement en base', 'Database partitioning', 'العزل في القاعدة'), v: t('appliqué serveur, pas écran', 'server-enforced, not screen', 'مطبَّق في الخادم لا الشاشة') },
-                { icon: I.shield, tint: '#E7F6EE', color: '#0E7C52', k: t('Chiffrement', 'Encryption', 'التشفير'), v: t('en transit (HTTPS) et au repos', 'in transit (HTTPS) and at rest', 'أثناء النقل والتخزين') },
-                { icon: I.scale, tint: '#E7F6EE', color: '#0E7C52', k: t('Loi 09-08', 'Law 09-08', 'القانون 09-08'), v: t('déclaré, sous contrôle CNDP', 'declared, under CNDP oversight', 'مُصرَّح، تحت إشراف CNDP') },
+                { icon: I.check, tint: '#C7E9D8', color: '#0E7C52', k: t('Médecins vérifiés', 'Verified doctors', 'أطباء موثّقون'), v: t('INPE et diplômes contrôlés', 'INPE and diplomas checked', 'التحقق من INPE والشهادات') },
+                { icon: I.lock, tint: '#C7E9D8', color: '#0E7C52', k: t('Cloisonnement en base', 'Database partitioning', 'العزل في القاعدة'), v: t('appliqué serveur, pas écran', 'server-enforced, not screen', 'مطبَّق في الخادم لا الشاشة') },
+                { icon: I.shield, tint: '#C7E9D8', color: '#0E7C52', k: t('Chiffrement', 'Encryption', 'التشفير'), v: t('en transit (HTTPS) et au repos', 'in transit (HTTPS) and at rest', 'أثناء النقل والتخزين') },
+                { icon: I.scale, tint: '#C7E9D8', color: '#0E7C52', k: t('Loi 09-08', 'Law 09-08', 'القانون 09-08'), v: t('déclaré, sous contrôle CNDP', 'declared, under CNDP oversight', 'مُصرَّح، تحت إشراف CNDP') },
               ].map((c) => (
-                <div key={c.k} style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(160deg, ${c.tint} 0%, #FFFFFF 66%)`, border: `1px solid ${c.tint}`, borderRadius: 16, padding: '16px 16px' }}>
+                <div key={c.k} style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(160deg, ${c.tint} 0%, #E3F5EC 100%)`, border: `1px solid ${CARD_EDGE}`, borderRadius: 16, padding: '16px 16px' }}>
                   <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -22, top: -30, width: 84, height: 84, borderRadius: '50%', background: c.color, opacity: 0.06 }} />
                   <span style={{ position: 'relative', display: 'inline-flex', width: 34, height: 34, borderRadius: 10, background: '#fff', color: c.color, alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: `0 8px 16px -10px ${c.color}` }}>{c.icon}</span>
                   <div style={{ position: 'relative', fontSize: 13.5, fontWeight: 800, color: DARK, lineHeight: 1.3 }}>{c.k}</div>

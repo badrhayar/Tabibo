@@ -41,9 +41,13 @@ export default function Profile() {
   // selDocData — prefer it so we show the RIGHT doctor even before the public
   // directory list has loaded (otherwise we'd fall back to doctors[0], the first
   // doctor in the list). Otherwise resolve the selected id from the directory.
+  // JAMAIS de repli sur doctors[0] : un identifiant qui ne correspond à rien
+  // (médecin sorti de l'annuaire, lien périmé) affichait alors la fiche du
+  // PREMIER médecin de la liste, sous le nom demandé — le patient pouvait
+  // réserver chez quelqu'un qu'il n'avait pas choisi. Rien, puis la recherche.
   const doc = (state.selDocData && state.selDocData.id === selDoc)
     ? state.selDocData
-    : (doctors.find((d) => d.id === selDoc) || doctors[0]);
+    : (doctors.find((d) => d.id === selDoc) || null);
   // Annuaire vide (tout premier chargement, réseau lent) → on repart sur la
   // recherche. La redirection se fait dans un EFFET, jamais pendant le rendu :
   // un `return` anticipé ici sauterait tous les hooks déclarés plus bas et
@@ -53,7 +57,13 @@ export default function Profile() {
   // qu'une fois l'annuaire REÇU : sinon un lien partagé ouvert sur un réseau
   // lent se referme tout seul avant d'avoir montré le médecin.
   const dirLoaded = state.doctorsLoaded;
-  useEffect(() => { if (dirLoaded && !doc) go('search'); }, [dirLoaded, !doc]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!dirLoaded || doc) return;
+    // On dit pourquoi : partir sur la recherche sans un mot laisse croire à un
+    // bug. Le message ne s'affiche que si un médecin avait bien été demandé.
+    if (selDoc) setState({ toast: tr('Ce médecin n’est plus disponible à la réservation.', 'This doctor is no longer available for booking.', 'هذا الطبيب لم يعد متاحاً للحجز.'), toastShow: true });
+    go('search');
+  }, [dirLoaded, !doc]); // eslint-disable-line react-hooks/exhaustive-deps
   const si  = SPEC_INFO[doc?.spec] || {};
   const [avatarBg, avatarFg] = tint(doctors.indexOf(doc));
   const docLoc = doctorCoords(doc);

@@ -361,6 +361,12 @@ export function mapAppointment(row, nameById = {}) {
     doctorId: row.doctor_id,
     patientId: row.patient_id,
     doctorName: nameById[row.doctor_id] || 'Médecin',
+    // Faux quand le médecin ne figure plus dans l'annuaire public : abonnement
+    // échu, compte suspendu, vérification retirée. Le rendez-vous passé reste
+    // valable, mais on ne connaît plus son nom et sa fiche n'existe plus. Les
+    // écrans doivent le savoir, sinon ils affichent « Dr. Médecin » et ouvrent
+    // la fiche de quelqu'un d'autre.
+    doctorListed: !!nameById[row.doctor_id],
     // patient_name is only ever set intentionally (guest booking, or a visit
     // booked FOR a relative) — when present it IS the patient, so it wins.
     patientName: row.patient_name || row.patient?.full_name || 'Patient',

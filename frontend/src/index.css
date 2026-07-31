@@ -82,6 +82,19 @@ button:focus-visible{
 .sa-in{animation:saRise .55s cubic-bezier(.16,.8,.3,1) both;}
 .sa-float{animation:saFloat 5.5s ease-in-out infinite;}
 
+/* ── Accueil : bandeau des villes + placeholder tournant ──────────────────── */
+/* Le ruban contient deux copies identiques de la liste ; le décaler de la
+   moitié de sa largeur le fait boucler sans raccord visible. */
+@keyframes saTicker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes saPhIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+.sa-ticker-track{animation:saTicker 78s linear infinite;}
+.sa-ticker:hover .sa-ticker-track{animation-play-state:paused;}
+.sa-ph{animation:saPhIn .42s cubic-bezier(.16,.8,.3,1) both;}
+@media (prefers-reduced-motion: reduce){
+  .sa-ticker-track{animation:none;}
+  .sa-ph{animation:none;}
+}
+
 @media print{
   .no-print{display:none!important;}
   body{background:#fff;}

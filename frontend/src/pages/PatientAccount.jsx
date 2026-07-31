@@ -140,7 +140,13 @@ export default function PatientAccount() {
   const visitedDocs = (() => {
     const m = new Map();
     for (const a of (state.myAppointments || [])) {
-      if (a.doctorId && !m.has(a.doctorId)) m.set(a.doctorId, { id: a.doctorId, name: a.doctorName || 'Médecin', spec: a.spec || '' });
+      // `doctorListed === false` : le médecin a quitté l'annuaire public. On ne
+      // sait plus le nommer et sa fiche n'existe plus — l'inscrire ici donnait
+      // un « Dr. Médecin » fantôme dont le bouton « Réserver » ouvrait la fiche
+      // du premier médecin de la liste. Le rendez-vous passé, lui, reste
+      // affiché dans l'historique.
+      if (!a.doctorId || a.doctorListed === false || m.has(a.doctorId)) continue;
+      m.set(a.doctorId, { id: a.doctorId, name: a.doctorName || 'Médecin', spec: a.spec || '' });
     }
     return [...m.values()];
   })();
@@ -153,7 +159,7 @@ export default function PatientAccount() {
   // ── Live conversation thread with the selected doctor ──────────────────────
   const [convId, setConvId] = useState(null);
   const [thread, setThread] = useState([]);
-  const threadEndRef = useRef(null);
+  const threadBoxRef = useRef(null);
   const appUserId = state.appUser?.id;
   const docNameById = (id) => visitedDocs.find((d) => d.id === id)?.name || 'Médecin';
 
@@ -194,7 +200,14 @@ export default function PatientAccount() {
     return () => unsub();
   }, [convId, appUserId]);
 
-  useEffect(() => { threadEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [thread.length]);
+  // On fait défiler le CADRE des messages, pas la page. `scrollIntoView` remonte
+  // toute la chaîne des conteneurs : au montage il emportait la fenêtre entière
+  // et déposait le patient au milieu de la messagerie, en bas de son profil,
+  // au lieu du haut de la page.
+  useEffect(() => {
+    const box = threadBoxRef.current;
+    if (box) box.scrollTop = box.scrollHeight;
+  }, [thread.length]);
 
   // Land on the appointments section when arriving from "Voir mes rendez-vous"
   // (e.g. right after booking) instead of the top/bottom of the page.
@@ -447,8 +460,21 @@ export default function PatientAccount() {
               {!isMobile && tr('Espace cabinet', 'Practice space', 'فضاء العيادة')}
             </button>
           )}
-          <button onClick={() => go('search')} style={{ background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding: isMobile?0:'0 15px', width: isMobile?44:'auto', height: isMobile?44:34, borderRadius:9, fontSize:13, fontWeight:700, letterSpacing:'0.2px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6, boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)' }}>
-            <span style={{ fontSize:15, lineHeight:1 }}>+</span>{isMobile ? tr('RDV', 'Book', 'حجز') : tr('Prendre un rendez-vous', 'Book an appointment', 'حجز موعد')}
+          <button onClick={() => go('search')} aria-label={tr('Prendre un rendez-vous', 'Book an appointment', 'حجز موعد')} title={tr('Prendre un rendez-vous', 'Book an appointment', 'حجز موعد')} style={{ background:BTN_GREEN, color:'#fff', border:'none', cursor:'pointer', padding: isMobile?0:'0 15px', width: isMobile?44:'auto', height: isMobile?44:34, borderRadius:9, fontSize:13, fontWeight:700, letterSpacing:'0.2px', fontFamily:"'Plus Jakarta Sans', Inter, sans-serif", whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6, boxShadow:'0 4px 14px -5px rgba(18,144,94,0.65)' }}>
+            {/* Sur téléphone le bouton est un carré de 44 px : « + RDV » n'y
+                tenait pas et débordait du fond vert. On garde le carré — même
+                gabarit que la déconnexion à côté — avec une icône seule et un
+                intitulé accessible. L'écran propose de toute façon un grand
+                « Prendre un rendez-vous » plus bas. */}
+            {isMobile ? (
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+                <path d="M18 15v6M15 18h6" />
+              </svg>
+            ) : (
+              <><span style={{ fontSize:15, lineHeight:1 }}>+</span>{tr('Prendre un rendez-vous', 'Book an appointment', 'حجز موعد')}</>
+            )}
           </button>
           <button onClick={() => authSignOut()} aria-label="Déconnexion" title="Déconnexion" style={{ background:'transparent', color:'rgba(255,255,255,0.85)', border:'1px solid rgba(255,255,255,0.22)', cursor:'pointer', padding: isMobile?0:'7px 13px', width: isMobile?44:'auto', height: isMobile?44:'auto', borderRadius:9, fontSize:13, fontWeight:600, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}
             onMouseEnter={e=>e.currentTarget.style.background='rgba(255,255,255,0.12)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
@@ -898,7 +924,7 @@ export default function PatientAccount() {
           </div>
 
           {/* Live conversation thread */}
-          <div style={{ borderRadius:11, border:`1px solid ${BORDER_STRONG}`, marginBottom:14, background:BG, height:280, overflowY:'auto', padding:'14px 12px', display:'flex', flexDirection:'column', gap:8 }}>
+          <div style={{ borderRadius:11, border:`1px solid ${BORDER_STRONG}`, marginBottom:14, background:BG, height:280, overflowY:'auto', padding:'14px 12px', display:'flex', flexDirection:'column', gap:8 }} ref={threadBoxRef}>
             {thread.length === 0 ? (
               <div style={{ margin:'auto', textAlign:'center', color:MUT, fontSize:12.5, padding:'0 20px', lineHeight:1.5 }}>
                 {visitedDocs.length > 0
@@ -919,7 +945,6 @@ export default function PatientAccount() {
                 </div>
               ))
             )}
-            <div ref={threadEndRef} />
           </div>
 
           {/* Choose which already-visited doctor to message — or an info notice */}

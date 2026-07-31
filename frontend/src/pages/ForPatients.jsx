@@ -297,13 +297,13 @@ export default function ForPatients() {
             isMobile={isMobile}
             cols={4}
             items={[
-              { big: `${CITY_COUNT}`, icon: PIC.pin, tint: '#E7F6EE', color: '#0E7C52',
+              { big: `${CITY_COUNT}`, icon: PIC.pin, tint: '#C7E9D8', color: '#0E7C52',
                 sub: lang === 'ar' ? 'مدينة مغربية مغطاة' : lang === 'en' ? 'Moroccan cities covered' : 'villes du Maroc couvertes' },
-              { big: '50+', icon: PIC.stetho, tint: '#E7F6EE', color: '#0E7C52',
+              { big: '50+', icon: PIC.stetho, tint: '#C7E9D8', color: '#0E7C52',
                 sub: lang === 'ar' ? 'تخصصاً طبياً' : lang === 'en' ? 'medical specialties' : 'spécialités médicales' },
-              { big: '24 h/24', icon: PIC.clock, tint: '#E7F6EE', color: '#0E7C52',
+              { big: '24 h/24', icon: PIC.clock, tint: '#C7E9D8', color: '#0E7C52',
                 sub: lang === 'ar' ? 'احجزوا متى شئتم، دون اتصال' : lang === 'en' ? 'book whenever you want, without calling' : 'réservez quand vous voulez, sans appeler' },
-              { big: lang === 'ar' ? 'مجاني' : lang === 'en' ? 'Free' : 'Gratuit', icon: PIC.wallet, tint: '#E7F6EE', color: '#0E7C52',
+              { big: lang === 'ar' ? 'مجاني' : lang === 'en' ? 'Free' : 'Gratuit', icon: PIC.wallet, tint: '#C7E9D8', color: '#0E7C52',
                 sub: lang === 'ar' ? 'للمرضى — لا رسوم حجز' : lang === 'en' ? 'for patients — no booking fee' : 'pour les patients — aucun frais de réservation' },
             ]}
           />
