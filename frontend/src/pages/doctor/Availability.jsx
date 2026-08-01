@@ -253,6 +253,9 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
     if (!doctorId) {                                      // demo mode → local only
       setTimeOff((l) => [...l, { id: `local_${offStart}`, start_date: offStart, end_date: end, reason: offReason || null }].sort((a, b) => a.start_date.localeCompare(b.start_date)));
       setOffStart(''); setOffEnd(''); setOffReason('');
+      // Sans cabinet actif, rien ne part en base : le dire, au lieu de laisser
+      // croire à un enregistrement durable.
+      setOffMsg('Aperçu de démonstration — cette absence n’est pas enregistrée.');
       return;
     }
     setOffSaving(true);

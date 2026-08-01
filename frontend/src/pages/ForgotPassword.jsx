@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { resetPasswordRequest } from '../lib/auth';
+import { resetPasswordRequest , authErrorMessage } from '../lib/auth';
 import { BTN_GREEN } from '../shared.jsx';
 
 const PRIMARY = '#16A06A';
@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       await resetPasswordRequest(email);
       setSent(true);
     } catch (e) {
-      setError(e?.message || 'Envoi impossible. Réessayez.');
+      setError(authErrorMessage(e).message || 'Envoi impossible. Réessayez.');
     } finally {
       setBusy(false);
     }

@@ -101,7 +101,7 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
         sub="Envoyez un document à un patient, retrouvez tout ce qui a été échangé."
         chips={[
           { value: docs.length, label: docs.length > 1 ? 'documents échangés' : 'document échangé' },
-          { value: docs.filter((d) => d.direction === 'received' || d.from_patient).length, label: 'reçus', color: SEC.histo.c },
+          { value: docs.filter((d) => d.direction === 'to_doctor').length, label: 'reçus', color: SEC.histo.c },
           { value: patientOpts.length, label: 'patients', color: '#0E7C52' },
         ]} />
 

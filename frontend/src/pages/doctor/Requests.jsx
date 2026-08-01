@@ -99,7 +99,16 @@ export default function Requests({ state, setState, go }) {
       closed: draft ? x.closed : close,
     } : x);
     persist(next);
-    setState({ toast: draft ? 'Brouillon enregistré ✓' : 'Réponse envoyée au patient ✓', toastShow: true });
+    // Cet écran est un carnet de tri LOCAL : il n'existe aucune table
+    // `requests`, aucun écran patient pour en créer, et `reply` n'a jamais
+    // atteint le moindre canal d'envoi. Annoncer « Réponse envoyée au patient »
+    // était donc faux — dans une application médicale, un accusé d'envoi
+    // mensonger est pire que pas d'accusé du tout. Le vrai canal patient ↔
+    // cabinet est la Messagerie (conversations/messages en base).
+    setState({
+      toast: draft ? 'Brouillon enregistré ✓' : 'Réponse notée — envoyez-la au patient depuis la Messagerie',
+      toastShow: true,
+    });
     if (!draft) setOpenId(null);
   };
   const toggleClosed = (r) => {
@@ -117,12 +126,20 @@ export default function Requests({ state, setState, go }) {
 
       <Hero tint={SEC.admin} icon={ICONS.inbox} isMobile={isMobile}
         title="Demandes des patients"
-        sub="Renouvellements, résultats, certificats — répondez en quelques secondes."
+        sub="Carnet de tri du cabinet — vos réponses partent au patient depuis la Messagerie."
         chips={[
           { value: list.filter((r) => !r.closed).length, label: 'en attente', color: '#B45309' },
           { value: list.filter((r) => r.closed).length, label: 'traitées', color: '#0E7C52' },
           { value: list.length, label: 'au total', color: SEC.histo.c },
         ]} />
+
+      {/* Dire ce que fait réellement cet écran : il classe et prépare, il
+          n'expédie pas. Le canal qui atteint vraiment le patient est la
+          Messagerie (table `conversations`/`messages`). */}
+      <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '12px 16px', margin: '14px 0 0', fontSize: 13, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 10 }}>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
+        <span>Ces demandes et vos réponses restent sur ce poste : c'est un carnet de tri, pas un canal d'envoi. Pour écrire au patient, ouvrez la <strong>Messagerie</strong>.</span>
+      </div>
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
-import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations } from '../../lib/api';
+import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations , withUrgentTag } from '../../lib/api';
 import { activeStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 
@@ -177,7 +177,10 @@ export default function Navigator({ state, setState, go }) {
   const saveNote = async (a, text, urgent) => {
     patch(a.id, (x) => ({ ...x, deskNote: text, deskUrgent: urgent }));
     setNoteFor(null);
-    await sync(a.id, () => updateAppointment(a.id, { notes: text || null }), text ? 'Note transmise au médecin ✓' : 'Note supprimée');
+    // On envoie l'urgence AVEC le texte : sans elle, seul `notes` partait en
+    // base et le drapeau était perdu au premier rechargement.
+    const payload = text ? withUrgentTag(text, urgent) : null;
+    await sync(a.id, () => updateAppointment(a.id, { notes: payload }), text ? 'Note transmise au médecin ✓' : 'Note supprimée');
   };
   const openFile = (a) => {
     const roster = state?.patients || [];

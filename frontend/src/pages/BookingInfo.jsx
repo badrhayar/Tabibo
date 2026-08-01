@@ -61,6 +61,7 @@ export default function BookingInfo() {
   const stationOpts = stationsOf(doc);
   const price = (selSvc && Number(selSvc.price)) || doc?.price || 300;
 
+  const payLabel = (PAY_OPTIONS.find((o) => o.key === payMethod) || {}).label || '';
   const slot = bookSlot || '';
   const dateObj = bookDate ? new Date(`${bookDate}T00:00:00`) : null;
   const dateStr = dateObj
@@ -156,7 +157,10 @@ export default function BookingInfo() {
           doctorId:  doc.id,
           datetime:  iso,
           reason:    selectedMotif,
-          notes:     info.notes || '',
+          // Le mode de paiement choisi voyage avec la demande : il ne peut pas
+          // aller dans `pay_method` (le serveur force cette colonne à null tant
+          // que le cabinet n'a pas encaissé), mais le secrétariat doit le voir.
+          notes:     [info.notes || '', payLabel ? `Paiement souhaité : ${payLabel}` : ''].filter(Boolean).join(' — '),
           relativeId:  bookForRel?.id || null,
           patientName: bookForRel?.full_name || null,
           durationMinutes: doc.slotMinutes || 30,   // the visit lasts one of the doctor's slots

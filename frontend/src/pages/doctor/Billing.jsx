@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchInvoices, createInvoice, updateInvoice, deleteInvoice } from '../../lib/api';
 import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useViewport } from '../../hooks/useViewport';
@@ -83,8 +84,37 @@ export default function Billing({ state, setState, go }) {
   const today = moroccoNow().dateISO;
 
   const [tab, setTab] = useState(state?.billTab || 'ca');
+  // ── Persistance ───────────────────────────────────────────────────────────
+  // La facturation ne vivait que dans le localStorage : invisible depuis un
+  // autre poste, effacée avec le cache du navigateur. Elle passe en base (table
+  // `invoices`). Le stockage local reste le socle de la DÉMONSTRATION ; dès
+  // qu'un cabinet réel est actif, la base fait foi.
+  const doctorId = state?.myDoctor?.id || null;
   const [list, setList] = useState(() => loadInvoices(state));
-  const patch = (next) => { setList(next); saveInvoices(state, next); };
+  const [syncErr, setSyncErr] = useState('');
+
+  useEffect(() => {
+    if (!doctorId) return undefined;
+    let alive = true;
+    fetchInvoices(doctorId)
+      .then((rows) => { if (alive) { setList(rows); setSyncErr(''); } })
+      .catch((e) => { if (alive) setSyncErr(e?.message || 'chargement impossible'); });
+    return () => { alive = false; };
+  }, [doctorId]);
+
+  // Optimiste à l'écran, confirmé par la base. Si le serveur refuse, on
+  // recharge : jamais d'écran qui affirme un enregistrement qui n'a pas eu lieu.
+  const patch = (next) => { setList(next); if (!doctorId) saveInvoices(state, next); };
+  const persist = async (next, run) => {
+    patch(next);
+    if (!doctorId) return;
+    try { await run(); setSyncErr(''); }
+    catch (e) {
+      setSyncErr(e?.message || 'enregistrement refusé');
+      setState({ toast: 'Enregistrement refusé : ' + (e?.message || 'erreur'), toastShow: true });
+      try { setList(await fetchInvoices(doctorId)); } catch { /* hors ligne */ }
+    }
+  };
 
   // ── Chiffre d'affaires ────────────────────────────────────────────────────
   const [pKind, setPKind] = useState('quarter');
@@ -128,8 +158,16 @@ export default function Billing({ state, setState, go }) {
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [list, sTab, q, fSent, fKind, fMin, fFrom]);
 
-  const act = (inv, status, extra) => { patch(list.map((i) => (i.id === inv.id ? advance(i, status, extra) : i))); setMenuFor(null); };
-  const remove = (inv) => { patch(list.filter((i) => i.id !== inv.id)); setMenuFor(null); setDetail(null); };
+  const act = (inv, status, extra) => {
+    const next = advance(inv, status, extra);
+    persist(list.map((i) => (i.id === inv.id ? next : i)),
+      () => updateInvoice(inv.id, { status: next.status, method: next.method, amount: next.amount, history: next.history, sentTo: next.sentTo }));
+    setMenuFor(null);
+  };
+  const remove = (inv) => {
+    persist(list.filter((i) => i.id !== inv.id), () => deleteInvoice(inv.id));
+    setMenuFor(null); setDetail(null);
+  };
 
   // Facturer une consultation réalisée : crée une vraie facture ouverte.
   const invoiceConsult = (c) => {
@@ -137,7 +175,18 @@ export default function Billing({ state, setState, go }) {
       list, patient: c.patient, service: c.service, amount: c.amount || c.fee || 0,
       kind: c.kind || 'prive', date: c.date,
     }), 'sent');
-    patch([inv, ...list]);
+    if (doctorId) {
+      // L'identifiant définitif vient de la base : on remplace la ligne
+      // provisoire pour que « Envoyer »/« Encaisser » visent la bonne facture.
+      setList([inv, ...list]);
+      createInvoice(doctorId, inv)
+        .then((saved) => { setList((l) => l.map((i) => (i.id === inv.id ? saved : i))); setSyncErr(''); })
+        .catch((e) => {
+          setSyncErr(e?.message || 'création refusée');
+          setState({ toast: 'Facture non enregistrée : ' + (e?.message || 'erreur'), toastShow: true });
+          setList((l) => l.filter((i) => i.id !== inv.id));
+        });
+    } else patch([inv, ...list]);
     setState({ toast: `Facture n° ${inv.no} créée pour ${c.patient} ✓`, toastShow: true });
   };
 
@@ -195,6 +244,11 @@ export default function Billing({ state, setState, go }) {
         <Hero tint={SEC.factures} icon={ICONS.euro} isMobile={isMobile}
           title="Facturation"
           sub={`${cabinet} · N° de facturation ${billNo}`} />
+        {syncErr && (
+          <div style={{ margin: '12px 0 0', background: '#FCE7EE', border: '1px solid #F2C2CD', borderRadius: 12, padding: '11px 15px', fontSize: 13, fontWeight: 600, color: '#C2415C' }}>
+            Facturation non synchronisée : {syncErr}. Les montants affichés peuvent ne pas refléter la base — rechargez la page.
+          </div>
+        )}
         <div style={{ display: 'flex', gap: isMobile ? 14 : 22, marginTop: 16, overflowX: 'auto' }}>
           {TABS.map((t) => {
             const on = tab === t.key;

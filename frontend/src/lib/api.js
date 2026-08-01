@@ -57,6 +57,80 @@ export async function setMySlug(doctorId, slug) {
   return data;
 }
 
+
+// ── Factures du cabinet ─────────────────────────────────────────────────────
+// La facturation vivait dans le localStorage du navigateur : invisible depuis
+// un autre poste, perdue au vidage du cache. Elle passe en base (table
+// `invoices`, RLS par cabinet via owns_doctor).
+
+const invoiceFromRow = (r) => ({
+  id: r.id,
+  no: r.no,
+  date: r.invoice_date,
+  patient: r.patient_name,
+  service: r.service || '',
+  sentTo: r.sent_to || 'Patient',
+  kind: r.kind,
+  status: r.status,
+  amount: Number(r.amount) || 0,
+  method: r.method || null,
+  history: Array.isArray(r.history) ? r.history : [],
+  appointmentId: r.appointment_id || null,
+});
+
+const invoiceToRow = (inv, doctorId) => ({
+  doctor_id: doctorId,
+  no: String(inv.no),
+  invoice_date: inv.date,
+  patient_name: inv.patient || 'Patient',
+  service: inv.service || null,
+  sent_to: inv.sentTo || null,
+  kind: inv.kind === 'amo' ? 'amo' : 'prive',
+  status: inv.status,
+  amount: Number(inv.amount) || 0,
+  method: inv.method || null,
+  history: inv.history || [],
+  appointment_id: inv.appointmentId || null,
+});
+
+export async function fetchInvoices(doctorId) {
+  if (!doctorId) return [];
+  const { data, error } = await supabase
+    .from('invoices').select('*')
+    .eq('doctor_id', doctorId)
+    .order('invoice_date', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(invoiceFromRow);
+}
+
+export async function createInvoice(doctorId, inv) {
+  const { data, error } = await supabase
+    .from('invoices').insert(invoiceToRow(inv, doctorId)).select().single();
+  if (error) throw error;
+  return invoiceFromRow(data);
+}
+
+// Le journal (`history`) part avec la mise à jour : l'écran affiche exactement
+// les étapes enregistrées, pas une reconstitution locale.
+export async function updateInvoice(id, patch) {
+  const row = {};
+  if (patch.status !== undefined) row.status = patch.status;
+  if (patch.method !== undefined) row.method = patch.method || null;
+  if (patch.amount !== undefined) row.amount = Number(patch.amount) || 0;
+  if (patch.history !== undefined) row.history = patch.history;
+  if (patch.sentTo !== undefined) row.sent_to = patch.sentTo || null;
+  const { data, error } = await supabase
+    .from('invoices').update(row).eq('id', id).select().single();
+  if (error) throw error;
+  return invoiceFromRow(data);
+}
+
+export async function deleteInvoice(id) {
+  const { error } = await supabase.from('invoices').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
 // ── Doctors ──────────────────────────────────────────────────────────────────
 
 /**
@@ -364,6 +438,16 @@ export async function fetchMyAppointments() {
   return rows.map((r) => mapAppointment(r, nameById));
 }
 
+
+// ── Note de comptoir : marquage de l'urgence ────────────────────────────────
+// `appointments` n'a pas de colonne d'urgence et en ajouter une exigerait une
+// migration exécutée avant le lancement. Le drapeau voyage donc en tête du
+// texte, sous une forme lisible par un humain qui lirait la base.
+export const URGENT_TAG = '[URGENT] ';
+export const isUrgentNote = (t) => typeof t === 'string' && t.startsWith(URGENT_TAG);
+export const stripUrgentTag = (t) => (isUrgentNote(t) ? t.slice(URGENT_TAG.length) : (t || ''));
+export const withUrgentTag = (t, urgent) => (urgent ? URGENT_TAG + (t || '') : (t || ''));
+
 // Flatten a joined appointment row into the shape the UI consumes.
 export function mapAppointment(row, nameById = {}) {
   const d = row.doctor || {};
@@ -374,6 +458,13 @@ export function mapAppointment(row, nameById = {}) {
     status: row.status,
     reason: row.reason,
     notes: row.notes,
+    // Note laissée au comptoir par le secrétariat (écran Navigateur). Elle est
+    // stockée dans `notes` ; l'urgence est encodée par le préfixe URGENT_TAG,
+    // faute de colonne dédiée. Sans cette réhydratation, la note et son badge
+    // s'effaçaient de l'écran au premier rechargement (chaque nouvelle
+    // réservation en déclenche un via l'écoute temps réel).
+    deskNote: stripUrgentTag(row.notes),
+    deskUrgent: isUrgentNote(row.notes),
     doctorId: row.doctor_id,
     patientId: row.patient_id,
     doctorName: nameById[row.doctor_id] || 'Médecin',

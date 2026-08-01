@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BTN_GREEN } from '../shared.jsx';
 import PasswordInput from '../components/PasswordInput';
 import { useApp } from '../context/AppContext';
-import { updatePassword } from '../lib/auth';
+import { updatePassword , authErrorMessage } from '../lib/auth';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -27,7 +27,7 @@ export default function ResetPassword() {
       setState({ toast: 'Mot de passe mis à jour ✓', toastShow: true });
       go('plogin');
     } catch (e) {
-      setError(e?.message || 'Mise à jour impossible. Le lien a peut-être expiré — redemandez-en un.');
+      setError(authErrorMessage(e).message || 'Mise à jour impossible. Le lien a peut-être expiré — redemandez-en un.');
     } finally {
       setBusy(false);
     }

@@ -393,8 +393,8 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
           sub="Tous vos rendez-vous, filtrables — confirmez, déplacez, encaissez."
           chips={[
             { value: rows.length, label: 'au total' },
-            { value: rows.filter((a) => a.status === 'En attente').length, label: 'à confirmer', color: '#B45309' },
-            { value: rows.filter((a) => a.status === 'Confirmé').length, label: 'confirmés', color: '#0E7C52' },
+            { value: rows.filter((a) => a.rawStatus === 'pending').length, label: 'à confirmer', color: '#B45309' },
+            { value: rows.filter((a) => a.rawStatus === 'confirmed').length, label: 'confirmés', color: '#0E7C52' },
           ]}
           right={<div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button

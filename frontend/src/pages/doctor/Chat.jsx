@@ -51,7 +51,6 @@ export default function Chat({ state, setState }) {
   const [activeId, setActiveId] = useState(null);
   const [msgs, setMsgs] = useState([]);
   const [inputVal, setInputVal] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const [showNew, setShowNew] = useState(false);   // "Nouvelle conversation" picker
   const [creating, setCreating] = useState(false);
@@ -251,12 +250,12 @@ export default function Chat({ state, setState }) {
       setState({ toast: 'Envoi de l’image échoué : ' + (err?.message || 'erreur'), toastShow: true });
     }
   };
-  const toggleRecording = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      setMsgs((m) => [...m, { id: 'aud_' + Date.now(), mine: true, type: 'audio', duration: '0:12', time: 'maintenant' }]);
-    } else { setIsRecording(true); }
-  };
+  // Le bouton micro a été retiré : il n'enregistrait RIEN (ni MediaRecorder ni
+  // getUserMedia) et fabriquait une bulle « message vocal · 0:12 » purement
+  // décorative, jamais envoyée par sendMessage(). Dans une conversation
+  // médicale, un message inventé qui a l'air transmis est pire qu'absent.
+  // Pour le rétablir il faudra : getUserMedia → MediaRecorder → téléversement
+  // dans le bucket de pièces jointes → sendMessage(jeton audio).
 
   // Hauteur exacte du bandeau : « 100vh moins une constante » se trompait dès
   // qu'une barre s'ajoutait en haut (mode démonstration, rappel de paiement) et
@@ -411,12 +410,6 @@ export default function Chat({ state, setState }) {
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </button>
                 <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload} />
-
-                <button onClick={toggleRecording} title={isRecording ? 'Arrêter' : 'Message vocal'} style={{ background: isRecording ? '#FCE7EE' : BG, border: `1px solid ${isRecording ? '#C2466A' : BORDER_STRONG}`, borderRadius: 10, cursor: 'pointer', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: isRecording ? '#C2466A' : MUTED }}>
-                  {isRecording
-                    ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-                    : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>}
-                </button>
 
                 <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder="Écrire un message…" style={{ flex: 1, background: 'none', border: 'none', padding: '8px 8px', fontSize: 14, outline: 'none', color: DARK }} />
 
