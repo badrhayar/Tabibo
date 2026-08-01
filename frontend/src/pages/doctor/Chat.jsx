@@ -100,6 +100,16 @@ export default function Chat({ state, setState }) {
   if (isDoctor) for (const p of (state?.patients || [])) addCandidate(p.userId, p.name);
   const candidates = [...candidatesMap.entries()].map(([id, name]) => ({ id, name }));
 
+  // En démonstration rien n'est écrit en base : on le dit au lieu d'ouvrir un
+  // sélecteur dont aucun choix n'aboutirait.
+  const openNewConversation = () => {
+    if (isDemo) {
+      setState?.({ toast: "Aperçu de démonstration — la messagerie s'active avec votre compte.", toastShow: true });
+      return;
+    }
+    setShowNew(true);
+  };
+
   const startConversation = async (peer) => {
     if (!appUser) return;
     setCreating(true);
@@ -274,25 +284,35 @@ export default function Chat({ state, setState }) {
        toute la fenêtre, bord à bord, alors que le reste de l'espace cabinet
        respire. Sur téléphone en revanche on reste pleine largeur — une
        conversation encadrée sur un écran de 6 pouces ne sert personne. */
-    <div ref={shellRef} style={{ height: shellH ? shellH : 'calc(100vh - 64px)', padding: isMobile ? 0 : 26, boxSizing: 'border-box', background: BG }}>
+    <div ref={shellRef} style={{ height: shellH ? shellH : 'calc(100vh - 64px)', padding: isMobile ? 0 : '26px 58px 30px', boxSizing: 'border-box', background: BG }}>
       <div style={{ display: 'flex', height: '100%', overflow: 'hidden', borderRadius: isMobile ? 0 : 20, border: isMobile ? 'none' : `1px solid ${BORDER_STRONG}`, background: '#fff', boxShadow: isMobile ? 'none' : '0 1px 2px rgba(16,42,32,0.04), 0 24px 48px -32px rgba(16,42,32,0.45)' }}>
       {/* Left Panel */}
       <div style={{ width: isMobile ? '100%' : 300, flexShrink: 0, borderRight: `1px solid ${BORDER_STRONG}`, background: '#fff', display: (isMobile && activeId) ? 'none' : 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '14px 18px', borderBottom: `1px solid ${BORDER_STRONG}`, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', background: `linear-gradient(90deg, ${SEC.histo.bg} 0%, #FFFFFF 60%)` }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <span style={{ width: 30, height: 30, borderRadius: 10, background: '#fff', color: SEC.histo.c, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 10px -6px ${SEC.histo.c}` }}>{ICONS.chat}</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: DARK }}>Messages</span>
+        {/* Bandeau vert profond : la messagerie reprend la matière des rails du
+            cabinet au lieu du blanc générique. */}
+        <div style={{ position: 'relative', overflow: 'hidden', padding: '16px 18px 14px', background: 'linear-gradient(150deg, #0F6E56 0%, #0A3D2D 100%)' }}>
+          <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -48, top: -62, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+          <span style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <span style={{ width: 32, height: 32, borderRadius: 11, background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.24)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{ICONS.chat}</span>
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>Messages</span>
+              <span style={{ display: 'block', fontSize: 11.5, color: 'rgba(255,255,255,0.68)', fontWeight: 600 }}>
+                {convs.length > 0 ? `${convs.length} conversation${convs.length > 1 ? 's' : ''}` : 'Aucune conversation'}
+              </span>
+            </span>
           </span>
-          {!isDemo && (
-            <button onClick={() => setShowNew(true)} title="Nouvelle conversation" style={{ ...greenBtn }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              Nouveau
-            </button>
-          )}
+
+          {/* Un bouton visible en toutes circonstances : en démonstration il
+              était masqué, et le médecin n'avait aucun moyen d'écrire. */}
+          <button onClick={openNewConversation} title="Nouvelle conversation"
+            style={{ position: 'relative', marginTop: 14, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: BTN_GREEN, color: '#fff', border: 'none', borderRadius: 12, padding: '11px 14px', fontSize: 13.5, fontWeight: 800, cursor: 'pointer', boxShadow: '0 12px 24px -12px rgba(22,160,106,0.95)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Nouvelle conversation
+          </button>
         </div>
 
-        <div style={{ margin: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: BG, border: `1px solid ${BORDER_STRONG}`, borderRadius: 10, padding: '9px 12px' }}>
+        <div style={{ margin: '12px 12px 8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: BG, border: `1px solid ${BORDER_STRONG}`, borderRadius: 12, padding: '10px 12px' }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7B76" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
             <input value={searchVal} onChange={(e) => setSearchVal(e.target.value)} placeholder="Rechercher une conversation…" style={{ border: 'none', outline: 'none', background: 'none', flex: 1, fontSize: 13, color: DARK }} />
           </div>
@@ -309,8 +329,8 @@ export default function Chat({ state, setState }) {
             const isActive = activeId === c.id;
             return (
               <div key={c.id} onClick={() => setActiveId(c.id)}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', cursor: 'pointer', background: isActive ? HEADER_BG : '#fff', borderBottom: `1px solid ${BORDER}`, borderLeft: isActive ? `3px solid ${PRIMARY}` : '3px solid transparent', transition: 'background .12s' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: tBg, color: tFg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', margin: '0 10px 6px', borderRadius: 13, cursor: 'pointer', background: isActive ? 'linear-gradient(150deg, #E3F5EC 0%, #F4FBF7 100%)' : '#fff', border: `1px solid ${isActive ? '#A9DCC5' : 'transparent'}`, boxShadow: isActive ? '0 10px 22px -16px rgba(11,90,60,0.9)' : 'none', transition: 'background .14s, border-color .14s' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: tBg, color: tFg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0, boxShadow: isActive ? '0 0 0 2px #fff, 0 0 0 3.5px #16A06A' : 'none' }}>
                   {initials(c.peer)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -385,8 +405,8 @@ export default function Chat({ state, setState }) {
             </div>
 
             {/* Input area */}
-            <div style={{ background: '#fff', borderTop: `2px solid ${BORDER_STRONG}`, padding: '12px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: 'linear-gradient(180deg, rgba(237,246,241,0) 0%, #EDF6F1 40%)', padding: '10px 16px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: `1px solid ${BORDER_STRONG}`, borderRadius: 26, padding: '7px 8px 7px 10px', boxShadow: '0 10px 26px -18px rgba(16,42,32,0.8)' }}>
                 <button onClick={() => fileInputRef.current?.click()} title="Joindre une image" style={{ background: BG, border: `1px solid ${BORDER_STRONG}`, borderRadius: 10, cursor: 'pointer', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: MUTED }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </button>
@@ -398,7 +418,7 @@ export default function Chat({ state, setState }) {
                     : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>}
                 </button>
 
-                <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder="Écrire un message…" style={{ flex: 1, background: BG, border: `1px solid ${BORDER_STRONG}`, borderRadius: 24, padding: '10px 16px', fontSize: 14, outline: 'none', color: DARK }} />
+                <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} onKeyDown={handleKeyDown} placeholder="Écrire un message…" style={{ flex: 1, background: 'none', border: 'none', padding: '8px 8px', fontSize: 14, outline: 'none', color: DARK }} />
 
                 <button onClick={doSend} aria-label="Envoyer le message" disabled={!inputVal.trim()} style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: inputVal.trim() ? BTN_GREEN : BORDER_STRONG, border: 'none', cursor: inputVal.trim() ? 'pointer' : 'default', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
@@ -408,16 +428,16 @@ export default function Chat({ state, setState }) {
           </>
         ) : (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-            <div style={{ color: "#CBD5D0", display: "flex" }}><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <div style={{ width: 92, height: 92, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0E7C52', background: 'radial-gradient(circle at 35% 30%, #E3F5EC 0%, #CFEDDF 70%)', boxShadow: '0 20px 40px -26px rgba(11,90,60,0.9), inset 0 1px 0 #fff' }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
             <div style={{ fontSize: 16, fontWeight: 700, color: DARK }}>Aucune conversation</div>
             <div style={{ fontSize: 14, color: MUTED, maxWidth: 280, textAlign: 'center' }}>
               {isDemo ? 'Sélectionnez une conversation pour lire les échanges avec vos patients.' : isDoctor ? 'Démarrez une conversation avec un de vos patients.' : 'Démarrez une conversation avec un médecin déjà consulté.'}
             </div>
-            {!isDemo && (
-              <button onClick={() => setShowNew(true)} style={{ ...greenBtn, marginTop: 4 }}>
-                + Nouvelle conversation
-              </button>
-            )}
+            <button onClick={openNewConversation} style={{ ...greenBtn, marginTop: 4 }}>
+              + Nouvelle conversation
+            </button>
           </div>
         )}
       </div>

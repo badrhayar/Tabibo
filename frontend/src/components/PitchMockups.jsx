@@ -42,6 +42,12 @@ const KEYFRAMES = `
 @keyframes tbBlink   { 0%,92%,100% { transform:scaleY(1) }            96% { transform:scaleY(.1) } }
 @keyframes tbSlide   { 0% { opacity:0; transform:translateY(6px) }    100% { opacity:1; transform:translateY(0) } }
 @keyframes tbSweep   { 0% { transform:translateX(-120%) }             100% { transform:translateX(320%) } }
+@keyframes tbHalo    { 0%,100% { opacity:.30; transform:scale(1) }    50% { opacity:.55; transform:scale(1.06) } }
+@keyframes tbPop     { 0% { transform:scale(.86); opacity:0 }  60% { transform:scale(1.05) }  100% { transform:scale(1); opacity:1 } }
+@keyframes tbDrift   { 0%,100% { transform:translateY(0) }            50% { transform:translateY(-7px) } }
+@keyframes tbRing    { 0% { box-shadow:0 0 0 0 rgba(46,204,113,.55) } 70% { box-shadow:0 0 0 12px rgba(46,204,113,0) } 100% { box-shadow:0 0 0 0 rgba(46,204,113,0) } }
+@keyframes tbDraw    { to { stroke-dashoffset: 0 } }
+@keyframes tbSpinSlow{ to { transform: rotate(360deg) } }
 @media (prefers-reduced-motion: reduce) {
   .tb-anim, .tb-anim * { animation: none !important; }
 }
@@ -72,36 +78,99 @@ const PhoneHead = ({ children }) => (
   }}>{children}</div>
 );
 
-/* Portrait dessiné — géométrique, sans prétention photographique. `seed` change
-   la carnation, la coiffure et la tenue pour que deux portraits ne soient pas
-   le même visage recoloré. */
-const Avatar = ({ size = 46, seed = 0, ring = true }) => {
-  const skins  = ['#E4B98F', '#C98F63', '#A9714A', '#EFCBA6'];
-  const hairs  = ['#2E2622', '#1C1714', '#4A342A', '#241C18'];
-  const wears  = ['#0E7C52', '#1C6FA8', '#7A4A8C', '#0C6B62'];
-  const skin = skins[seed % skins.length];
-  const hair = hairs[seed % hairs.length];
-  const wear = wears[seed % wears.length];
-  const scarf = seed % 2 === 1;               // hijab sur un portrait sur deux
+/* Portraits illustrés — style « anime » épuré : grands yeux avec reflet,
+   traits nets, aplats modernes. `seed` choisit le personnage (carnation,
+   coiffure, tenue), `role` habille en blouse de médecin ou en civil. Tout est
+   dessiné ici, sans image externe : la CSP ne laisse rien entrer d'autre. */
+const AV_CAST = [
+  // [peau, ombre peau, cheveux, reflet cheveux, tenue, accessoire]
+  ['#F2C9A0', '#DEAE84', '#26201C', '#3D332C', '#1C6FA8', 'none'],     // 0 · homme, coupe courte
+  ['#F7D6B8', '#E4BB9A', '#33251E', '#4A362C', '#0E7C52', 'earring'],  // 1 · femme, carré lisse
+  ['#C98F63', '#B27A51', '#1E1916', '#332A24', '#0C6B62', 'glasses'],  // 2 · homme, lunettes
+  ['#EFC29B', '#D9A87E', '#241C18', '#3A2E26', '#7A4A8C', 'bun'],      // 3 · femme, chignon
+];
+
+const Avatar = ({ size = 46, seed = 0, ring = true, role = 'patient' }) => {
+  const [skin, shade, hair, hairHi, wear, extra] = AV_CAST[seed % AV_CAST.length];
+  const female = seed % 2 === 1;
+  const doctor = role === 'doctor';
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" className="tb-anim"
-      style={{ display: 'block', borderRadius: '50%', background: LIGHT, ...(ring ? { boxShadow: `0 0 0 2px #fff, 0 0 0 3.5px ${GREEN}` } : {}) }}
+      style={{ display: 'block', borderRadius: '50%',
+               background: 'radial-gradient(circle at 32% 26%, #F0FBF5 0%, #D9F0E4 100%)',
+               ...(ring ? { boxShadow: `0 0 0 2px #fff, 0 0 0 3.5px ${GREEN}` } : {}) }}
       role="img" aria-label="Portrait illustré">
-      <g style={{ animation: 'tbBreathe 4.2s ease-in-out infinite' }}>
-        {/* épaules */}
-        <path d="M10 64c0-11.5 9.8-17 22-17s22 5.5 22 17z" fill={wear} />
-        <path d="M27 47h10v7a5 5 0 0 1-10 0z" fill={skin} />
-        {scarf
-          ? <path d="M32 10c-11 0-17 8-17 18 0 8 3 13 6 16l-4 5h30l-4-5c3-3 6-8 6-16 0-10-6-18-17-18z" fill={wear} opacity=".92" />
-          : <path d="M15 27c0-11 7-17 17-17s17 6 17 17c0 3-1 5-1 5l-2-9-14-4-14 6z" fill={hair} />}
-        {/* visage */}
-        <ellipse cx="32" cy="30" rx="12.5" ry="14" fill={skin} />
-        {/* yeux — clignement lent */}
-        <g style={{ animation: 'tbBlink 6.5s ease-in-out infinite', transformOrigin: '32px 29px' }}>
-          <ellipse cx="27" cy="29" rx="1.5" ry="1.9" fill="#2A2320" />
-          <ellipse cx="37" cy="29" rx="1.5" ry="1.9" fill="#2A2320" />
+      <g style={{ animation: 'tbBreathe 4.6s ease-in-out infinite' }}>
+        {/* buste */}
+        <path d="M8 64c0-12 10.5-18 24-18s24 6 24 18z" fill={doctor ? '#F7FAF9' : wear} />
+        {doctor && (
+          <>
+            <path d="M8 64c0-12 10.5-18 24-18s24 6 24 18z" fill="none" stroke="#DEE9E4" strokeWidth="1" />
+            {/* col en V de la tunique sous la blouse */}
+            <path d="M26 47.5l6 7 6-7 3 2-9 9.5-9-9.5z" fill={GREEN} />
+            <path d="M25 48l7 8.5L25 63zM39 48l-7 8.5L39 63z" fill="#fff" opacity=".9" />
+            {/* stéthoscope */}
+            <path d="M25.5 52c0 5.5 2.6 8.4 6.2 9" fill="none" stroke="#3A4A52" strokeWidth="1.6" strokeLinecap="round" />
+            <circle cx="34" cy="61.4" r="2.3" fill="#3A4A52" />
+            <circle cx="34" cy="61.4" r="1" fill="#8FA6B0" />
+          </>
+        )}
+        {!doctor && <path d="M27 47c1.6 2.6 8.4 2.6 10 0l1.6 3.4c-2.4 2-10.8 2-13.2 0z" fill="#fff" opacity=".22" />}
+        {/* cou */}
+        <path d="M27.5 42h9v8a4.5 4.5 0 0 1-9 0z" fill={skin} />
+        <path d="M27.5 42c1.2 3 7.8 3 9 0v3.6c-1.2 1.6-7.8 1.6-9 0z" fill={shade} opacity=".55" />
+        {/* oreilles */}
+        <circle cx="19.8" cy="30.5" r="2.4" fill={skin} />
+        <circle cx="44.2" cy="30.5" r="2.4" fill={skin} />
+        {extra === 'earring' && <><circle cx="19.8" cy="33.6" r="1" fill="#D9A441" /><circle cx="44.2" cy="33.6" r="1" fill="#D9A441" /></>}
+        {/* tête */}
+        <path d="M32 15.5c7.6 0 12.3 5.6 12.3 13 0 8.2-5.4 14-12.3 14s-12.3-5.8-12.3-14c0-7.4 4.7-13 12.3-13z" fill={skin} />
+        <ellipse cx="28" cy="22.5" rx="6" ry="3" fill="#fff" opacity=".14" />
+        {/* chevelures */}
+        {female ? (
+          extra === 'bun' ? (
+            <>
+              <circle cx="43" cy="14.8" r="4.6" fill={hair} />
+              <circle cx="41.6" cy="13.6" r="1.4" fill={hairHi} opacity=".8" />
+              <path d="M18.8 27c-1-9.6 4.8-15.4 13.2-15.4S46.2 17.4 45.2 27c-2-4.4-2.9-6.2-3.8-7.3-2.2 1.5-5.6 2.2-9.4 2.2s-7.2-.7-9.4-2.2c-.9 1.1-1.8 2.9-3.8 7.3z" fill={hair} />
+              <path d="M22 18.5c2.4-3.6 6-5.4 10-5.4" stroke={hairHi} strokeWidth="1.3" fill="none" strokeLinecap="round" opacity=".7" />
+            </>
+          ) : (
+            <>
+              <path d="M18.6 27.5c-1-10 5-16.5 13.4-16.5s14.4 6.5 13.4 16.5c-1.9-4.6-2.8-6.6-3.7-7.8-2.2 1.5-5.8 2.2-9.7 2.2s-7.5-.7-9.7-2.2c-.9 1.2-1.8 3.2-3.7 7.8z" fill={hair} />
+              <path d="M18.9 22.5c-1.7 5.8-1.5 13 .8 18 1.5.75 3 .7 4.1-.1-1.9-4.6-2.5-10.2-1.7-15.3z" fill={hair} />
+              <path d="M45.1 22.5c1.7 5.8 1.5 13-.8 18-1.5.75-3 .7-4.1-.1 1.9-4.6 2.5-10.2 1.7-15.3z" fill={hair} />
+              <path d="M23 17.5c2.4-3.4 5.6-5 9-5" stroke={hairHi} strokeWidth="1.4" fill="none" strokeLinecap="round" opacity=".75" />
+            </>
+          )
+        ) : (
+          <>
+            <path d="M20 27c-1-9.2 4.6-14.8 12-14.8S45 17.8 44 27c-2.3-4.2-3.3-5.8-4.1-6.8-2 1.35-4.9 1.95-7.9 1.95s-5.9-.6-7.9-1.95c-.8 1-1.8 2.6-4.1 6.8z" fill={hair} />
+            <path d="M24 16.8c2.2-1.9 5-2.9 8-2.9" stroke={hairHi} strokeWidth="1.3" fill="none" strokeLinecap="round" opacity=".7" />
+          </>
+        )}
+        {/* sourcils */}
+        <path d="M24.4 25.2q2.3-1.7 4.6-.7" stroke={hair} strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        <path d="M39.6 25.2q-2.3-1.7-4.6-.7" stroke={hair} strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        {/* yeux « anime » : iris sombre + reflet */}
+        <g style={{ animation: 'tbBlink 6.5s ease-in-out infinite', transformOrigin: '32px 29.5px' }}>
+          <ellipse cx="26.8" cy="29.6" rx="2" ry="2.8" fill="#241D19" />
+          <ellipse cx="37.2" cy="29.6" rx="2" ry="2.8" fill="#241D19" />
+          <circle cx="27.5" cy="28.6" r=".8" fill="#fff" />
+          <circle cx="37.9" cy="28.6" r=".8" fill="#fff" />
         </g>
-        <path d="M28.5 36.5c1.6 1.5 5.4 1.5 7 0" stroke="#8A5A48" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        {extra === 'glasses' && (
+          <g stroke="#2A3238" strokeWidth="1.2" fill="none" opacity=".85">
+            <rect x="22.6" y="26.2" width="8.2" height="6.6" rx="3.2" />
+            <rect x="33.2" y="26.2" width="8.2" height="6.6" rx="3.2" />
+            <path d="M30.8 29h2.4" />
+          </g>
+        )}
+        {/* nez + bouche + joues */}
+        <path d="M32 31.6q-.9 1.7 0 2.5" stroke={shade} strokeWidth="1" fill="none" strokeLinecap="round" opacity=".7" />
+        <path d="M28.7 37.4q3.3 2.5 6.6 0" stroke="#A9604C" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <ellipse cx="24.6" cy="34.2" rx="2.3" ry="1.2" fill="#F09A7E" opacity=".3" />
+        <ellipse cx="39.4" cy="34.2" rx="2.3" ry="1.2" fill="#F09A7E" opacity=".3" />
       </g>
     </svg>
   );
@@ -152,7 +221,7 @@ export function VisibiliteVisual({ lang = 'fr' }) {
           <PhoneHead>tabibo.ma/dr-el-amrani</PhoneHead>
           <div style={{ padding: 11 }}>
             <div style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
-              <Avatar size={44} seed={1} />
+              <Avatar size={44} seed={1} role="doctor" />
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 900, color: DARK, lineHeight: 1.2 }}>Dr Nadia El Amrani</div>
                 <div style={{ fontSize: 8, color: MUTED, fontWeight: 700, marginTop: 1 }}>{T('Cardiologue', 'Cardiologist', 'طبيبة قلب')} · Casablanca</div>
@@ -396,7 +465,7 @@ export function TeleconsultVisual({ lang = 'fr' }) {
             {/* incrustation médecin */}
             <div style={{ position: 'absolute', insetInlineEnd: 8, top: 8, width: 52, borderRadius: 8, overflow: 'hidden', border: '1.5px solid rgba(255,255,255,.28)', background: 'linear-gradient(150deg,#164A3B,#10382D)' }}>
               <div style={{ display: 'grid', placeItems: 'center', padding: 5 }}>
-                <Avatar size={36} seed={1} ring={false} />
+                <Avatar size={36} seed={1} ring={false} role="doctor" />
               </div>
               <div style={{ fontSize: 6, fontWeight: 800, color: '#fff', textAlign: 'center', padding: '0 0 3px' }}>{T('Vous', 'You', 'أنتم')}</div>
             </div>
@@ -467,7 +536,7 @@ export function NetworkVisual({ lang = 'fr' }) {
           {[['Dr Karim Benali', T('Cardiologue', 'Cardiologist', 'طبيب قلب'), T('Relié', 'Linked', 'مرتبط'), true],
             ['Dr Salma Idrissi', T('Radiologue', 'Radiologist', 'أشعة'), T('Demander', 'Request', 'طلب'), false]].map(([n, s, a, linked], i) => (
             <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 0', borderTop: i ? '1px solid #F1F5F3' : 'none' }}>
-              <Avatar size={22} seed={i + 2} ring={false} />
+              <Avatar size={22} seed={i + 2} ring={false} role="doctor" />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 8, fontWeight: 900, color: DARK }}>{n}</div>
                 <div style={{ fontSize: 7, color: MUTED, fontWeight: 600 }}>{s}</div>
@@ -502,7 +571,7 @@ export function NetworkVisual({ lang = 'fr' }) {
         {/* 3 — messagerie */}
         <Card title={T('Messagerie confrères', 'Colleague messaging', 'مراسلة الزملاء')}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, paddingBottom: 6, borderBottom: '1px solid #F1F5F3' }}>
-            <Avatar size={20} seed={2} ring={false} />
+            <Avatar size={20} seed={2} ring={false} role="doctor" />
             <span style={{ fontSize: 8, fontWeight: 900, color: DARK, flex: 1 }}>Dr Karim Benali</span>
             <Dot />
             <span style={{ fontSize: 6.5, color: GREEN, fontWeight: 800 }}>{T('en ligne', 'online', 'متصل')}</span>
@@ -870,5 +939,188 @@ export function AvisVerifiesVisual({ lang = 'fr' }) {
         </div>
       </div>
     </>
+  );
+}
+
+const HeroFloat = ({ side, top, bottom, icon, title, sub, delay, rtl, isMobile }) => (
+  <div className="tb-anim" style={{
+    position: 'absolute', top, bottom,
+    [side === 'start' ? (rtl ? 'right' : 'left') : (rtl ? 'left' : 'right')]: isMobile ? 4 : -32,
+    display: 'flex', alignItems: 'center', gap: 9, zIndex: 3,
+    background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255,255,255,.75)', borderRadius: 14, padding: '9px 12px',
+    boxShadow: '0 18px 40px -16px rgba(6,40,30,.55)',
+    animation: `tbSlide .55s cubic-bezier(.16,.8,.3,1) both ${delay}s, tbDrift 6.5s ease-in-out infinite ${delay + 0.6}s`,
+  }}>
+    <span style={{ width: 30, height: 30, borderRadius: 9, background: LIGHT, color: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</span>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 900, color: DARK, whiteSpace: 'nowrap' }}>{title}</div>
+      <div style={{ fontSize: 10, color: MUTED, fontWeight: 600, whiteSpace: 'nowrap' }}>{sub}</div>
+    </div>
+  </div>
+);
+
+// ═══ Accueil · le parcours de réservation, mis en scène ═════════════════════
+/* Trois cartes de verre inclinées en perspective — la fiche vérifiée, le choix
+   du créneau, le récapitulatif — reliées par un fil lumineux qui se trace dans
+   l'ordre où le patient les traverse. Chaque carte est l'écran RÉEL (mêmes
+   libellés que la page de réservation) ; seule la mise en scène est décorative :
+   aurores, orbite, particules, reflet. */
+export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }) {
+  const T = (fr, en, ar) => tr(lang, fr, en, ar);
+  const calm = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  const card = (extra) => ({
+    position: 'absolute', background: 'rgba(255,255,255,.97)',
+    border: '1px solid rgba(255,255,255,.85)', borderRadius: 16,
+    boxShadow: '0 0 0 1px rgba(122,245,193,.14), 0 34px 60px -28px rgba(2,24,16,.75)',
+    zIndex: 2, ...extra,
+  });
+  const badge = (n) => (
+    <span style={{ position: 'absolute', top: -11, insetInlineStart: -11, width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(150deg,#16A06A,#0B5C3E)', color: '#fff', fontSize: 12, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px -6px rgba(4,40,26,.8), inset 0 1px 0 rgba(255,255,255,.35)' }}>{n}</span>
+  );
+  const SLOT = {
+    free:   { bg: '#fff', bd: '#BFE3D0', fg: GREEN, deco: 'none' },
+    taken:  { bg: '#F4F6F5', bd: '#E6EBE8', fg: '#A9B5B0', deco: 'line-through' },
+    picked: { bg: GREEN, bd: GREEN, fg: '#fff', deco: 'none' },
+  };
+  const slot = (h, state, i = 0) => {
+    const st = SLOT[state];
+    return (
+      <div key={h} className="tb-anim" style={{
+        background: st.bg, border: `1px solid ${st.bd}`, color: st.fg, textDecoration: st.deco,
+        borderRadius: 7, padding: '5.5px 0', textAlign: 'center', fontSize: 9, fontWeight: 800,
+        animation: state === 'picked'
+          ? 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 1.5s, tbRing 2.6s ease-out infinite 2.1s'
+          : `tbSlide .4s ease both ${0.7 + i * 0.05}s`,
+        boxShadow: state === 'picked' ? '0 10px 18px -8px rgba(11,90,60,.95)' : 'none',
+      }}>{h}</div>
+    );
+  };
+  const recapRow = (k, v, strong) => (
+    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: '1px solid #F1F5F3', fontSize: 9.5 }}>
+      <span style={{ color: MUTED, fontWeight: 600 }}>{k}</span>
+      <span style={{ color: DARK, fontWeight: strong ? 900 : 700 }}>{v}</span>
+    </div>
+  );
+
+  // La scène est composée en 560×430 puis mise à l'échelle : la perspective et
+  // les ancres du fil lumineux restent justes à toutes les largeurs.
+  const scale = isMobile ? 0.58 : 1;
+
+  return (
+    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+      <Style />
+      {/* Fond : dégradé profond + aurores + orbite en rotation lente. */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 28, overflow: 'hidden',
+        background: 'radial-gradient(130% 110% at 18% 0%, #17916A 0%, #0F6E56 40%, #082E23 100%)',
+        boxShadow: '0 30px 70px -28px rgba(11,106,70,.75), inset 0 1px 0 rgba(255,255,255,.14)',
+      }}>
+        <span aria-hidden className="tb-anim" style={{ position: 'absolute', top: -80, right: -70, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(122,245,193,.35) 0%, rgba(122,245,193,0) 70%)', animation: 'tbHalo 7s ease-in-out infinite' }} />
+        <span aria-hidden className="tb-anim" style={{ position: 'absolute', bottom: -90, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(90,220,255,.22) 0%, rgba(90,220,255,0) 70%)', animation: 'tbHalo 9s ease-in-out infinite 1.5s' }} />
+        <span aria-hidden className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', width: 460, height: 460, marginTop: -230, marginLeft: -230, borderRadius: '50%', border: '1.5px dashed rgba(255,255,255,.14)', animation: 'tbSpinSlow 60s linear infinite' }} />
+        <span aria-hidden style={{
+          position: 'absolute', inset: 0, opacity: .45,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)',
+          backgroundSize: '34px 34px',
+          maskImage: 'radial-gradient(85% 75% at 50% 45%, #000 25%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(85% 75% at 50% 45%, #000 25%, transparent 100%)',
+        }} />
+        {/* particules */}
+        {[[52, 60, 0], [500, 90, 1.2], [70, 330, 2.1], [480, 350, .6], [280, 30, 1.7]].map(([x, y, d]) => (
+          <span key={x + '-' + y} aria-hidden className="tb-anim" style={{ position: 'absolute', left: x, top: y, width: 5, height: 5, borderRadius: '50%', background: 'rgba(160,255,214,.7)', boxShadow: '0 0 10px 2px rgba(160,255,214,.45)', animation: `tbDrift ${5.5 + d}s ease-in-out infinite ${d}s` }} />
+        ))}
+      </div>
+
+      {/* Scène en perspective */}
+      <div style={{ position: 'absolute', top: '50%', left: '50%', width: 560, height: 430, transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, perspective: 1100 }}>
+
+          {/* Fil lumineux 1 → 2 → 3, tracé dans l'ordre du parcours. */}
+          <svg aria-hidden width="560" height="430" style={{ position: 'absolute', inset: 0, zIndex: 1, overflow: 'visible' }}>
+            <defs>
+              <filter id="tbHeroGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="3.2" result="b" />
+                <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs>
+            <path id="tbHeroPath" d="M170 128 C 270 152, 380 108, 428 168 C 468 220, 430 272, 340 298 C 312 306, 288 310, 264 316"
+              fill="none" stroke="rgba(140,255,205,.95)" strokeWidth="3" strokeLinecap="round"
+              filter="url(#tbHeroGlow)" pathLength="100" strokeDasharray="100" strokeDashoffset="100"
+              className="tb-anim" style={{ animation: 'tbDraw 1.6s cubic-bezier(.4,0,.2,1) both .9s' }} />
+            {!calm && (
+              <circle r="4" fill="#B8FFD9" filter="url(#tbHeroGlow)">
+                <animateMotion dur="4.5s" begin="2.6s" repeatCount="indefinite" rotate="none">
+                  <mpath href="#tbHeroPath" />
+                </animateMotion>
+              </circle>
+            )}
+          </svg>
+
+          {/* 1 · La fiche vérifiée */}
+          <div className="tb-anim" style={card({ top: 20, insetInlineStart: 30, width: 234, padding: '13px 14px', transform: 'rotateY(10deg) rotateX(3deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both .15s' })}>
+            {badge(1)}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Avatar size={44} seed={1} role="doctor" />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 900, color: DARK }}>Dr Leila Marmioui</div>
+                <div style={{ fontSize: 9.5, color: MUTED, fontWeight: 600 }}>{T('Gynécologue · Tanger', 'Gynaecologist · Tangier', 'طبيبة نساء · طنجة')}</div>
+                <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                  <Chip>{T('Conventionné', 'Insurance-approved', 'مُتعاقد')}</Chip>
+                  <Chip bg="#FEF6E7" fg="#9A6510">★ 4,8 · 128 {T('avis', 'reviews', 'رأي')}</Chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 2 · Le créneau */}
+          <div className="tb-anim" style={card({ top: 108, insetInlineEnd: 20, width: 252, padding: '12px 13px 13px', transform: 'rotateY(-9deg) rotateX(2deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both .55s' })}>
+            {badge(2)}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 900, color: DARK }}>{T('Août 2026', 'August 2026', 'غشت 2026')}</span>
+              <span style={{ fontSize: 8.5, fontWeight: 700, color: MUTED }}>{T('Choisissez une date et une heure', 'Pick a date and time', 'اختر التاريخ والساعة')}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+              {[['Lun', '10'], ['Mar', '11'], ['Mer', '12'], ['Jeu', '13'], ['Ven', '14']].map(([d, n], i) => (
+                <div key={n} style={{ flex: 1, textAlign: 'center', borderRadius: 7, padding: '4px 0', background: i === 2 ? GREEN : '#F4F8F6', color: i === 2 ? '#fff' : MUTED, boxShadow: i === 2 ? '0 6px 14px -8px rgba(11,90,60,.9)' : 'none' }}>
+                  <div style={{ fontSize: 6.5, fontWeight: 700, opacity: .85 }}>{d}</div>
+                  <div style={{ fontSize: 9.5, fontWeight: 900 }}>{n}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+              {slot('09:00', 'taken', 0)}{slot('09:30', 'free', 1)}{slot('10:00', 'free', 2)}
+              {slot('10:30', 'picked', 3)}{slot('11:00', 'free', 4)}{slot('11:30', 'taken', 5)}
+              {slot('12:00', 'free', 6)}{slot('12:30', 'free', 7)}{slot('14:00', 'free', 8)}
+            </div>
+          </div>
+
+          {/* 3 · Le récapitulatif */}
+          <div className="tb-anim" style={card({ bottom: 16, insetInlineStart: 74, width: 250, padding: '12px 14px 13px', transform: 'rotateY(7deg) rotateX(-2deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both 1.9s' })}>
+            {badge(3)}
+            {recapRow(T('Honoraires', 'Fee', 'الأتعاب'), '300 MAD', true)}
+            {recapRow(T('Durée', 'Duration', 'المدة'), T('20 minutes', '20 minutes', '20 دقيقة'))}
+            {recapRow(T('Paiement', 'Payment', 'الدفع'), T('Espèces · Carte · M-Wallet', 'Cash · Card · M-Wallet', 'نقداً · بطاقة · M-Wallet'))}
+            <div className="tb-anim" style={{ marginTop: 10, background: 'linear-gradient(150deg,#16A06A 0%,#0E7C52 100%)', color: '#fff', borderRadius: 9, padding: '8px 0', textAlign: 'center', fontSize: 10, fontWeight: 900, boxShadow: '0 14px 24px -12px rgba(11,90,60,1)', animation: 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 2.5s, tbRing 2.8s ease-out infinite 3.1s' }}>
+              {T('Confirmer · 10:30', 'Confirm · 10:30', 'تأكيد · 10:30')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {!isMobile && (
+        <>
+          <HeroFloat side="end" top={16} delay={3.1} rtl={rtl} isMobile={isMobile}
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>}
+            title={T('Rendez-vous confirmé', 'Appointment confirmed', 'تم تأكيد الموعد')}
+            sub={T('Mer. 12 août · 10:30', 'Wed 12 Aug · 10:30', 'الأربعاء 12 غشت · 10:30')} />
+          <HeroFloat side="end" bottom={16} delay={3.6} rtl={rtl} isMobile={isMobile}
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>}
+            title={T('Rappel WhatsApp', 'WhatsApp reminder', 'تذكير واتساب')}
+            sub={T('La veille à 18:00', 'The day before at 6 PM', 'اليوم السابق على 18:00')} />
+        </>
+      )}
+    </div>
   );
 }

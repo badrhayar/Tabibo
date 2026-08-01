@@ -9,6 +9,8 @@ import SecurityTrust from '../components/SecurityTrust';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import MarketingFooter from '../components/MarketingFooter';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
+import { countVerifiedDoctors } from '../lib/api';
+import { HeroBookingVisual } from '../components/PitchMockups';
 import { Stethoscope } from '../components/BrandMark';
 
 const PRIMARY = '#16A06A';
@@ -114,6 +116,17 @@ export default function Landing() {
   const pickSpec = (s) => goSearch({ scSpec: s.key });
   const runSearch = () => goSearch({ scQ: searchQ.trim() });
   const pickCity = (key) => { setCityKey(key); setCityOpen(false); };
+
+  // Nombre réel de médecins publiés. Tant qu'il vaut 0 ou reste inconnu, la
+  // carte garde le repère des villes : annoncer « 0 médecin vérifié » sur sa
+  // page d'accueil est pire que ne rien annoncer.
+  const [docCount, setDocCount] = useState(null);
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let alive = true;
+    countVerifiedDoctors().then((n) => { if (alive && n > 0) setDocCount(n); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -446,35 +459,9 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Right: hero visual (floating cards hidden on mobile to avoid overflow) */}
-          <div style={{ position: 'relative', height: isMobile ? 240 : 420 }}>
-            <div className="sa-float" style={{ height: '100%', borderRadius: 28, background: GRAD, position: 'relative', overflow: 'hidden', boxShadow: '0 30px 70px -28px rgba(11,106,70,0.7)' }}>
-              <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.10)' }} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                <div style={{ marginBottom: 10, filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.2))' }}><Icon name="stethoscope" size={isMobile ? 52 : 72} strokeWidth={1.6} /></div>
-                <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 19, fontWeight: 800, opacity: 0.95 }}>Tabibo</div>
-                <div style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>{tr('Votre santé, notre priorité', 'Your health, our priority', 'صحتك أولويتنا')}</div>
-              </div>
-            </div>
-
-            {!isMobile && (
-              <>
-                <div style={{ position: 'absolute', top: 26, [rtl ? 'right' : 'left']: -28, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: 16, padding: '12px 15px', display: 'flex', alignItems: 'center', gap: 11, boxShadow: '0 16px 40px -14px rgba(13,43,30,0.3)' }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 11, background: '#E7F6EE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY }}><Icon name="checkCircle" size={20} /></div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: DARK }}>{tr('RDV confirmé', 'Booking confirmed', 'تم تأكيد الموعد')}</div>
-                    <div style={{ fontSize: 11.5, color: MUTED }}>{tr('Aujourd’hui · 14:00', 'Today · 2:00 PM', 'اليوم · 14:00')}</div>
-                  </div>
-                </div>
-                <div style={{ position: 'absolute', bottom: 30, [rtl ? 'left' : 'right']: -30, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: 16, padding: '12px 15px', display: 'flex', alignItems: 'center', gap: 11, boxShadow: '0 16px 40px -14px rgba(13,43,30,0.3)' }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 11, background: '#E7F6EE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY }}><Icon name="bell" size={20} /></div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: DARK }}>{tr('Rappel envoyé', 'Reminder sent', 'تم إرسال التذكير')}</div>
-                    <div style={{ fontSize: 11.5, color: MUTED }}>{tr('Fini les oublis', 'No more missed visits', 'لا مزيد من النسيان')}</div>
-                  </div>
-                </div>
-              </>
-            )}
+          {/* Right: la réservation reconstruite — l'écran réel, pas un décor. */}
+          <div style={{ position: 'relative', height: isMobile ? 260 : 440 }}>
+            <HeroBookingVisual lang={lang} isMobile={isMobile} rtl={rtl} />
           </div>
         </div>
 
@@ -485,7 +472,9 @@ export default function Landing() {
               couleurs changent ici — contour, rayon, retraits et tailles de
               texte restent ceux d'origine. */}
           {[
-            { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#C7E9D8', color: '#0E7C52' },
+            docCount
+              ? { v: `${docCount}`, l: tr('Médecins vérifiés', 'Verified doctors', 'أطباء موثّقون'), tint: '#C7E9D8', color: '#0E7C52', live: true }
+              : { v: `${CITY_OPTS.length}`, l: tr('Villes du Maroc', 'Cities in Morocco', 'مدينة مغربية'), tint: '#C7E9D8', color: '#0E7C52' },
             { v: '50+', l: tr('Spécialités', 'Specialties', 'تخصص'), tint: '#C7E9D8', color: '#0E7C52' },
             { v: '24/7', l: tr('Prise de rendez-vous', 'Booking availability', 'حجز المواعيد'), tint: '#C7E9D8', color: '#0E7C52' },
             { v: tr('Gratuit', 'Free', 'مجاني'), l: tr('Pour les patients', 'For patients', 'للمرضى'), tint: '#C7E9D8', color: '#0E7C52' },
@@ -498,7 +487,10 @@ export default function Landing() {
               boxShadow: '0 1px 3px rgba(13,43,30,0.06), 0 12px 28px -20px rgba(11,90,60,0.45)',
             }}>
               <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -28, top: -38, width: 100, height: 100, borderRadius: '50%', background: s.color, opacity: 0.055 }} />
-              <div style={{ position: 'relative', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: isPhone ? 22 : 26, fontWeight: 800, color: s.color, letterSpacing: '-0.5px' }}>{s.v}</div>
+              <div style={{ position: 'relative', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: isPhone ? 22 : 26, fontWeight: 800, color: s.color, letterSpacing: '-0.5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                {s.live && <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: '#16A06A', boxShadow: '0 0 0 3px rgba(22,160,106,0.18)' }} />}
+                {s.v}
+              </div>
               {/* MUTED sur fond blanc passait tout juste ; sur la carte teintée
                   il ne passe plus. BODY est assez sombre pour rester lisible. */}
               <div style={{ position: 'relative', fontSize: 12.5, color: BODY, marginTop: 3, fontWeight: 500 }}>{s.l}</div>
@@ -566,6 +558,11 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Sécurité : juste après « Comment ça marche ». Reléguée au-dessus du
+          pied de page, la seule section qui répond à « puis-je leur confier mon
+          dossier médical ? » n'était lue par personne. */}
+      <SecurityTrust />
+
       {/* ── CTA band — stacks on mobile ── */}
       <section style={{ padding: isPhone ? '0 16px 48px' : '0 24px 84px', background: '#fff' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', borderRadius: 26, background: GRAD, padding: isPhone ? '32px 22px' : '52px 56px', overflow: 'hidden', boxShadow: '0 30px 70px -30px rgba(11,106,70,0.6)' }}>
@@ -591,7 +588,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <SecurityTrust />
 
       <MarketingFooter />
 

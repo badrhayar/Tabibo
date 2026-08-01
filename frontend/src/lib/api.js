@@ -60,6 +60,22 @@ export async function setMySlug(doctorId, slug) {
 // ── Doctors ──────────────────────────────────────────────────────────────────
 
 /**
+ * Combien de médecins figurent réellement dans l'annuaire public.
+ * `head: true` ne rapatrie aucune ligne : seul le total voyage. Renvoie null
+ * si la requête échoue — l'accueil retombe alors sur un repère statique
+ * plutôt que d'annoncer « 0 médecin vérifié ».
+ */
+export async function countVerifiedDoctors() {
+  try {
+    const { count, error } = await supabase
+      .from('doctor_directory')
+      .select('id', { count: 'exact', head: true });
+    if (error) return null;
+    return typeof count === 'number' ? count : null;
+  } catch (_) { return null; }
+}
+
+/**
  * Fetch the public doctor directory with optional filters/sorting.
  * @param {object} f { q, spec, city, type: 'all'|'cabinet'|'tele', conv, sort }
  */
