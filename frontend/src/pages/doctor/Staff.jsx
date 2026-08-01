@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BTN_GREEN } from '../../shared.jsx';
-import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
+import { SEC, Hero, ICONS, KIT_SHADOW } from '../../components/SectionKit.jsx';
+import { useViewport } from '../../hooks/useViewport';
 import { useApp } from '../../context/AppContext';
 import { fetchStaff, inviteStaff, setStaffActive, removeStaff } from '../../lib/api';
 
@@ -47,6 +48,7 @@ function Card({ title, children }) {
       border: `1px solid ${BORDER}`,
       borderRadius: 16,
       overflow: 'hidden',
+      boxShadow: KIT_SHADOW,
     }}>
       {title && (
         <div style={{
@@ -66,6 +68,41 @@ function Card({ title, children }) {
   );
 }
 
+// Qui voit quoi. Le même texte sert à l'aperçu de démonstration et à la vraie
+// page : c'est la question que pose tout médecin avant d'inviter sa secrétaire.
+const ROLE_MATRIX = [
+  ['Secrétaire', 'Agenda, rendez-vous, patients, salle d\'attente et documents. Ni facturation du cabinet, ni ordonnances, ni abonnement.'],
+  ['Médecin remplaçant', 'Tout le dossier médical et les ordonnances pendant la période de remplacement. Pas la facturation du cabinet.'],
+  ['Médecin titulaire', 'Accès complet, y compris la facturation, l\'équipe et l\'abonnement.'],
+];
+
+function RoleCard() {
+  return (
+    <Card title="Ce que voit chaque rôle">
+      {ROLE_MATRIX.map(([role, txt], i, a) => (
+        <div key={role} style={{ padding: '12px 0', borderBottom: i < a.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: DARK, marginBottom: 3 }}>{role}</div>
+          <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{txt}</div>
+        </div>
+      ))}
+    </Card>
+  );
+}
+
+/* La page tenait dans une colonne de 900 px : sur un écran de bureau, toute la
+   moitié droite restait vide. La liste des membres — la seule chose qui grandit
+   avec le cabinet — prend la colonne large ; ce qui est fixe (invitation,
+   explications, rôles) tient dans la colonne étroite. */
+function TwoCol({ isMobile, main, aside }) {
+  if (isMobile) return <div style={{ display: 'grid', gap: 16 }}>{aside}{main}</div>;
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.55fr) minmax(320px, 1fr)', gap: 22, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gap: 20, minWidth: 0 }}>{main}</div>
+      <div style={{ display: 'grid', gap: 20 }}>{aside}</div>
+    </div>
+  );
+}
+
 
 // ── Aperçu de démonstration ─────────────────────────────────────────────────
 // Ce que le médecin verra une fois son compte activé : les membres de son
@@ -77,6 +114,7 @@ const PREVIEW_MEMBERS = [
 ];
 
 function StaffPreview() {
+  const { isMobile } = useViewport();
   const demoToast = () => {
     const el = document.createElement('div');
     el.textContent = "Aperçu de démonstration — l'équipe devient modifiable dès l'activation de votre compte.";
@@ -93,7 +131,7 @@ function StaffPreview() {
           { value: PREVIEW_MEMBERS.filter((m) => m.active).length, label: 'membres actifs', color: '#0E7C52' },
           { value: PREVIEW_MEMBERS.length, label: 'au total' },
         ]} />
-      <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <TwoCol isMobile={isMobile} aside={<>
         <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '14px 18px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
           <span><strong>Aperçu de démonstration.</strong> Voici la page telle qu'elle fonctionnera dès l'activation de votre compte. Les membres ci-dessous sont fictifs et aucune action n'est enregistrée.</span>
@@ -107,7 +145,7 @@ function StaffPreview() {
 
         <Card title="Inviter un membre">
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 220 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 180 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: MUTED }}>Email du membre</label>
               <input disabled value="" placeholder="secretaire@email.com"
                 style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, color: MUTED, background: '#F7FAF9', width: '100%', boxSizing: 'border-box' }} />
@@ -117,6 +155,8 @@ function StaffPreview() {
           </div>
         </Card>
 
+        <RoleCard />
+      </>} main={<>
         <Card title="Membres de l'équipe">
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {PREVIEW_MEMBERS.map((m, i) => (
@@ -138,26 +178,14 @@ function StaffPreview() {
             ))}
           </div>
         </Card>
-
-        <Card title="Ce que voit chaque rôle">
-          {[
-            ['Secrétaire', 'Agenda, rendez-vous, patients, salle d\'attente et documents. Ni facturation du cabinet, ni ordonnances, ni abonnement.'],
-            ['Médecin remplaçant', "Tout le dossier médical et les ordonnances pendant la période de remplacement. Pas la facturation du cabinet."],
-            ['Médecin titulaire', 'Accès complet, y compris la facturation, l\'équipe et l\'abonnement.'],
-          ].map(([role, txt], i, a) => (
-            <div key={role} style={{ padding: '12px 0', borderBottom: i < a.length - 1 ? `1px solid ${BORDER}` : 'none' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: DARK, marginBottom: 3 }}>{role}</div>
-              <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{txt}</div>
-            </div>
-          ))}
-        </Card>
-      </div>
+      </>} />
     </div>
   );
 }
 
 export default function Staff() {
   const { state, setState } = useApp();
+  const { isMobile } = useViewport();
   const doctorId = state?.myDoctor?.id;
 
   const [members, setMembers] = useState([]);
@@ -258,13 +286,7 @@ export default function Staff() {
         title="Mon équipe"
         sub="Le secrétariat de votre cabinet : qui a accès, et à quoi." />
 
-      <div style={{
-        maxWidth: 900,
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 20,
-      }}>
+      <TwoCol isMobile={isMobile} aside={<>
 
         {/* Info box */}
         <div style={{
@@ -327,6 +349,8 @@ export default function Staff() {
           </form>
         </Card>
 
+        <RoleCard />
+      </>} main={<>
         {/* Members list */}
         <Card title="Membres de l'équipe">
           {loading ? (
@@ -410,7 +434,7 @@ export default function Staff() {
             </div>
           )}
         </Card>
-      </div>
+      </>} />
     </div>
   );
 }

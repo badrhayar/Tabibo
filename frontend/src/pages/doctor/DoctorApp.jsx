@@ -682,9 +682,19 @@ export default function DoctorApp() {
           </div>
         )}
 
-        <main style={{ flex:1, minWidth:0, padding: (screen==='dchat' || screen==='dpfile') ? 0 : (isMobile ? 14 : 26), overflowY: screen==='dchat' ? 'hidden' : 'auto' }}>
-          <SubScreen state={state} setState={setState} go={go} openNewAppt={openNewAppt} openAddPatient={openAddPatient} />
-        </main>
+        {/* Le dossier OUVERT est un plan de travail pleine hauteur en trois
+            colonnes : il pose ses propres marges, d'où le retrait nul. Mais
+            tant qu'aucun patient n'est choisi, « Dossier patient » n'est qu'une
+            liste comme les autres — sans cette nuance elle collait au menu
+            alors que « Liste des patients » respirait. */}
+        {(() => {
+          const bleed = screen === 'dchat' || (screen === 'dpfile' && !!state.pfilePatient);
+          return (
+            <main style={{ flex:1, minWidth:0, padding: bleed ? 0 : (isMobile ? 14 : 26), overflowY: screen==='dchat' ? 'hidden' : 'auto' }}>
+              <SubScreen state={state} setState={setState} go={go} openNewAppt={openNewAppt} openAddPatient={openAddPatient} />
+            </main>
+          );
+        })()}
 
         {/* New appointment modal */}
         {newApptOpen && (

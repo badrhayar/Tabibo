@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { useApp } from '../../context/AppContext';
 import { docDisplayName, BTN_GREEN } from '../../shared.jsx';
-import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
+import { SEC, Hero, ICONS, KIT_SHADOW } from '../../components/SectionKit.jsx';
+import { useViewport } from '../../hooks/useViewport';
 
 const G = '#16A06A';
 const DARK = '#15314A';
@@ -12,6 +13,7 @@ const MUT = '#6B7B76';
 
 export default function BookingShare() {
   const { state, setState } = useApp();
+  const { isMobile } = useViewport();
   const doctorId = state.myDoctor?.id;
   const slug = state.myDoctor?.slug;
   const rawDocName = state.myDoctor?.name || state.appUser?.full_name || '';
@@ -75,27 +77,39 @@ export default function BookingShare() {
     w.document.close();
   };
 
-  const card = { background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: 22 };
-  const btn = (bg, color, border) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '7px 14px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: bg, color, border: border || 'none', textDecoration: 'none' });
+  const card = { background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 18, padding: 22, boxShadow: KIT_SHADOW };
+  const btn = (bg, color, border) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 16px', borderRadius: 10, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: bg, color, border: border || 'none', textDecoration: 'none' });
 
+  // Ce que vit le patient, de son côté. Trois lignes suffisent : la page servait
+  // surtout à rassurer un médecin qui n'a jamais partagé de lien de sa vie.
+  const STEPS = [
+    ['Il scanne ou clique', 'Le QR code ou le lien ouvre votre page — aucune application à installer.'],
+    ['Il choisit son créneau', 'Il ne voit que vos heures réellement libres, prières et congés déduits.'],
+    ['Vous recevez le rendez-vous', 'Il apparaît dans votre agenda, et le patient reçoit sa confirmation.'],
+  ];
 
   return (
-    <div style={{ maxWidth: 760, margin: '0 auto' }}>
-      <Hero tint={SEC.consult} icon={ICONS.share}
+    <div style={{ padding: isMobile ? 12 : 32, background: BG, minHeight: '100%', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}>
+      <Hero tint={SEC.consult} icon={ICONS.share} isMobile={isMobile}
         title="Invitez vos patients à réserver en ligne"
         sub="Votre lien, votre QR code et votre affiche de salle d’attente — prêts à partager." />
       {preview && (
-        <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '13px 17px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11, margin: '12px 0 18px' }}>
+        <div style={{ background: '#FEF6E7', border: '1px solid #F0DCAE', borderRadius: 14, padding: '13px 17px', fontSize: 13.5, lineHeight: 1.6, color: '#7A5A10', display: 'flex', gap: 11, margin: '0 0 18px' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
           <span><strong>Aperçu de démonstration.</strong> Le lien et le QR code ci-dessous sont des exemples. À l'activation de votre compte, ils sont remplacés par votre adresse réelle — de la forme <em>tabibo.ma/dr-votre-nom</em> — et toutes les commandes deviennent actives.</span>
         </div>
       )}
-      <p style={{ fontSize: 14, color: MUT, margin: '0 0 22px', lineHeight: 1.6 }}>
-        Partagez votre lien ou votre QR code avec vos patients actuels. Ils réservent en quelques
-        secondes — vous réduisez les appels et remplissez votre agenda automatiquement.
-      </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+      {/* Deux colonnes sur grand écran : les commandes à gauche, le QR à droite.
+          En une seule colonne étroite, la moitié droite de l'écran restait vide. */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1.35fr) minmax(320px, 1fr)', gap: isMobile ? 14 : 22, alignItems: 'start' }}>
+        {/* Colonne gauche — lien, partage, mode d'emploi */}
+        <div style={{ display: 'grid', gap: isMobile ? 14 : 20, minWidth: 0 }}>
+        <p style={{ fontSize: 14, color: MUT, margin: 0, lineHeight: 1.6 }}>
+          Partagez votre lien ou votre QR code avec vos patients actuels. Ils réservent en quelques
+          secondes — vous réduisez les appels et remplissez votre agenda automatiquement.
+        </p>
+
         {/* Link + actions */}
         <div style={card}>
           <div style={{ fontSize: 12.5, fontWeight: 800, color: '#9AA8A2', marginBottom: 10 }}>Votre lien de réservation</div>
@@ -122,17 +136,43 @@ export default function BookingShare() {
           </div>
         </div>
 
-        {/* QR preview */}
-        <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 22, flexWrap: 'wrap' }}>
-          <div style={{ width: 168, height: 168, borderRadius: 14, border: `1px solid ${BORDER}`, padding: 10, background: '#fff', flexShrink: 0 }}>
-            {qr ? <img src={qr} alt="QR code de réservation" style={{ width: '100%', height: '100%' }} /> : <div style={{ width: '100%', height: '100%', background: BG, borderRadius: 8 }} />}
+        {/* Mode d'emploi côté patient */}
+        <div style={card}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: DARK, marginBottom: 4 }}>Ce que vit votre patient</div>
+          <p style={{ fontSize: 13, color: MUT, margin: '0 0 16px', lineHeight: 1.6 }}>Trois gestes, sans compte à créer ni application à installer.</p>
+          <div style={{ display: 'grid', gap: 12 }}>
+            {STEPS.map(([t, d], i) => (
+              <div key={t} style={{ display: 'flex', gap: 13, alignItems: 'flex-start' }}>
+                <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 10, background: 'linear-gradient(150deg, #C7E9D8, #E3F5EC)', border: '1px solid #A9DCC5', color: '#0E7C52', fontSize: 13, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: DARK }}>{t}</div>
+                  <div style={{ fontSize: 12.5, color: MUT, lineHeight: 1.55 }}>{d}</div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div style={{ flex: '1 1 240px', minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: DARK, marginBottom: 6 }}>Affichez ce QR au cabinet</div>
-            <p style={{ fontSize: 13.5, color: MUT, lineHeight: 1.6, margin: 0 }}>
+        </div>
+        </div>
+
+        {/* Colonne droite — le QR, en grand, sur un fond qui rappelle l'affiche */}
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(165deg, #0F6E56 0%, #0A4B3A 100%)', borderRadius: 20, padding: isMobile ? 20 : 26, boxShadow: '0 24px 48px -28px rgba(9,52,39,0.85)' }}>
+          <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -70, top: -80, width: 240, height: 240, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+          <span aria-hidden style={{ position: 'absolute', insetInlineStart: -50, bottom: -70, width: 190, height: 190, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+          <div style={{ position: 'relative', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.75)', marginBottom: 14 }}>Affichez ce QR au cabinet</div>
+            <div style={{ width: '100%', maxWidth: 250, aspectRatio: '1 / 1', margin: '0 auto', borderRadius: 18, padding: 14, background: '#fff', boxShadow: '0 18px 40px -20px rgba(0,0,0,0.55)', boxSizing: 'border-box' }}>
+              {qr
+                ? <img src={qr} alt="QR code de réservation" style={{ width: '100%', height: '100%', display: 'block' }} />
+                : <div style={{ width: '100%', height: '100%', background: BG, borderRadius: 10 }} />}
+            </div>
+            <div style={{ marginTop: 16, fontSize: 13.5, fontWeight: 800, color: '#fff', wordBreak: 'break-all', direction: 'ltr' }}>{prettyLink}</div>
+            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.65, margin: '12px 0 0' }}>
               Imprimez l'affiche et posez-la à l'accueil ou en salle d'attente. Vos patients scannent
               avec leur téléphone et réservent leur prochain rendez-vous sans passer par le secrétariat.
             </p>
+            <button onClick={() => (preview ? previewToast() : printPoster())} style={{ marginTop: 16, width: '100%', background: 'rgba(255,255,255,0.14)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 11, padding: '11px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              Imprimer l'affiche
+            </button>
           </div>
         </div>
       </div>

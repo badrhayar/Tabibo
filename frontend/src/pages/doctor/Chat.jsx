@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { fetchConversations, fetchMessages, sendMessage, getOrCreateConversation, deleteConversation, subscribeToConversation, subscribeToInbox, uploadChatImage, isImageMessage } from '../../lib/api';
 import { greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
@@ -248,12 +248,34 @@ export default function Chat({ state, setState }) {
     } else { setIsRecording(true); }
   };
 
+  // Hauteur exacte du bandeau : « 100vh moins une constante » se trompait dès
+  // qu'une barre s'ajoutait en haut (mode démonstration, rappel de paiement) et
+  // le bas de la messagerie passait sous le pli. On mesure ce qui reste.
+  const shellRef = useRef(null);
+  const [shellH, setShellH] = useState(null);
+  useLayoutEffect(() => {
+    const fit = () => {
+      const el = shellRef.current;
+      if (el) setShellH(Math.max(340, Math.round(window.innerHeight - el.getBoundingClientRect().top)));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fit) : null;
+    ro?.observe(document.body);
+    return () => { window.removeEventListener('resize', fit); ro?.disconnect(); };
+  }, []);
+
   const filteredConvs = searchVal.trim()
     ? convs.filter((c) => (c.peer || '').toLowerCase().includes(searchVal.toLowerCase()))
     : convs;
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    /* La messagerie garde ses marges comme les autres sections : elle occupait
+       toute la fenêtre, bord à bord, alors que le reste de l'espace cabinet
+       respire. Sur téléphone en revanche on reste pleine largeur — une
+       conversation encadrée sur un écran de 6 pouces ne sert personne. */
+    <div ref={shellRef} style={{ height: shellH ? shellH : 'calc(100vh - 64px)', padding: isMobile ? 0 : 26, boxSizing: 'border-box', background: BG }}>
+      <div style={{ display: 'flex', height: '100%', overflow: 'hidden', borderRadius: isMobile ? 0 : 20, border: isMobile ? 'none' : `1px solid ${BORDER_STRONG}`, background: '#fff', boxShadow: isMobile ? 'none' : '0 1px 2px rgba(16,42,32,0.04), 0 24px 48px -32px rgba(16,42,32,0.45)' }}>
       {/* Left Panel */}
       <div style={{ width: isMobile ? '100%' : 300, flexShrink: 0, borderRight: `1px solid ${BORDER_STRONG}`, background: '#fff', display: (isMobile && activeId) ? 'none' : 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '14px 18px', borderBottom: `1px solid ${BORDER_STRONG}`, display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', background: `linear-gradient(90deg, ${SEC.histo.bg} 0%, #FFFFFF 60%)` }}>
@@ -336,7 +358,7 @@ export default function Chat({ state, setState }) {
             </div>
 
             {/* Messages area */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 12, background: 'linear-gradient(180deg, #F3FAF6 0%, #EDF6F1 100%)' }}>
               {msgs.map((msg) => {
                 const isMe = msg.mine;
                 return (
@@ -351,7 +373,7 @@ export default function Chat({ state, setState }) {
                         <span style={{ fontSize: 13 }}>Message vocal · {msg.duration || '0:12'}</span>
                       </div>
                     ) : (
-                      <div style={{ background: isMe ? PRIMARY : '#fff', color: isMe ? '#fff' : DARK, borderRadius: isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px', border: isMe ? 'none' : `1px solid ${BORDER}`, padding: '10px 14px', maxWidth: '68%', fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                      <div style={{ background: isMe ? 'linear-gradient(150deg, #16A06A 0%, #0E7C52 100%)' : '#fff', color: isMe ? '#fff' : DARK, borderRadius: isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px', border: isMe ? 'none' : `1px solid ${BORDER}`, padding: '10px 14px', maxWidth: '68%', fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word', boxShadow: isMe ? '0 8px 18px -12px rgba(11,90,60,0.9)' : '0 6px 14px -12px rgba(16,42,32,0.6)' }}>
                         {msg.text}
                       </div>
                     )}
@@ -398,6 +420,7 @@ export default function Chat({ state, setState }) {
             )}
           </div>
         )}
+      </div>
       </div>
 
       {/* New-conversation picker */}
