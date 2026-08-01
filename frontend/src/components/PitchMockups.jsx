@@ -1200,7 +1200,7 @@ function StepSearchVisual({ T, isMobile }) {
   );
   return (
     <Scene isMobile={isMobile}>
-      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(2deg)', animation: 'tbFade .6s ease both .15s' }}>
+      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: `translate(-50%, -50%) rotate(2deg)${isMobile ? ' scale(.82)' : ''}`, animation: 'tbFade .6s ease both .15s' }}>
         <Phone w={176}>
           {/* la barre du haut, celle de l'application */}
           <div style={{ background: 'linear-gradient(90deg,#0C4A37,#0A3D2D)', padding: '13px 8px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1216,44 +1216,85 @@ function StepSearchVisual({ T, isMobile }) {
               </div>
               <span style={{ fontSize: 5.6, fontWeight: 800, color: DARK, border: '1px solid #EAEFEC', borderRadius: 12, padding: '3.5px 6px' }}>{T('Filtres', 'Filters', 'مرشحات')}</span>
             </div>
-            {/* La carte : reproduction fidèle de la vue MapTiler de l'application
-                — détroit de Gibraltar, côtes atlantique et méditerranéenne,
-                reliefs, villes, attribution — avec les épingles réelles (tige +
-                tête verte brillante, reprises de NearbyMap). Si une VRAIE
-                capture est déposée dans public/ecrans/carte-recherche.png, elle
-                remplace ce dessin automatiquement. */}
-            <div style={{ position: 'relative', height: 66, borderRadius: 8, overflow: 'hidden', background: '#BAD8E6' }}>
-              <svg viewBox="0 0 320 132" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
-                {/* Espagne, au-dessus du détroit */}
-                <path d="M112 0 H320 V9 C290 5 268 13 246 9 C224 5 204 12 186 7 L170 13 L158 8 C144 12 128 5 112 0 Z" fill="#F1EEE7" />
-                {/* Maroc + Algérie voisine */}
-                <path d="M153 20 C160 22 166 26 176 28 C192 31 208 29 223 30 C245 32 260 34 320 36 L320 132 L55 132 C57 122 55 114 59 108 C62 100 58 95 55 91 C58 86 62 82 68 78 C74 72 80 66 86 62 C96 59 102 58 109 57 C118 54 122 52 127 49 C130 47 132 46 133 45 C137 40 141 34 144 30 C147 26 150 22 153 20 Z" fill="#F1EEE7" />
-                {/* reliefs (Rif, Moyen et Haut Atlas, Souss) */}
-                <ellipse cx="175" cy="33" rx="26" ry="7" fill="#DBE7CF" opacity=".85" transform="rotate(-8 175 33)" />
-                <ellipse cx="182" cy="62" rx="20" ry="10" fill="#DBE7CF" opacity=".8" transform="rotate(20 182 62)" />
-                <ellipse cx="125" cy="88" rx="45" ry="9" fill="#D6E4C9" opacity=".9" transform="rotate(-18 125 88)" />
-                <ellipse cx="80" cy="112" rx="20" ry="6" fill="#DBE7CF" opacity=".8" transform="rotate(-12 80 112)" />
-                {/* frontière algérienne */}
-                <path d="M247 33 C246 55 242 80 240 100 C239 112 238 122 238 132" fill="none" stroke="#C9B8A8" strokeWidth="1" strokeDasharray="3 2.5" opacity=".8" />
-                {/* villes (points + noms, halo blanc comme sur la vraie carte) */}
-                {[[168, 12, 'Gibraltar'], [131, 46, 'Rabat'], [177, 46, 'Fès'], [252, 35, 'Oujda'], [66, 59, 'El Jadida'], [104, 86, 'Marrakech'], [66, 105, 'Agadir'], [245, 87, 'Bechar']].map(([x, y, n]) => (
+            {/* La carte : copie de la capture MapTiler fournie — même cadrage
+                (Gibraltar → Agadir/Zagora, Tlemcen à droite), mêmes routes
+                orange, oueds, reliefs verts, libellés de régions bilingues,
+                lignes maritimes en tirets, aéroports, et les épingles de
+                l'application aux mêmes villes. Une capture réelle déposée dans
+                public/ecrans/carte-recherche.png la remplace pixel pour pixel. */}
+            <div style={{ position: 'relative', height: 120, borderRadius: 8, overflow: 'hidden', background: '#A6C9E5' }}>
+              <svg viewBox="0 0 320 245" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
+                {/* limites maritimes (détroit + mer d'Alboran) */}
+                <g stroke="#8FB4D4" strokeWidth=".8" strokeDasharray="4 3" opacity=".8">
+                  <path d="M191 10 L320 22" /><path d="M191 10 L320 38" /><path d="M178 14 L100 0" />
+                </g>
+                {/* Espagne (au-dessus du détroit) */}
+                <path d="M150 0 L230 0 C220 4 210 6 203 4 C197 8 193 9 191 8 L183 11 C176 8 168 4 160 2 Z" fill="#F6F4EF" />
+                {/* Maroc + Algérie voisine, côtes atlantique et méditerranéenne */}
+                <path d="M177 20 C185 23 190 26 196 28 L212 33 C224 36 232 39 240 38 C252 35 262 34 266 37 L268 40 C278 43 290 46 320 52 L320 245 L52 245 C54 235 55 228 59 222 C52 214 50 208 48 204 C49 196 50 188 54 181 C58 170 63 159 70 151 C76 143 80 136 85 130 C88 124 90 119 93 115 C102 110 112 105 121 103 C130 99 138 93 145 86 C147 82 148 78 150 74 C155 63 160 52 166 42 C168 38 169 34 170 31 C172 26 174 22 177 20 Z" fill="#F6F4EF" />
+                {/* reliefs et plaines */}
+                <ellipse cx="200" cy="42" rx="38" ry="11" fill="#CFE3BC" opacity=".85" transform="rotate(-6 200 42)" />
+                <ellipse cx="182" cy="34" rx="14" ry="8" fill="#CFE3BC" opacity=".8" />
+                <ellipse cx="185" cy="80" rx="30" ry="12" fill="#DFEBCE" opacity=".9" transform="rotate(8 185 80)" />
+                <ellipse cx="195" cy="115" rx="28" ry="16" fill="#CFE3BC" opacity=".8" transform="rotate(25 195 115)" />
+                <ellipse cx="150" cy="172" rx="55" ry="11" fill="#CFE3BC" opacity=".85" transform="rotate(-18 150 172)" />
+                <ellipse cx="105" cy="120" rx="22" ry="10" fill="#E2EDD2" opacity=".9" transform="rotate(-30 105 120)" />
+                <ellipse cx="85" cy="222" rx="24" ry="7" fill="#CFE3BC" opacity=".8" transform="rotate(-8 85 222)" />
+                {/* oueds */}
+                <g stroke="#A6C8E2" strokeWidth=".8" fill="none" opacity=".9">
+                  <path d="M288 47 C280 70 272 95 262 118" />
+                  <path d="M96 116 C120 130 140 138 158 144 C170 148 178 152 186 158" />
+                  <path d="M152 72 C165 80 180 84 196 88" />
+                  <path d="M150 205 C160 215 170 222 178 228" />
+                </g>
+                {/* routes principales */}
+                <g stroke="#EFA35C" strokeWidth=".9" fill="none" strokeLinejoin="round" opacity=".95">
+                  <path d="M177 22 L166 44 L150 74 L145 88 L121 104 L93 117 L70 152 L54 182 L59 222" />
+                  <path d="M145 88 L169 93 L203 88 L233 80 L267 72 L298 62" />
+                  <path d="M121 104 L110 140 L109 176 L81 218 L61 222" />
+                  <path d="M109 176 L143 203 L176 224" />
+                  <path d="M203 88 L210 120 L220 165" />
+                  <path d="M143 129 L160 149" />
+                  <path d="M298 62 L297 142 L288 176" />
+                </g>
+                {/* régions (bilingue, comme sur la capture) */}
+                <g fill="#A8B0AC" fontFamily="Inter, sans-serif" fontWeight="600">
+                  <text x="186" y="100" fontSize="5.4">Fès-Meknès · فاس مكناس</text>
+                  <text x="272" y="108" fontSize="5.4">Oriental</text>
+                  <text x="276" y="115" fontSize="5.4">الشرقية</text>
+                  <text x="158" y="197" fontSize="5.4">Drâa-Tafilalet</text>
+                  <text x="166" y="204" fontSize="5.4">درعة تافيلالت</text>
+                </g>
+                {/* aéroports */}
+                <g fill="#5B8FD4" fontFamily="Inter, sans-serif" fontSize="4.6" fontWeight="700">
+                  <text x="252" y="56">✈ NDR</text>
+                  <text x="60" y="234">✈ AGA</text>
+                </g>
+                {/* villes secondaires — la texture de la carte */}
+                {[[190,28,'Tétouan'],[166,42,'Larache'],[194,43,'Chefchaouen'],[233,40,'Al Hoceima'],[264,36,'Melilla'],[182,57,'Ouezzane'],[283,50,'Berkane'],[303,53,'Tlemcen'],[231,79,'Taza'],[265,70,'Taourirt'],[178,77,'Sidi Kacem'],[167,93,'Khemisset'],[120,114,'Berrechid'],[91,115,'El Jadida'],[119,124,'Settat'],[141,129,'Khouribga'],[179,127,'Khenifra'],[208,111,'Boulemane'],[158,148,'Beni Mellal'],[160,139,'Kasba Tadla'],[68,151,'Safi'],[93,138,'Sidi Bennour'],[52,181,'Essaouira'],[108,153,'Ben Guerir'],[218,164,'Errachidia'],[184,180,'Tinghir'],[141,203,'Ouarzazate'],[174,225,'Zagora'],[79,220,'Taroudant'],[286,176,'Bechar'],[295,142,'Bouarfa'],[231,122,'Missour']].map(([x, y, n]) => (
                   <g key={n}>
-                    <circle cx={x} cy={y + 3} r="1.3" fill="#8A9993" />
-                    <text x={x + 3} y={y + 5} fontSize="6.4" fontWeight="600" fill="#4A5A55" style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 2, fontFamily: 'Inter, sans-serif' }}>{n}</text>
+                    <circle cx={x} cy={y - 2} r="1" fill="#8A9993" />
+                    <text x={x + 2.5} y={y} fontSize="5.4" fontWeight="600" fill="#4A5550" style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 1.6, fontFamily: 'Inter, sans-serif' }}>{n}</text>
                   </g>
                 ))}
-                {/* les épingles de l'application : tige métallique, tête verte */}
-                {[[109, 57, 1], [127, 49, 0], [173, 49, 1], [159, 51, 0], [86, 62, 0], [98, 89, 1], [59, 108, 0]].map(([x, y, pulse], i) => (
+                {/* grandes villes */}
+                <text x="191" y="7" fontSize="9" fontWeight="800" fill="#2E3B36" textAnchor="middle" style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 2, fontFamily: 'Inter, sans-serif' }}>Gibraltar</text>
+                {/* Fès s'écrit à gauche de ses deux épingles, Oujda aussi (le
+                    bord du cadre le tronquait) — comme sur la capture réelle. */}
+                {[[177,20,'Tanger','s'],[145,86,'Rabat','s'],[121,103,'Casablanca','s'],[199,84,'Fès','e'],[109,176,'Marrakech','s'],[59,222,'Agadir','s'],[292,61,'Oujda','e']].map(([x, y, n, a]) => (
+                  <text key={n} x={a === 'e' ? x - 5 : x + 6} y={y - 1} fontSize="7.5" fontWeight="800" fill="#2E3B36" textAnchor={a === 'e' ? 'end' : 'start'} style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 2, fontFamily: 'Inter, sans-serif' }}>{n}</text>
+                ))}
+                {/* les épingles de l'application, aux mêmes villes que la capture */}
+                {[[177,22,1],[145,88,0],[119,103,1],[123,106,0],[203,88,0],[213,91,1],[296,63,0],[109,178,1],[59,224,0]].map(([x, y, pulse], i) => (
                   <g key={i}>
-                    {pulse === 1 && <circle cx={x} cy={y - 7} r="3.4" fill="rgba(22,160,106,.45)" className="tb-anim" style={{ animation: `tbPulse ${1.9 + i * .2}s ease-out infinite ${i * .4}s`, transformOrigin: `${x}px ${y - 7}px` }} />}
-                    <rect x={x - .7} y={y - 6.5} width="1.4" height="6.5" rx=".7" fill="#98A2AA" />
-                    <circle cx={x} cy={y - 7} r="3.2" fill="#16A06A" stroke="#fff" strokeWidth=".9" />
-                    <circle cx={x - 1} cy={y - 8} r=".9" fill="rgba(255,255,255,.65)" />
+                    {pulse === 1 && <circle cx={x} cy={y - 8} r="4" fill="rgba(22,160,106,.4)" className="tb-anim" style={{ animation: `tbPulse ${1.9 + i * .2}s ease-out infinite ${i * .4}s`, transformOrigin: `${x}px ${y - 8}px` }} />}
+                    <rect x={x - .8} y={y - 7.5} width="1.6" height="7.5" rx=".8" fill="#98A2AA" />
+                    <circle cx={x} cy={y - 8} r="3.6" fill="#16A06A" stroke="#fff" strokeWidth="1" />
+                    <circle cx={x - 1.1} cy={y - 9.1} r="1" fill="rgba(255,255,255,.65)" />
                   </g>
                 ))}
-                {/* attribution */}
-                <rect x="2" y="123" width="88" height="8" rx="2" fill="rgba(255,255,255,.78)" />
-                <text x="5" y="129" fontSize="5.2" fill="#6B7B76" style={{ fontFamily: 'Inter, sans-serif' }}>© MapTiler © OpenStreetMap</text>
+                <rect x="2" y="236" width="88" height="8" rx="2" fill="rgba(255,255,255,.78)" />
+                <text x="5" y="242" fontSize="5" fill="#6B7B76" style={{ fontFamily: 'Inter, sans-serif' }}>© MapTiler © OpenStreetMap</text>
               </svg>
               {/* une capture réelle déposée dans public/ecrans/ prend le dessus */}
               <img src="/ecrans/carte-recherche.png" alt="" aria-hidden
@@ -1264,6 +1305,9 @@ function StepSearchVisual({ T, isMobile }) {
                 {['+', '−'].map((c) => (
                   <span key={c} style={{ width: 10, height: 10, background: '#fff', borderRadius: 3, display: 'grid', placeItems: 'center', fontSize: 7, fontWeight: 800, color: DARK, boxShadow: '0 1px 4px rgba(13,43,30,.22)', lineHeight: 1 }}>{c}</span>
                 ))}
+                <span style={{ width: 10, height: 10, background: '#fff', borderRadius: 3, display: 'grid', placeItems: 'center', boxShadow: '0 1px 4px rgba(13,43,30,.22)' }}>
+                  <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="#15314A" strokeWidth="2.6" strokeLinecap="round"><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg>
+                </span>
               </div>
               <span style={{ position: 'absolute', bottom: 4, insetInlineEnd: 4, background: '#fff', borderRadius: 8, padding: '1.5px 5px', fontSize: 5, fontWeight: 800, color: DARK, boxShadow: '0 2px 6px rgba(13,43,30,.18)' }}>⤢ {T('Agrandir', 'Expand', 'تكبير')}</span>
             </div>
