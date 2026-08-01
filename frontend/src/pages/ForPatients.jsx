@@ -85,7 +85,7 @@ export default function ForPatients() {
       <MarketingHeader activeKey="forpatients" audience="patient" />
 
       {/* Hero */}
-      <section style={{ background: 'linear-gradient(180deg, #EAF6F0 0%, #F4F8F5 100%)', padding: '80px 24px 72px' }}>
+      <section style={{ background: 'linear-gradient(180deg, #EAF6F0 0%, #F4F8F5 100%)', padding: isMobile ? '44px 16px 34px' : '80px 24px 72px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -328,7 +328,7 @@ export default function ForPatients() {
       </section>
 
       {/* Features Grid */}
-      <section style={{ padding: '56px 24px 72px', background: '#fff' }}>
+      <section style={{ padding: isMobile ? '30px 16px 34px' : '56px 24px 72px', background: '#fff' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: DARK, textAlign: 'center', whiteSpace: isMobile ? 'normal' : 'nowrap', marginBottom: 10, letterSpacing: '-0.3px' }}>
             {lang === 'ar' ? 'كل ما تحتاجه في مكان واحد' : lang === 'en' ? 'Everything you need, in one place' : 'Tout ce dont vous avez besoin, en un seul endroit'}
@@ -422,7 +422,7 @@ export default function ForPatients() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '64px 24px', background: 'linear-gradient(135deg, #0C4A37 0%, #0A3D2D 100%)' }}>
+      <section style={{ padding: isMobile ? '36px 16px' : '64px 24px', background: 'linear-gradient(135deg, #0C4A37 0%, #0A3D2D 100%)' }}>
         <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 30, fontWeight: 800, color: '#fff', marginBottom: 14, letterSpacing: '-0.3px' }}>
             {lang === 'ar' ? 'ابدأ رحلتك الصحية اليوم' : lang === 'en' ? 'Start your health journey today' : 'Commencez votre parcours santé dès aujourd\'hui'}

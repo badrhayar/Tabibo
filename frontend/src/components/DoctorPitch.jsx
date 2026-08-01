@@ -197,7 +197,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
   return (
     <>
       {/* ── Repères ──────────────────────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '34px 0 8px' : '56px 0 16px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '26px 0 6px' : '56px 0 16px' }}>
         <div style={wrap}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
             {MARKERS.map((m, mi) => (
@@ -228,7 +228,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       </section>
 
       {/* ── Un cabinet mieux organisé ────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '44px 0 10px' : '76px 0 20px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '30px 0 8px' : '76px 0 20px' }}>
         <div style={wrap}>
           <SectionTitle isMobile={isMobile}>
             {t('Un cabinet mieux organisé', 'A better-organised practice', 'عيادة أفضل تنظيماً')}
@@ -291,7 +291,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       </section>
 
       {/* ── Parole de l'éditeur (à la place d'un témoignage inventé) ─────── */}
-      <section style={{ background: '#EAF4EF', padding: isMobile ? '40px 0' : '64px 0' }}>
+      <section style={{ background: '#EAF4EF', padding: isMobile ? '28px 0' : '64px 0' }}>
         <div style={{ ...wrap, maxWidth: 860, textAlign: 'center', position: 'relative' }}>
           <svg width="46" height="46" viewBox="0 0 24 24" fill={GREEN} opacity="0.22" style={{ display: 'block', margin: '0 auto 14px' }}>
             <path d="M9.5 5C6 5 3.2 7.9 3.2 11.4c0 3.2 2.4 5.6 5.4 5.6.5 0 1-.1 1.4-.2-.6 1.4-2 2.4-3.7 2.6l.5 2.6c4.2-.5 7.2-4 7.2-9.2C14 7.6 12 5 9.5 5zm10 0C16 5 13.2 7.9 13.2 11.4c0 3.2 2.4 5.6 5.4 5.6.5 0 1-.1 1.4-.2-.6 1.4-2 2.4-3.7 2.6l.5 2.6c4.2-.5 7.2-4 7.2-9.2C24 7.6 22 5 19.5 5z" />
@@ -308,7 +308,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       </section>
 
       {/* ── Communication patient ────────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '44px 0 10px' : '76px 0 20px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '30px 0 8px' : '76px 0 20px' }}>
         <div style={wrap}>
           <SectionTitle isMobile={isMobile}>
             {t('Une communication patient simplifiée', 'Simpler patient communication', 'تواصل أبسط مع المرضى')}
@@ -378,9 +378,9 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       </section>
 
       {/* ── Tabibo Network ─────────────────────────────────────────────────────────── */}
-      <section style={{ background: BG, padding: isMobile ? '44px 0' : '76px 0' }}>
+      <section style={{ background: BG, padding: isMobile ? '30px 0' : '76px 0' }}>
         <div style={wrap}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? 30 : 48 }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? 22 : 48 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 99, padding: '6px 15px', fontSize: 12, fontWeight: 800, color: GREEN, marginBottom: 16 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.6" r="3.5" /><path d="M12 12.6c-3.35 0-6.05 2.05-6.05 4.75 0 .72.58 1.3 1.3 1.3h9.5c.72 0 1.3-.58 1.3-1.3 0-2.7-2.7-4.75-6.05-4.75z" /><circle cx="4.5" cy="9.6" r="2.7" /><circle cx="19.5" cy="9.6" r="2.7" /></svg>
               {t('Nouveau', 'New', 'جديد')}
@@ -434,7 +434,7 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       </section>
 
       {/* ── Protection des données ───────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '44px 0 10px' : '76px 0 24px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '30px 0 8px' : '76px 0 24px' }}>
         <div style={wrap}>
           <SectionTitle isMobile={isMobile}>
             {t('Vos données, et celles de vos patients', 'Your data, and your patients’ data', 'بياناتكم وبيانات مرضاكم')}

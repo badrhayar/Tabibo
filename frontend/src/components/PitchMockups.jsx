@@ -768,7 +768,7 @@ export const FeatureBlock = ({ visual, title, eyebrow, points, isMobile, flip })
     </svg>
   );
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 22 : 56, alignItems: 'center', marginBottom: isMobile ? 44 : 78 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 56, alignItems: 'center', marginBottom: isMobile ? 30 : 78 }}>
       <div style={{ order: isMobile ? 0 : (flip ? 1 : 0) }}>{visual}</div>
       <div style={{ order: isMobile ? 1 : (flip ? 0 : 1) }}>
         <h3 style={{ fontSize: isMobile ? 21 : 26, fontWeight: 800, color: DARK, margin: '0 0 14px', letterSpacing: '-0.4px', lineHeight: 1.25 }}>{title}</h3>

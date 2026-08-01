@@ -538,7 +538,7 @@ export default function Landing() {
             <p style={{ color: MUTED, fontSize: 15.5, margin: 0 }}>{tr('Simple, rapide et sécurisé', 'Simple, fast and secure', 'بسيط وسريع وآمن')}</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isPhone ? 16 : 26 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 34 : 26 }}>
             {/* Chaque colonne : la carte de l'étape, puis la scène qui la montre
                 en vrai (carte du Maroc, créneaux, WhatsApp). La carte s'étire
                 (flex:1) pour que les trois scènes s'alignent sur bureau ; sur
@@ -548,7 +548,7 @@ export default function Landing() {
               { icon: 'calendar', title: t.s2t, sub: t.s2s, num: '02', tint: '#C7E9D8', color: '#0E7C52' },
               { icon: 'checkCircle', title: t.s3t, sub: t.s3s, num: '03', tint: '#C7E9D8', color: '#0E7C52' },
             ].map((step, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: isPhone ? 14 : 18 }}>
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 18 }}>
                 <div className="sa-lift" style={{ flex: 1, background: `linear-gradient(160deg, ${step.tint} 0%, #E3F5EC 100%)`, border: `1px solid ${CARD_EDGE}`, borderRadius: 20, padding: isPhone ? '26px 22px' : '34px 30px', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 10px -4px rgba(13,43,30,0.09), 0 20px 40px -30px rgba(11,90,60,0.5)' }}>
                   <div style={{ position: 'absolute', top: 14, [rtl ? 'left' : 'right']: 22, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 46, fontWeight: 800, color: step.color, opacity: 0.13, lineHeight: 1 }}>{step.num}</div>
                   <div style={{ width: 56, height: 56, borderRadius: 16, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: step.color, marginBottom: 20, boxShadow: `0 8px 18px -10px ${step.color}` }}><Icon name={step.icon} size={26} /></div>

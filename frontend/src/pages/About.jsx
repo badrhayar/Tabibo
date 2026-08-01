@@ -134,7 +134,7 @@ export default function About() {
       </section>
 
       {/* ── Bandeau de repères (teintes partagées avec les autres pages) ── */}
-      <section style={{ background: '#fff', padding: isMobile ? '34px 0 8px' : '58px 0 12px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '26px 0 6px' : '58px 0 12px' }}>
         <div style={wrap}>
           <MetricBand
             isMobile={isMobile}
@@ -157,9 +157,9 @@ export default function About() {
       </section>
 
       {/* ── Trois piliers ───────────────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '40px 0 8px' : '64px 0 16px' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '28px 0 6px' : '64px 0 16px' }}>
         <div style={wrap}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? 28 : 44 }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? 20 : 44 }}>
             <Eyebrow>{t('Ce qui nous guide', 'What guides us', 'ما يوجّهنا')}</Eyebrow>
             <SectionTitle isMobile={isMobile}>{t('Trois engagements, tenus par le produit', 'Three commitments, kept by the product', 'ثلاثة التزامات، يحفظها المنتج')}</SectionTitle>
           </div>
@@ -183,9 +183,9 @@ export default function About() {
       </section>
 
       {/* ── Parcours patient ────────────────────────────────────────────── */}
-      <section style={{ background: BG, padding: isMobile ? '44px 0' : '72px 0', marginTop: isMobile ? 40 : 64 }}>
+      <section style={{ background: BG, padding: isMobile ? '30px 0' : '72px 0', marginTop: isMobile ? 40 : 64 }}>
         <div style={wrap}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? 30 : 48 }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? 22 : 48 }}>
             <Eyebrow>{t('Le parcours', 'The journey', 'المسار')}</Eyebrow>
             <SectionTitle isMobile={isMobile}>{t('Du besoin de soin au suivi, en trois temps', 'From needing care to follow-up, in three steps', 'من الحاجة إلى الرعاية إلى المتابعة، في ثلاث خطوات')}</SectionTitle>
           </div>
@@ -209,9 +209,9 @@ export default function About() {
       </section>
 
       {/* ── Ce qui distingue Tabibo ─────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '44px 0' : '72px 0' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '30px 0' : '72px 0' }}>
         <div style={wrap}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? 30 : 48 }}>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? 22 : 48 }}>
             <Eyebrow>{t('Ce qui nous distingue', 'What sets us apart', 'ما يميّزنا')}</Eyebrow>
             <SectionTitle isMobile={isMobile}>{t('Une plateforme pensée ici, pour ici', 'A platform built here, for here', 'منصة صُمّمت هنا، لأجل هنا')}</SectionTitle>
           </div>
@@ -231,7 +231,7 @@ export default function About() {
       </section>
 
       {/* ── Parole de l'éditeur ─────────────────────────────────────────── */}
-      <section style={{ background: '#EAF4EF', padding: isMobile ? '44px 0' : '68px 0' }}>
+      <section style={{ background: '#EAF4EF', padding: isMobile ? '30px 0' : '68px 0' }}>
         <div style={{ ...wrap, maxWidth: 860, textAlign: 'center' }}>
           <svg width="44" height="44" viewBox="0 0 24 24" fill={GREEN} opacity="0.22" style={{ display: 'block', margin: '0 auto 14px' }}>
             <path d="M9.5 5C6 5 3.2 7.9 3.2 11.4c0 3.2 2.4 5.6 5.4 5.6.5 0 1-.1 1.4-.2-.6 1.4-2 2.4-3.7 2.6l.5 2.6c4.2-.5 7.2-4 7.2-9.2C14 7.6 12 5 9.5 5zm10 0C16 5 13.2 7.9 13.2 11.4c0 3.2 2.4 5.6 5.4 5.6.5 0 1-.1 1.4-.2-.6 1.4-2 2.4-3.7 2.6l.5 2.6c4.2-.5 7.2-4 7.2-9.2C24 7.6 22 5 19.5 5z" />
@@ -246,7 +246,7 @@ export default function About() {
       </section>
 
       {/* ── Sécurité et conformité ──────────────────────────────────────── */}
-      <section style={{ background: '#fff', padding: isMobile ? '44px 0' : '72px 0' }}>
+      <section style={{ background: '#fff', padding: isMobile ? '30px 0' : '72px 0' }}>
         <div style={wrap}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '0.85fr 1.15fr', gap: isMobile ? 26 : 48, alignItems: 'center' }}>
             <div>
@@ -278,7 +278,7 @@ export default function About() {
       </section>
 
       {/* ── État du projet — honnêteté pré-lancement ────────────────────── */}
-      <section style={{ background: BG, padding: isMobile ? '40px 0' : '60px 0' }}>
+      <section style={{ background: BG, padding: isMobile ? '28px 0' : '60px 0' }}>
         <div style={{ ...wrap, maxWidth: 820 }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: '#fff', border: '1px solid #EAEFEC', borderRadius: 18, padding: isMobile ? '20px 20px' : '26px 30px' }}>
             <span style={{ flexShrink: 0, display: 'inline-flex', width: 42, height: 42, borderRadius: 12, background: '#E7F6EE', color: GREEN, alignItems: 'center', justifyContent: 'center' }}>{I.spark}</span>
