@@ -1134,7 +1134,7 @@ export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }
    ÉCRANS réels — la carte du Maroc et les fiches pour la recherche, la grille
    de créneaux pour le choix, la conversation WhatsApp pour la confirmation. */
 
-const SCENE_H = { desktop: 252, mobile: 216 };
+const SCENE_H = { desktop: 312, mobile: 268 };
 
 function Scene({ children, isMobile }) {
   return (
@@ -1158,136 +1158,227 @@ function Scene({ children, isMobile }) {
   );
 }
 
-/* Silhouette stylisée du Maroc (Sahara compris), tracée en « low-poly » :
-   points projetés depuis les vraies latitudes/longitudes, arêtes franches,
-   contour lumineux. Les capitales de la couverture pulsent dessus. */
-const MA_OUTLINE = 'M211 8 L264 17 L283 26 L296 78 L237 82 L211 114 L171 126 L158 166 L158 294 L6 300 L23 246 L50 198 L75 177 L80 162 L130 132 L141 112 L138 90 L178 49 L192 40 L197 35 L205 16 Z';
-const MA_PINS = [
-  [178, 49], [192, 40], [170, 87], [208, 12], [226, 39], [141, 112], [278, 28], [75, 177], [26, 246],
-];
+/* Pastille de contexte : un fait, posé en coin de scène. */
+const SceneChip = ({ children, side = 'end', pos = 'bottom', delay = 1.6 }) => (
+  <div className="tb-anim" style={{
+    position: 'absolute', [pos]: 10, [side === 'end' ? 'insetInlineEnd' : 'insetInlineStart']: 10,
+    background: 'rgba(6,30,24,.6)', border: '1px solid rgba(140,255,205,.35)', borderRadius: 20,
+    padding: '4px 10px', fontSize: 8.5, fontWeight: 800, color: '#B8FFD9',
+    backdropFilter: 'blur(4px)', animation: `tbSlide .5s ease both ${delay}s`, zIndex: 3,
+  }}>{children}</div>
+);
 
+/* ── 1 · La recherche, telle quelle sur téléphone : carte réelle en clair,
+      « 20 sur la carte », résultats avec tarif et Réserver. ── */
 function StepSearchVisual({ T, isMobile }) {
+  const tile = (txt, bg, fg) => (
+    <span style={{ width: 20, height: 20, borderRadius: 6, background: bg, color: fg, display: 'grid', placeItems: 'center', fontSize: 6.5, fontWeight: 900, flexShrink: 0 }}>{txt}</span>
+  );
+  const resultCard = (highlight, initials, tbg, tfg, name, spec, stars, clinic, price, chips, delay) => (
+    <div className="tb-anim" style={{
+      display: 'flex', alignItems: 'flex-start', gap: 5, padding: '5px 6px',
+      background: '#fff', borderRadius: 8, border: highlight ? `1.3px solid ${GREEN}` : '1px solid #EAEFEC',
+      boxShadow: highlight ? '0 6px 14px -8px rgba(11,90,60,.6)' : 'none',
+      animation: `tbSlide .45s ease both ${delay}s`,
+    }}>
+      {tile(initials, tbg, tfg)}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 6.8, fontWeight: 900, color: DARK, whiteSpace: 'nowrap' }}>{name}</div>
+        <div style={{ fontSize: 5.8, fontWeight: 800, color: GREEN }}>{spec}</div>
+        <div style={{ fontSize: 5.4, color: MUTED, fontWeight: 600 }}>★ {stars} · {clinic}</div>
+        <div style={{ display: 'flex', gap: 2.5, marginTop: 2 }}>
+          {chips.map(([txt, bg, fg]) => (
+            <span key={txt} style={{ fontSize: 4.8, fontWeight: 800, color: fg, background: bg, borderRadius: 8, padding: '1px 4px', whiteSpace: 'nowrap' }}>{txt}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ textAlign: 'end', flexShrink: 0 }}>
+        <div style={{ fontSize: 6.6, fontWeight: 900, color: DARK }}>{price}<span style={{ fontSize: 4.6, color: MUTED }}> MAD</span></div>
+        <div style={{ marginTop: 2.5, background: 'linear-gradient(150deg,#16A06A,#0E7C52)', color: '#fff', borderRadius: 5, padding: '2.5px 6px', fontSize: 5.2, fontWeight: 900 }}>{T('Réserver', 'Book', 'احجز')}</div>
+      </div>
+    </div>
+  );
   return (
     <Scene isMobile={isMobile}>
-      {/* la carte, légèrement inclinée — un plateau, pas un document */}
-      <svg viewBox="0 0 300 310" aria-hidden style={{ position: 'absolute', insetInlineEnd: 4, top: 4, height: 'calc(100% - 8px)', transform: 'rotate(4deg)', opacity: .96 }}>
-        <path d={MA_OUTLINE} fill="rgba(122,245,193,.09)" stroke="rgba(140,255,205,.75)" strokeWidth="2" strokeLinejoin="round" />
-        <path d={MA_OUTLINE} fill="none" stroke="rgba(140,255,205,.22)" strokeWidth="7" strokeLinejoin="round" />
-        {MA_PINS.map(([x, y], i) => (
-          <g key={i} className="tb-anim">
-            <circle cx={x} cy={y} r="7" fill="rgba(122,245,193,.25)" style={{ animation: `tbPulse ${2 + (i % 3) * .5}s ease-in-out infinite ${i * .3}s`, transformOrigin: `${x}px ${y}px` }} />
-            <circle cx={x} cy={y} r="2.6" fill="#B8FFD9" />
-          </g>
-        ))}
-      </svg>
-
-      {/* la recherche tapée… */}
-      <div className="tb-anim" style={{ position: 'absolute', top: 14, insetInlineStart: 12, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.96)', borderRadius: 20, padding: '7px 12px', boxShadow: '0 14px 28px -14px rgba(2,24,16,.8)', animation: 'tbSlide .5s ease both .2s' }}>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.6" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
-        <span style={{ fontSize: 10, fontWeight: 800, color: DARK }}>{T('Cardiologue · Casablanca', 'Cardiologist · Casablanca', 'طبيب القلب · الدار البيضاء')}</span>
-      </div>
-
-      {/* …fait surgir la fiche du médecin, reliée à sa ville */}
-      <svg aria-hidden style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
-        <line x1="46%" y1="62%" x2="72%" y2="24%" stroke="rgba(140,255,205,.6)" strokeWidth="1.6" strokeDasharray="4 4" className="tb-anim" style={{ animation: 'tbSlide .01s both 1s' }} />
-      </svg>
-      <div className="tb-anim" style={{ position: 'absolute', bottom: 16, insetInlineStart: 12, width: 168, background: 'rgba(255,255,255,.97)', borderRadius: 13, padding: '10px 11px', boxShadow: '0 0 0 1px rgba(122,245,193,.16), 0 22px 40px -20px rgba(2,24,16,.9)', animation: 'tbPop .55s cubic-bezier(.16,.8,.3,1) both .9s' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Avatar size={34} seed={3} role="doctor" ring={false} />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 900, color: DARK }}>Dr Aya Chakkour</div>
-            <div style={{ fontSize: 8, color: MUTED, fontWeight: 700 }}>{T('Cardiologue · 4,9 ★', 'Cardiologist · 4.9 ★', 'طبيبة القلب · 4,9 ★')}</div>
+      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(2deg)', animation: 'tbFade .6s ease both .15s' }}>
+        <Phone w={176}>
+          {/* la barre du haut, celle de l'application */}
+          <div style={{ background: 'linear-gradient(90deg,#0C4A37,#0A3D2D)', padding: '13px 8px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 8, fontWeight: 900, color: '#fff' }}>Tabibo</span>
+            <span style={{ fontSize: 5.5, fontWeight: 800, color: '#fff', background: 'rgba(255,255,255,.16)', border: '1px solid rgba(255,255,255,.3)', borderRadius: 9, padding: '2px 6px' }}>{T('Se connecter', 'Sign in', 'تسجيل الدخول')}</span>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: 4, marginTop: 7 }}>
-          <Chip>{T('INPE vérifié', 'INPE verified', 'INPE موثّق')}</Chip>
-          <Chip bg="#FEF6E7" fg="#9A6510">{T('Auj. 14:30', 'Today 2:30', 'اليوم 14:30')}</Chip>
-        </div>
+          <div style={{ padding: '6px 7px 8px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {/* recherche + filtres */}
+            <div style={{ display: 'flex', gap: 4 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3, background: '#F4F8F6', border: '1px solid #EAEFEC', borderRadius: 12, padding: '3.5px 6px' }}>
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="3" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+                <span style={{ fontSize: 5.8, color: '#9AA8A2', fontWeight: 600 }}>{T('Médecin, spécialité…', 'Doctor, specialty…', 'طبيب، تخصص…')}</span>
+              </div>
+              <span style={{ fontSize: 5.6, fontWeight: 800, color: DARK, border: '1px solid #EAEFEC', borderRadius: 12, padding: '3.5px 6px' }}>{T('Filtres', 'Filters', 'مرشحات')}</span>
+            </div>
+            {/* la carte, EN CLAIR comme la vraie */}
+            <div style={{ position: 'relative', height: 56, borderRadius: 8, overflow: 'hidden', background: 'linear-gradient(160deg,#DCE9F2 0%, #E7F0F6 100%)' }}>
+              <svg viewBox="0 0 160 56" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
+                <path d="M28 0 L82 4 L118 0 L160 8 L160 24 L128 34 L112 56 L58 56 L44 40 L20 34 L0 20 L0 6 Z" fill="#CDE7D4" opacity=".9" />
+                <path d="M118 0 L160 8 L160 24 L128 34 Z" fill="#BFDFC9" opacity=".7" />
+                {[[46, 20], [66, 14], [92, 18], [58, 34], [40, 42], [104, 30]].map(([x, y], i) => (
+                  <g key={i}>
+                    <circle cx={x} cy={y} r="4.5" fill="rgba(22,160,106,.25)" className="tb-anim" style={{ animation: `tbPulse ${2 + (i % 3) * .5}s ease-in-out infinite ${i * .35}s`, transformOrigin: `${x}px ${y}px` }} />
+                    <circle cx={x} cy={y} r="2" fill="#0E7C52" stroke="#fff" strokeWidth=".8" />
+                  </g>
+                ))}
+              </svg>
+              <span style={{ position: 'absolute', top: 4, insetInlineStart: 4, background: '#fff', borderRadius: 8, padding: '1.5px 5px', fontSize: 5, fontWeight: 800, color: DARK, boxShadow: '0 2px 6px rgba(13,43,30,.18)' }}>{T('20 sur la carte', '20 on the map', '20 على الخريطة')}</span>
+              <span style={{ position: 'absolute', bottom: 4, insetInlineEnd: 4, background: '#fff', borderRadius: 8, padding: '1.5px 5px', fontSize: 5, fontWeight: 800, color: DARK, boxShadow: '0 2px 6px rgba(13,43,30,.18)' }}>⤢ {T('Agrandir', 'Expand', 'تكبير')}</span>
+            </div>
+            <div style={{ fontSize: 6, color: DARK }}><b style={{ color: GREEN }}>20 {T('médecins', 'doctors', 'طبيباً')}</b> {T('disponibles', 'available', 'متاحون')}</div>
+            {resultCard(true, 'LM', '#E7F6EE', '#0E7C52', 'Dr. Leila Marmioui', T('Gynécologue', 'Gynaecologist', 'طبيبة نساء'), '4,8 · 128 ' + T('avis', 'reviews', 'رأي'), 'Tanger', '300',
+              [[T('Conventionné', 'Approved', 'متعاقد'), '#E7F6EE', '#0E7C52'], [T('Téléconsultation', 'Telehealth', 'عن بُعد'), '#E8F1FC', '#3B6FB0']], .7)}
+            {resultCard(false, 'KB', '#FEF3DC', '#9A6510', 'Dr. Karim Benali', T('Cardiologue', 'Cardiologist', 'طبيب قلب'), '4,9 · 208 ' + T('avis', 'reviews', 'رأي'), 'Casablanca', '500',
+              [[T('Conventionné', 'Approved', 'متعاقد'), '#E7F6EE', '#0E7C52']], 1)}
+          </div>
+        </Phone>
       </div>
-
-      {/* le repère qui relie la scène au chiffre de la page */}
-      <div className="tb-anim" style={{ position: 'absolute', bottom: 14, insetInlineEnd: 12, background: 'rgba(6,30,24,.55)', border: '1px solid rgba(140,255,205,.35)', borderRadius: 20, padding: '4px 10px', fontSize: 8.5, fontWeight: 800, color: '#B8FFD9', backdropFilter: 'blur(4px)', animation: 'tbSlide .5s ease both 1.4s' }}>
-        {T('72 villes couvertes', '72 cities covered', '72 مدينة مغطاة')}
-      </div>
+      <SceneChip side="end" pos="bottom" delay={1.6}>{T('72 villes couvertes', '72 cities covered', '72 مدينة مغطاة')}</SceneChip>
     </Scene>
   );
 }
 
+/* ── 2 · La page de réservation, telle quelle : calendrier d'août 2026,
+      horaires, honoraires, « Confirmer · 08:30 ». ── */
 function StepSlotVisual({ T, isMobile }) {
-  const SL = {
-    free:   { bg: '#fff', bd: '#BFE3D0', fg: GREEN, deco: 'none' },
-    taken:  { bg: '#F4F6F5', bd: '#E6EBE8', fg: '#A9B5B0', deco: 'line-through' },
-    picked: { bg: GREEN, bd: GREEN, fg: '#fff', deco: 'none' },
-  };
-  const cell = (h, st, i) => (
+  // Août 2026 commence un samedi ; les dimanches ne sont pas réservables.
+  const WEEKS = [[null, null, null, null, null, 1, 2], [3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16], [17, 18, 19, 20, 21, 22, 23], [24, 25, 26, 27, 28, 29, 30], [31, null, null, null, null, null, null]];
+  const SUNDAYS = new Set([2, 9, 16, 23, 30]);
+  const slot = (h, picked, taken, i) => (
     <div key={h} className="tb-anim" style={{
-      background: SL[st].bg, border: `1px solid ${SL[st].bd}`, color: SL[st].fg, textDecoration: SL[st].deco,
-      borderRadius: 7, padding: '5px 0', textAlign: 'center', fontSize: 8.5, fontWeight: 800,
-      animation: st === 'picked' ? 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 1.2s, tbRing 2.6s ease-out infinite 1.8s' : `tbSlide .4s ease both ${.3 + i * .06}s`,
-      boxShadow: st === 'picked' ? '0 10px 18px -8px rgba(11,90,60,.95)' : 'none',
+      background: picked ? GREEN : '#fff', border: `1px solid ${picked ? GREEN : taken ? '#E6EBE8' : '#D8E6DE'}`,
+      color: picked ? '#fff' : taken ? '#A9B5B0' : DARK, textDecoration: taken ? 'line-through' : 'none',
+      borderRadius: 6, padding: '3.5px 0', textAlign: 'center', fontSize: 6.2, fontWeight: 800,
+      animation: picked ? 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 1.1s, tbRing 2.8s ease-out infinite 1.7s' : `tbSlide .4s ease both ${.4 + i * .04}s`,
+      boxShadow: picked ? '0 8px 16px -8px rgba(11,90,60,.95)' : 'none',
     }}>{h}</div>
   );
   return (
     <Scene isMobile={isMobile}>
-      {/* orbite décorative derrière la carte */}
-      <span aria-hidden className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', width: 300, height: 300, marginTop: -150, marginLeft: -150, borderRadius: '50%', border: '1.5px dashed rgba(255,255,255,.14)', animation: 'tbSpinSlow 50s linear infinite' }} />
-      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 196, background: 'rgba(255,255,255,.97)', borderRadius: 14, padding: '11px 12px 12px', boxShadow: '0 0 0 1px rgba(122,245,193,.16), 0 26px 48px -22px rgba(2,24,16,.95)', animation: 'tbFade .55s ease both .15s' }}>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 7 }}>
-          {[['Mar', '11'], ['Mer', '12'], ['Jeu', '13']].map(([d, n], i) => (
-            <div key={n} style={{ flex: 1, textAlign: 'center', borderRadius: 7, padding: '3.5px 0', background: i === 1 ? GREEN : '#F4F8F6', color: i === 1 ? '#fff' : MUTED, boxShadow: i === 1 ? '0 6px 14px -8px rgba(11,90,60,.9)' : 'none' }}>
-              <div style={{ fontSize: 6.5, fontWeight: 700, opacity: .85 }}>{d}</div>
-              <div style={{ fontSize: 9.5, fontWeight: 900 }}>{n}</div>
+      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-1.5deg)', width: isMobile ? 250 : 288, background: '#fff', borderRadius: 13, padding: '9px 11px 11px', boxShadow: '0 0 0 1px rgba(122,245,193,.16), 0 26px 48px -22px rgba(2,24,16,.95)', animation: 'tbFade .55s ease both .15s' }}>
+        <div style={{ fontSize: 7.5, fontWeight: 900, color: DARK, marginBottom: 4 }}>{T('Choisissez une date et une heure', 'Pick a date and time', 'اختر التاريخ والساعة')}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+          <span style={{ fontSize: 6.5, color: MUTED, fontWeight: 800 }}>‹</span>
+          <span style={{ fontSize: 6.8, fontWeight: 900, color: DARK }}>{T('Août 2026', 'August 2026', 'غشت 2026')}</span>
+          <span style={{ fontSize: 6.5, color: MUTED, fontWeight: 800 }}>›</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1.5, marginBottom: 2 }}>
+          {[T('Lun', 'Mon', 'ن'), T('Mar', 'Tue', 'ث'), T('Mer', 'Wed', 'ر'), T('Jeu', 'Thu', 'خ'), T('Ven', 'Fri', 'ج'), T('Sam', 'Sat', 'س'), T('Dim', 'Sun', 'ح')].map((d) => (
+            <div key={d} style={{ textAlign: 'center', fontSize: 4.6, fontWeight: 800, color: MUTED }}>{d}</div>
+          ))}
+        </div>
+        {WEEKS.map((w, wi) => (
+          <div key={wi} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1.5, marginBottom: 1.5 }}>
+            {w.map((d, di) => (
+              <div key={di} style={{
+                textAlign: 'center', fontSize: 5.4, fontWeight: d === 20 ? 900 : 700, borderRadius: 4, padding: '2px 0',
+                color: d == null ? 'transparent' : d === 20 ? '#fff' : SUNDAYS.has(d) ? '#C3CDC8' : DARK,
+                background: d === 20 ? GREEN : d == null ? 'transparent' : '#FAFCFB',
+                boxShadow: d === 20 ? '0 4px 10px -4px rgba(11,90,60,.9)' : 'none',
+              }}>{d ?? '·'}</div>
+            ))}
+          </div>
+        ))}
+        <div style={{ fontSize: 6.2, fontWeight: 900, color: DARK, margin: '4px 0 3px' }}>{T('Horaires disponibles', 'Available times', 'الأوقات المتاحة')}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 3 }}>
+          {slot('08:00', false, false, 0)}{slot('08:30', true, false, 1)}{slot('09:00', false, false, 2)}{slot('09:30', false, true, 3)}
+          {slot('10:00', false, false, 4)}{slot('10:30', false, false, 5)}{slot('11:00', false, true, 6)}{slot('11:30', false, false, 7)}
+        </div>
+        <div style={{ background: '#F4F8F6', borderRadius: 7, padding: '4px 7px', margin: '5px 0' }}>
+          {[[T('Honoraires', 'Fee', 'الأتعاب'), '300 MAD', true], [T('Durée', 'Duration', 'المدة'), T('20 minutes', '20 minutes', '20 دقيقة'), false], [T('Paiement', 'Payment', 'الدفع'), T('Espèces · Carte · M-Wallet', 'Cash · Card · M-Wallet', 'نقداً · بطاقة · M-Wallet'), false]].map(([k, v, b]) => (
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 5.6, padding: '1.5px 0' }}>
+              <span style={{ color: MUTED, fontWeight: 600 }}>{k}</span><span style={{ color: DARK, fontWeight: b ? 900 : 700 }}>{v}</span>
             </div>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
-          {cell('09:00', 'taken', 0)}{cell('09:30', 'free', 1)}{cell('10:00', 'free', 2)}
-          {cell('10:30', 'picked', 3)}{cell('11:00', 'free', 4)}{cell('11:30', 'taken', 5)}
+        <div className="tb-anim" style={{ background: 'linear-gradient(150deg,#16A06A,#0E7C52)', color: '#fff', borderRadius: 8, padding: '5.5px 0', textAlign: 'center', fontSize: 7, fontWeight: 900, boxShadow: '0 10px 20px -10px rgba(11,90,60,1)', animation: 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 1.9s, tbRing 2.8s ease-out infinite 2.5s' }}>
+          {T('Confirmer · 08:30', 'Confirm · 08:30', 'تأكيد · 08:30')}
         </div>
       </div>
-      <div className="tb-anim" style={{ position: 'absolute', top: 12, insetInlineEnd: 12, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(6,30,24,.55)', border: '1px solid rgba(140,255,205,.35)', borderRadius: 20, padding: '4px 10px', backdropFilter: 'blur(4px)', animation: 'tbSlide .5s ease both 1.6s' }}>
-        <Dot s={5} />
-        <span style={{ fontSize: 8.5, fontWeight: 800, color: '#B8FFD9' }}>{T('Agenda en direct — créneaux réellement libres', 'Live diary — genuinely free slots', 'مفكرة مباشرة — مواعيد شاغرة فعلاً')}</span>
-      </div>
+      <SceneChip side="end" pos="top" delay={2.3}>{T('Agenda en direct — créneaux réellement libres', 'Live diary — genuinely free slots', 'مفكرة مباشرة — مواعيد شاغرة فعلاً')}</SceneChip>
     </Scene>
   );
 }
 
+/* ── 3 · La confirmation reçue : WhatsApp d'un côté, courriel de l'autre —
+      les deux téléphones de la page patients, en miniature. ── */
 function StepConfirmVisual({ T, isMobile }) {
   return (
     <Scene isMobile={isMobile}>
-      {/* le grand ✓ qui se dessine */}
-      <svg aria-hidden width="72" height="72" viewBox="0 0 72 72" style={{ position: 'absolute', top: 14, insetInlineStart: 14 }}>
-        <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(140,255,205,.85)" strokeWidth="3" pathLength="100" strokeDasharray="100" strokeDashoffset="100" className="tb-anim" style={{ animation: 'tbDraw 1s cubic-bezier(.4,0,.2,1) both .3s' }} />
-        <path d="M23 37l9 9 17-18" fill="none" stroke="#B8FFD9" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" pathLength="100" strokeDasharray="100" strokeDashoffset="100" className="tb-anim" style={{ animation: 'tbDraw .5s ease-out both 1.2s' }} />
-      </svg>
-
-      {/* la conversation WhatsApp, telle que le patient la reçoit */}
-      <div style={{ position: 'absolute', insetInlineEnd: 12, top: 16, bottom: 16, width: 190, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 7 }}>
-        <div className="tb-anim" style={{ background: '#E9FBEF', borderRadius: '12px 12px 4px 12px', padding: '8px 10px', boxShadow: '0 16px 30px -16px rgba(2,24,16,.9)', animation: 'tbSlide .5s ease both .5s' }}>
-          <div style={{ fontSize: 9, fontWeight: 900, color: DARK }}>{T('Rendez-vous confirmé ✓', 'Appointment confirmed ✓', 'تم تأكيد الموعد ✓')}</div>
-          <div style={{ fontSize: 8, color: BODY, fontWeight: 600, marginTop: 2, lineHeight: 1.5 }}>
-            {T('Dr Leila Marmioui — mer. 12 août à 10:30, Clinique du Parc, Tanger.', 'Dr Leila Marmioui — Wed 12 Aug, 10:30, Clinique du Parc, Tangier.', 'د. ليلى مرميوي — الأربعاء 12 غشت 10:30، مصحة الحديقة، طنجة.')}
-          </div>
-          <div style={{ textAlign: 'end', fontSize: 7, color: '#53BDEB', fontWeight: 900, marginTop: 2 }}>✓✓ 10:31</div>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        {/* WhatsApp */}
+        <div className="tb-anim" style={{ transform: 'rotate(-2.5deg) translateY(7px)', animation: 'tbFade .6s ease both .2s' }}>
+          <Phone w={138}>
+            <div style={{ background: 'linear-gradient(90deg,#0C4A37,#0A3D2D)', padding: '11px 7px 6px', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,.16)', display: 'grid', placeItems: 'center', fontSize: 6, color: '#fff', fontWeight: 900 }}>T</span>
+              <div>
+                <div style={{ fontSize: 6, fontWeight: 900, color: '#fff', lineHeight: 1.2 }}>Tabibo</div>
+                <div style={{ fontSize: 4.4, color: 'rgba(255,255,255,.65)', fontWeight: 700 }}>{T('compte professionnel', 'business account', 'حساب مهني')}</div>
+              </div>
+            </div>
+            <div style={{ background: '#ECE5DD', padding: '6px 6px 8px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 4 }}>
+                <span style={{ background: '#fff', borderRadius: 6, padding: '1px 6px', fontSize: 4.6, color: MUTED, fontWeight: 700 }}>{T('Aujourd’hui', 'Today', 'اليوم')}</span>
+              </div>
+              <div className="tb-anim" style={{ background: '#fff', borderRadius: '2px 8px 8px 8px', padding: '5px 6px', boxShadow: '0 1px 2px rgba(0,0,0,.12)', animation: 'tbSlide .45s ease both .8s' }}>
+                <div style={{ fontSize: 6, fontWeight: 900, color: '#128C4B' }}>✅ {T('Rendez-vous confirmé', 'Appointment confirmed', 'تم تأكيد الموعد')}</div>
+                <div style={{ fontSize: 5.2, color: BODY, lineHeight: 1.5, marginTop: 2 }}>
+                  {T('Bonjour Fatima Zahra, votre rendez-vous avec ', 'Hello Fatima Zahra, your appointment with ', 'مرحباً فاطمة الزهراء، موعدك مع ')}<b>Dr N. El Amrani</b>{T(' est confirmé.', ' is confirmed.', ' مؤكد.')}
+                </div>
+                <div style={{ background: '#F4F8F6', borderRadius: 5, padding: '3.5px 5px', marginTop: 3 }}>
+                  <div style={{ fontSize: 5.4, fontWeight: 900, color: DARK }}>📅 {T('Mardi 5 août · 14:30', 'Tuesday 5 Aug · 2:30 PM', 'الثلاثاء 5 غشت · 14:30')}</div>
+                  <div style={{ fontSize: 4.8, color: MUTED, fontWeight: 600, marginTop: 1 }}>12, rue Ibn Sina · Maârif, Casablanca</div>
+                </div>
+                <div style={{ display: 'flex', borderTop: '1px solid #F1F5F3', marginTop: 4, paddingTop: 3 }}>
+                  <span style={{ flex: 1, textAlign: 'center', fontSize: 5.4, fontWeight: 900, color: '#128C4B' }}>{T('Confirmer', 'Confirm', 'تأكيد')}</span>
+                  <span style={{ flex: 1, textAlign: 'center', fontSize: 5.4, fontWeight: 900, color: '#128C4B', borderInlineStart: '1px solid #F1F5F3' }}>{T('Annuler', 'Cancel', 'إلغاء')}</span>
+                </div>
+                <div style={{ textAlign: 'end', fontSize: 4.2, color: '#53BDEB', fontWeight: 900, marginTop: 1 }}>14:02 ✓✓</div>
+              </div>
+            </div>
+          </Phone>
         </div>
-        <div className="tb-anim" style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.97)', borderRadius: '12px 12px 12px 4px', padding: '7px 10px', boxShadow: '0 16px 30px -16px rgba(2,24,16,.9)', animation: 'tbSlide .5s ease both 1.5s' }}>
-          <span style={{ width: 24, height: 24, borderRadius: 8, background: LIGHT, color: GREEN, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-          </span>
-          <div>
-            <div style={{ fontSize: 8.5, fontWeight: 900, color: DARK }}>{T('Rappel automatique', 'Automatic reminder', 'تذكير تلقائي')}</div>
-            <div style={{ fontSize: 7.5, color: MUTED, fontWeight: 700 }}>{T('La veille à 18:00 — WhatsApp', 'The day before at 6 PM — WhatsApp', 'اليوم السابق 18:00 — واتساب')}</div>
-          </div>
+        {/* Courriel */}
+        <div className="tb-anim" style={{ transform: 'rotate(2.5deg) translateY(-7px)', animation: 'tbFade .6s ease both .5s' }}>
+          <Phone w={138}>
+            <div style={{ background: 'linear-gradient(90deg,#0C4A37,#0A3D2D)', padding: '11px 7px 6px' }}>
+              <span style={{ fontSize: 6.5, fontWeight: 900, color: '#fff' }}>{T('Boîte de réception', 'Inbox', 'صندوق الوارد')}</span>
+            </div>
+            <div style={{ padding: '6px 6px 8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#0C4A37', display: 'grid', placeItems: 'center', fontSize: 6, color: '#fff', fontWeight: 900 }}>T</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 5.4, fontWeight: 900, color: DARK }}>Tabibo</div>
+                  <div style={{ fontSize: 4.4, color: MUTED, fontWeight: 600 }}>rappels@tabibo.ma</div>
+                </div>
+                <span style={{ fontSize: 4.4, color: MUTED, fontWeight: 700 }}>08:00</span>
+              </div>
+              <div style={{ fontSize: 5.8, fontWeight: 900, color: '#C2412E' }}>⏰ {T('Rappel — votre rendez-vous demain', 'Reminder — your appointment tomorrow', 'تذكير — موعدك غداً')}</div>
+              <div style={{ fontSize: 4.9, color: BODY, lineHeight: 1.5, margin: '2px 0 3px' }}>
+                {T('Bonjour Fatima Zahra, nous vous rappelons votre rendez-vous :', 'Hello Fatima Zahra, a reminder of your appointment:', 'مرحباً فاطمة الزهراء، نذكّرك بموعدك:')}
+              </div>
+              <div style={{ border: '1px solid #EAEFEC', borderRadius: 5, overflow: 'hidden', marginBottom: 4 }}>
+                {[[T('Praticien', 'Practitioner', 'الطبيب'), 'Dr N. El Amrani'], [T('Date', 'Date', 'التاريخ'), T('Mar. 5 août', 'Tue 5 Aug', 'الثلاثاء 5 غشت')], [T('Heure', 'Time', 'الساعة'), '14:30'], [T('Lieu', 'Place', 'المكان'), 'Maârif, Casablanca']].map(([k, v], i) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 5px', fontSize: 4.9, background: i % 2 ? '#FAFCFB' : '#fff' }}>
+                    <span style={{ color: MUTED, fontWeight: 700 }}>{k}</span><span style={{ color: DARK, fontWeight: 900 }}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 3 }}>
+                <span className="tb-anim" style={{ flex: 1, textAlign: 'center', background: 'linear-gradient(150deg,#16A06A,#0E7C52)', color: '#fff', borderRadius: 5, padding: '3px 0', fontSize: 5.2, fontWeight: 900, animation: 'tbPop .45s ease both 1.4s' }}>{T('Je confirme', 'I confirm', 'أؤكد')}</span>
+                <span style={{ flex: 1, textAlign: 'center', border: `1px solid ${GREEN}`, color: GREEN, borderRadius: 5, padding: '3px 0', fontSize: 5.2, fontWeight: 900 }}>{T('Reporter', 'Reschedule', 'تأجيل')}</span>
+              </div>
+            </div>
+          </Phone>
         </div>
       </div>
-
-      {[[30, 118, 0], [72, 138, .8], [46, 160, 1.6]].map(([x, y, d]) => (
-        <span key={x} aria-hidden className="tb-anim" style={{ position: 'absolute', insetInlineStart: x, top: y, width: 5, height: 5, borderRadius: '50%', background: 'rgba(160,255,214,.75)', boxShadow: '0 0 10px 2px rgba(160,255,214,.4)', animation: `tbDrift ${5 + d}s ease-in-out infinite ${d}s` }} />
-      ))}
-      <div className="tb-anim" style={{ position: 'absolute', bottom: 13, insetInlineStart: 14, fontSize: 8.5, fontWeight: 800, color: 'rgba(255,255,255,.75)', animation: 'tbSlide .5s ease both 2s' }}>
-        {T('Aucune application à installer', 'No app to install', 'دون تثبيت أي تطبيق')}
-      </div>
+      <SceneChip side="start" pos="bottom" delay={1.9}>{T('WhatsApp + courriel — sans application', 'WhatsApp + email — no app needed', 'واتساب + بريد — دون تطبيق')}</SceneChip>
     </Scene>
   );
 }
