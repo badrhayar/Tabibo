@@ -200,8 +200,10 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
       <section style={{ background: '#fff', padding: isMobile ? '34px 0 8px' : '56px 0 16px' }}>
         <div style={wrap}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
-            {MARKERS.map((m) => (
+            {MARKERS.map((m, mi) => (
               <div key={m.big} style={{
+                ...(isMobile && MARKERS.length % 2 === 1 && mi === MARKERS.length - 1
+                  ? { gridColumn: '1 / -1', width: 'calc(50% - 6px)', justifySelf: 'center' } : {}),
                 position: 'relative', overflow: 'hidden', textAlign: 'center',
                 background: `linear-gradient(160deg, ${m.tint} 0%, #E3F5EC 100%)`,
                 border: `1px solid ${CARD_EDGE}`, borderRadius: 18,

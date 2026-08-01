@@ -47,6 +47,7 @@ const KEYFRAMES = `
 @keyframes tbDrift   { 0%,100% { transform:translateY(0) }            50% { transform:translateY(-7px) } }
 @keyframes tbRing    { 0% { box-shadow:0 0 0 0 rgba(46,204,113,.55) } 70% { box-shadow:0 0 0 12px rgba(46,204,113,0) } 100% { box-shadow:0 0 0 0 rgba(46,204,113,0) } }
 @keyframes tbDraw    { to { stroke-dashoffset: 0 } }
+@keyframes tbFade    { from { opacity:0 } to { opacity:1 } }
 @keyframes tbSpinSlow{ to { transform: rotate(360deg) } }
 @media (prefers-reduced-motion: reduce) {
   .tb-anim, .tb-anim * { animation: none !important; }
@@ -449,8 +450,8 @@ export function TeleconsultVisual({ lang = 'fr' }) {
             <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
               <Avatar size={78} seed={3} ring={false} />
             </div>
-            <div style={{ position: 'absolute', insetInlineStart: 8, bottom: 8, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(6,30,24,.62)', borderRadius: 20, padding: '3px 8px' }}>
-              <span style={{ fontSize: 8, fontWeight: 800, color: '#fff' }}>Mme Fatima Zahra B.</span>
+            <div style={{ position: 'absolute', insetInlineStart: 8, bottom: 8, maxWidth: 'calc(100% - 100px)', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(6,30,24,.62)', borderRadius: 20, padding: '3px 8px' }}>
+              <span style={{ fontSize: 8, fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>Mme Fatima Zahra B.</span>
               {/* onde de voix — l'appel est vivant */}
               <span className="tb-anim" style={{ display: 'inline-flex', gap: 1.5, alignItems: 'center', height: 9 }}>
                 {[0, 1, 2, 3].map((i) => (
@@ -471,7 +472,7 @@ export function TeleconsultVisual({ lang = 'fr' }) {
             </div>
 
             {/* commandes */}
-            <div style={{ position: 'absolute', insetInline: 0, bottom: 8, display: 'flex', justifyContent: 'center', gap: 6 }}>
+            <div style={{ position: 'absolute', insetInlineEnd: 8, bottom: 8, display: 'flex', gap: 6 }}>
               {[['#fff', 'rgba(255,255,255,.18)', 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM5 11a7 7 0 0 0 14 0M12 18v3'],
                 ['#fff', 'rgba(255,255,255,.18)', 'M23 7l-7 5 7 5V7zM1 5h15v14H1z'],
                 ['#fff', '#E0483A', 'M21 15.5a15 15 0 0 1-19 0v-3a1.9 1.9 0 0 1 2-2h3l1 3-2 1a11 11 0 0 0 5 5l1-2 3 1v3a1.9 1.9 0 0 1-2 2z']].map(([stroke, bg, d], i) => (
@@ -734,8 +735,10 @@ export const Canvas = ({ children, pad = 20 }) => (
 export const MetricBand = ({ items, isMobile, note, cols }) => (
   <>
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : `repeat(${cols || items.length}, 1fr)`, gap: isMobile ? 12 : 16 }}>
-      {items.map((m) => (
+      {items.map((m, mi) => (
         <div key={m.big} style={{
+          ...(isMobile && items.length % 2 === 1 && mi === items.length - 1
+            ? { gridColumn: '1 / -1', width: 'calc(50% - 6px)', justifySelf: 'center' } : {}),
           position: 'relative', overflow: 'hidden', textAlign: 'center',
           background: `linear-gradient(160deg, ${m.tint} 0%, #E3F5EC 100%)`,
           border: `1px solid ${CARD_EDGE}`, borderRadius: 18,
@@ -1059,7 +1062,7 @@ export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }
           </svg>
 
           {/* 1 · La fiche vérifiée */}
-          <div className="tb-anim" style={card({ top: 20, insetInlineStart: 30, width: 234, padding: '13px 14px', transform: 'rotateY(10deg) rotateX(3deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both .15s' })}>
+          <div className="tb-anim" style={card({ top: 20, insetInlineStart: 30, width: 234, padding: '13px 14px', transform: 'rotateY(10deg) rotateX(3deg)', animation: 'tbFade .6s ease both .15s' })}>
             {badge(1)}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Avatar size={44} seed={1} role="doctor" />
@@ -1075,7 +1078,7 @@ export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }
           </div>
 
           {/* 2 · Le créneau */}
-          <div className="tb-anim" style={card({ top: 108, insetInlineEnd: 20, width: 252, padding: '12px 13px 13px', transform: 'rotateY(-9deg) rotateX(2deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both .55s' })}>
+          <div className="tb-anim" style={card({ top: 108, insetInlineEnd: 20, width: 252, padding: '12px 13px 13px', transform: 'rotateY(-9deg) rotateX(2deg)', animation: 'tbFade .6s ease both .55s' })}>
             {badge(2)}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 10.5, fontWeight: 900, color: DARK }}>{T('Août 2026', 'August 2026', 'غشت 2026')}</span>
@@ -1097,7 +1100,7 @@ export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }
           </div>
 
           {/* 3 · Le récapitulatif */}
-          <div className="tb-anim" style={card({ bottom: 16, insetInlineStart: 74, width: 250, padding: '12px 14px 13px', transform: 'rotateY(7deg) rotateX(-2deg)', animation: 'tbSlide .6s cubic-bezier(.16,.8,.3,1) both 1.9s' })}>
+          <div className="tb-anim" style={card({ bottom: 16, insetInlineStart: 74, width: 250, padding: '12px 14px 13px', transform: 'rotateY(7deg) rotateX(-2deg)', animation: 'tbFade .6s ease both 1.9s' })}>
             {badge(3)}
             {recapRow(T('Honoraires', 'Fee', 'الأتعاب'), '300 MAD', true)}
             {recapRow(T('Durée', 'Duration', 'المدة'), T('20 minutes', '20 minutes', '20 دقيقة'))}
@@ -1123,4 +1126,175 @@ export function HeroBookingVisual({ lang = 'fr', isMobile = false, rtl = false }
       )}
     </div>
   );
+}
+
+// ═══ Accueil · les trois scènes du parcours (sous « Comment ça marche ») ════
+/* Même matière que le hero : panneau vert profond, halos, grille masquée,
+   verre dépoli. Chaque scène illustre l'étape au-dessus d'elle avec les
+   ÉCRANS réels — la carte du Maroc et les fiches pour la recherche, la grille
+   de créneaux pour le choix, la conversation WhatsApp pour la confirmation. */
+
+const SCENE_H = { desktop: 252, mobile: 216 };
+
+function Scene({ children, isMobile }) {
+  return (
+    <div style={{
+      position: 'relative', height: isMobile ? SCENE_H.mobile : SCENE_H.desktop,
+      borderRadius: 20, overflow: 'hidden',
+      background: 'radial-gradient(130% 115% at 20% 0%, #148363 0%, #0E6650 45%, #08291F 100%)',
+      boxShadow: '0 24px 48px -24px rgba(9,52,39,.7), inset 0 1px 0 rgba(255,255,255,.13)',
+    }}>
+      <Style />
+      <span aria-hidden className="tb-anim" style={{ position: 'absolute', top: -60, right: -50, width: 190, height: 190, borderRadius: '50%', background: 'radial-gradient(circle, rgba(122,245,193,.30) 0%, rgba(122,245,193,0) 70%)', animation: 'tbHalo 7s ease-in-out infinite' }} />
+      <span aria-hidden style={{
+        position: 'absolute', inset: 0, opacity: .4,
+        backgroundImage: 'linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)',
+        backgroundSize: '28px 28px',
+        maskImage: 'radial-gradient(90% 80% at 50% 45%, #000 25%, transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(90% 80% at 50% 45%, #000 25%, transparent 100%)',
+      }} />
+      {children}
+    </div>
+  );
+}
+
+/* Silhouette stylisée du Maroc (Sahara compris), tracée en « low-poly » :
+   points projetés depuis les vraies latitudes/longitudes, arêtes franches,
+   contour lumineux. Les capitales de la couverture pulsent dessus. */
+const MA_OUTLINE = 'M211 8 L264 17 L283 26 L296 78 L237 82 L211 114 L171 126 L158 166 L158 294 L6 300 L23 246 L50 198 L75 177 L80 162 L130 132 L141 112 L138 90 L178 49 L192 40 L197 35 L205 16 Z';
+const MA_PINS = [
+  [178, 49], [192, 40], [170, 87], [208, 12], [226, 39], [141, 112], [278, 28], [75, 177], [26, 246],
+];
+
+function StepSearchVisual({ T, isMobile }) {
+  return (
+    <Scene isMobile={isMobile}>
+      {/* la carte, légèrement inclinée — un plateau, pas un document */}
+      <svg viewBox="0 0 300 310" aria-hidden style={{ position: 'absolute', insetInlineEnd: 4, top: 4, height: 'calc(100% - 8px)', transform: 'rotate(4deg)', opacity: .96 }}>
+        <path d={MA_OUTLINE} fill="rgba(122,245,193,.09)" stroke="rgba(140,255,205,.75)" strokeWidth="2" strokeLinejoin="round" />
+        <path d={MA_OUTLINE} fill="none" stroke="rgba(140,255,205,.22)" strokeWidth="7" strokeLinejoin="round" />
+        {MA_PINS.map(([x, y], i) => (
+          <g key={i} className="tb-anim">
+            <circle cx={x} cy={y} r="7" fill="rgba(122,245,193,.25)" style={{ animation: `tbPulse ${2 + (i % 3) * .5}s ease-in-out infinite ${i * .3}s`, transformOrigin: `${x}px ${y}px` }} />
+            <circle cx={x} cy={y} r="2.6" fill="#B8FFD9" />
+          </g>
+        ))}
+      </svg>
+
+      {/* la recherche tapée… */}
+      <div className="tb-anim" style={{ position: 'absolute', top: 14, insetInlineStart: 12, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.96)', borderRadius: 20, padding: '7px 12px', boxShadow: '0 14px 28px -14px rgba(2,24,16,.8)', animation: 'tbSlide .5s ease both .2s' }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.6" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+        <span style={{ fontSize: 10, fontWeight: 800, color: DARK }}>{T('Cardiologue · Casablanca', 'Cardiologist · Casablanca', 'طبيب القلب · الدار البيضاء')}</span>
+      </div>
+
+      {/* …fait surgir la fiche du médecin, reliée à sa ville */}
+      <svg aria-hidden style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
+        <line x1="46%" y1="62%" x2="72%" y2="24%" stroke="rgba(140,255,205,.6)" strokeWidth="1.6" strokeDasharray="4 4" className="tb-anim" style={{ animation: 'tbSlide .01s both 1s' }} />
+      </svg>
+      <div className="tb-anim" style={{ position: 'absolute', bottom: 16, insetInlineStart: 12, width: 168, background: 'rgba(255,255,255,.97)', borderRadius: 13, padding: '10px 11px', boxShadow: '0 0 0 1px rgba(122,245,193,.16), 0 22px 40px -20px rgba(2,24,16,.9)', animation: 'tbPop .55s cubic-bezier(.16,.8,.3,1) both .9s' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Avatar size={34} seed={3} role="doctor" ring={false} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10, fontWeight: 900, color: DARK }}>Dr Aya Chakkour</div>
+            <div style={{ fontSize: 8, color: MUTED, fontWeight: 700 }}>{T('Cardiologue · 4,9 ★', 'Cardiologist · 4.9 ★', 'طبيبة القلب · 4,9 ★')}</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 4, marginTop: 7 }}>
+          <Chip>{T('INPE vérifié', 'INPE verified', 'INPE موثّق')}</Chip>
+          <Chip bg="#FEF6E7" fg="#9A6510">{T('Auj. 14:30', 'Today 2:30', 'اليوم 14:30')}</Chip>
+        </div>
+      </div>
+
+      {/* le repère qui relie la scène au chiffre de la page */}
+      <div className="tb-anim" style={{ position: 'absolute', bottom: 14, insetInlineEnd: 12, background: 'rgba(6,30,24,.55)', border: '1px solid rgba(140,255,205,.35)', borderRadius: 20, padding: '4px 10px', fontSize: 8.5, fontWeight: 800, color: '#B8FFD9', backdropFilter: 'blur(4px)', animation: 'tbSlide .5s ease both 1.4s' }}>
+        {T('72 villes couvertes', '72 cities covered', '72 مدينة مغطاة')}
+      </div>
+    </Scene>
+  );
+}
+
+function StepSlotVisual({ T, isMobile }) {
+  const SL = {
+    free:   { bg: '#fff', bd: '#BFE3D0', fg: GREEN, deco: 'none' },
+    taken:  { bg: '#F4F6F5', bd: '#E6EBE8', fg: '#A9B5B0', deco: 'line-through' },
+    picked: { bg: GREEN, bd: GREEN, fg: '#fff', deco: 'none' },
+  };
+  const cell = (h, st, i) => (
+    <div key={h} className="tb-anim" style={{
+      background: SL[st].bg, border: `1px solid ${SL[st].bd}`, color: SL[st].fg, textDecoration: SL[st].deco,
+      borderRadius: 7, padding: '5px 0', textAlign: 'center', fontSize: 8.5, fontWeight: 800,
+      animation: st === 'picked' ? 'tbPop .5s cubic-bezier(.16,.8,.3,1) both 1.2s, tbRing 2.6s ease-out infinite 1.8s' : `tbSlide .4s ease both ${.3 + i * .06}s`,
+      boxShadow: st === 'picked' ? '0 10px 18px -8px rgba(11,90,60,.95)' : 'none',
+    }}>{h}</div>
+  );
+  return (
+    <Scene isMobile={isMobile}>
+      {/* orbite décorative derrière la carte */}
+      <span aria-hidden className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', width: 300, height: 300, marginTop: -150, marginLeft: -150, borderRadius: '50%', border: '1.5px dashed rgba(255,255,255,.14)', animation: 'tbSpinSlow 50s linear infinite' }} />
+      <div className="tb-anim" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 196, background: 'rgba(255,255,255,.97)', borderRadius: 14, padding: '11px 12px 12px', boxShadow: '0 0 0 1px rgba(122,245,193,.16), 0 26px 48px -22px rgba(2,24,16,.95)', animation: 'tbFade .55s ease both .15s' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 7 }}>
+          {[['Mar', '11'], ['Mer', '12'], ['Jeu', '13']].map(([d, n], i) => (
+            <div key={n} style={{ flex: 1, textAlign: 'center', borderRadius: 7, padding: '3.5px 0', background: i === 1 ? GREEN : '#F4F8F6', color: i === 1 ? '#fff' : MUTED, boxShadow: i === 1 ? '0 6px 14px -8px rgba(11,90,60,.9)' : 'none' }}>
+              <div style={{ fontSize: 6.5, fontWeight: 700, opacity: .85 }}>{d}</div>
+              <div style={{ fontSize: 9.5, fontWeight: 900 }}>{n}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+          {cell('09:00', 'taken', 0)}{cell('09:30', 'free', 1)}{cell('10:00', 'free', 2)}
+          {cell('10:30', 'picked', 3)}{cell('11:00', 'free', 4)}{cell('11:30', 'taken', 5)}
+        </div>
+      </div>
+      <div className="tb-anim" style={{ position: 'absolute', top: 12, insetInlineEnd: 12, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(6,30,24,.55)', border: '1px solid rgba(140,255,205,.35)', borderRadius: 20, padding: '4px 10px', backdropFilter: 'blur(4px)', animation: 'tbSlide .5s ease both 1.6s' }}>
+        <Dot s={5} />
+        <span style={{ fontSize: 8.5, fontWeight: 800, color: '#B8FFD9' }}>{T('Agenda en direct — créneaux réellement libres', 'Live diary — genuinely free slots', 'مفكرة مباشرة — مواعيد شاغرة فعلاً')}</span>
+      </div>
+    </Scene>
+  );
+}
+
+function StepConfirmVisual({ T, isMobile }) {
+  return (
+    <Scene isMobile={isMobile}>
+      {/* le grand ✓ qui se dessine */}
+      <svg aria-hidden width="72" height="72" viewBox="0 0 72 72" style={{ position: 'absolute', top: 14, insetInlineStart: 14 }}>
+        <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(140,255,205,.85)" strokeWidth="3" pathLength="100" strokeDasharray="100" strokeDashoffset="100" className="tb-anim" style={{ animation: 'tbDraw 1s cubic-bezier(.4,0,.2,1) both .3s' }} />
+        <path d="M23 37l9 9 17-18" fill="none" stroke="#B8FFD9" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" pathLength="100" strokeDasharray="100" strokeDashoffset="100" className="tb-anim" style={{ animation: 'tbDraw .5s ease-out both 1.2s' }} />
+      </svg>
+
+      {/* la conversation WhatsApp, telle que le patient la reçoit */}
+      <div style={{ position: 'absolute', insetInlineEnd: 12, top: 16, bottom: 16, width: 190, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 7 }}>
+        <div className="tb-anim" style={{ background: '#E9FBEF', borderRadius: '12px 12px 4px 12px', padding: '8px 10px', boxShadow: '0 16px 30px -16px rgba(2,24,16,.9)', animation: 'tbSlide .5s ease both .5s' }}>
+          <div style={{ fontSize: 9, fontWeight: 900, color: DARK }}>{T('Rendez-vous confirmé ✓', 'Appointment confirmed ✓', 'تم تأكيد الموعد ✓')}</div>
+          <div style={{ fontSize: 8, color: BODY, fontWeight: 600, marginTop: 2, lineHeight: 1.5 }}>
+            {T('Dr Leila Marmioui — mer. 12 août à 10:30, Clinique du Parc, Tanger.', 'Dr Leila Marmioui — Wed 12 Aug, 10:30, Clinique du Parc, Tangier.', 'د. ليلى مرميوي — الأربعاء 12 غشت 10:30، مصحة الحديقة، طنجة.')}
+          </div>
+          <div style={{ textAlign: 'end', fontSize: 7, color: '#53BDEB', fontWeight: 900, marginTop: 2 }}>✓✓ 10:31</div>
+        </div>
+        <div className="tb-anim" style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.97)', borderRadius: '12px 12px 12px 4px', padding: '7px 10px', boxShadow: '0 16px 30px -16px rgba(2,24,16,.9)', animation: 'tbSlide .5s ease both 1.5s' }}>
+          <span style={{ width: 24, height: 24, borderRadius: 8, background: LIGHT, color: GREEN, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+          </span>
+          <div>
+            <div style={{ fontSize: 8.5, fontWeight: 900, color: DARK }}>{T('Rappel automatique', 'Automatic reminder', 'تذكير تلقائي')}</div>
+            <div style={{ fontSize: 7.5, color: MUTED, fontWeight: 700 }}>{T('La veille à 18:00 — WhatsApp', 'The day before at 6 PM — WhatsApp', 'اليوم السابق 18:00 — واتساب')}</div>
+          </div>
+        </div>
+      </div>
+
+      {[[30, 118, 0], [72, 138, .8], [46, 160, 1.6]].map(([x, y, d]) => (
+        <span key={x} aria-hidden className="tb-anim" style={{ position: 'absolute', insetInlineStart: x, top: y, width: 5, height: 5, borderRadius: '50%', background: 'rgba(160,255,214,.75)', boxShadow: '0 0 10px 2px rgba(160,255,214,.4)', animation: `tbDrift ${5 + d}s ease-in-out infinite ${d}s` }} />
+      ))}
+      <div className="tb-anim" style={{ position: 'absolute', bottom: 13, insetInlineStart: 14, fontSize: 8.5, fontWeight: 800, color: 'rgba(255,255,255,.75)', animation: 'tbSlide .5s ease both 2s' }}>
+        {T('Aucune application à installer', 'No app to install', 'دون تثبيت أي تطبيق')}
+      </div>
+    </Scene>
+  );
+}
+
+export function WorkflowStepVisual({ step = 0, lang = 'fr', isMobile = false }) {
+  const T = (fr, en, ar) => tr(lang, fr, en, ar);
+  if (step === 1) return <StepSlotVisual T={T} isMobile={isMobile} />;
+  if (step === 2) return <StepConfirmVisual T={T} isMobile={isMobile} />;
+  return <StepSearchVisual T={T} isMobile={isMobile} />;
 }
