@@ -59,12 +59,13 @@ export default function SecurityTrust({ compact = false }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 12 : 18 }}>
           {POINTS.map((p, i) => (
-            <div key={i} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 18 : 22 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: '#E7F6EE', color: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 13 }}>
+            <div key={i} style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: '1px solid #8CCCAE', borderRadius: 18, padding: isMobile ? 18 : 22, boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)' }}>
+              <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: '#0E7C52', opacity: 0.055 }} />
+              <div style={{ position: 'relative', width: 42, height: 42, borderRadius: 12, background: '#fff', color: '#0E7C52', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 13, boxShadow: '0 8px 18px -10px #0E7C52' }}>
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">{p.icon}</svg>
               </div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: DARK, marginBottom: 6 }}>{p.title}</div>
-              <div style={{ fontSize: 13.5, color: MUTED, lineHeight: 1.6 }}>{p.text}</div>
+              <div style={{ position: 'relative', fontSize: 15, fontWeight: 800, color: DARK, marginBottom: 6 }}>{p.title}</div>
+              <div style={{ position: 'relative', fontSize: 13.5, color: '#3A4A45', lineHeight: 1.6 }}>{p.text}</div>
             </div>
           ))}
         </div>

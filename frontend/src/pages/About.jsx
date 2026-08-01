@@ -217,7 +217,8 @@ export default function About() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 12 : 20 }}>
             {distinctives.map((d) => (
-              <div key={d.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: BG, border: '1px solid #EAEFEC', borderRadius: 16, padding: isMobile ? '18px 18px' : '22px 22px' }}>
+              <div key={d.title} style={{ position: 'relative', overflow: 'hidden', display: 'flex', gap: 14, alignItems: 'flex-start', background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: `1px solid ${CARD_EDGE}`, borderRadius: 18, padding: isMobile ? '18px 18px' : '22px 22px', boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)' }}>
+                <span aria-hidden style={{ position: 'absolute', insetInlineEnd: -30, top: -44, width: 120, height: 120, borderRadius: '50%', background: GREEN, opacity: 0.055 }} />
                 <span style={{ flexShrink: 0, display: 'inline-flex', width: 40, height: 40, borderRadius: 11, background: '#fff', color: GREEN, alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 18px -12px rgba(14,124,82,0.9)' }}>{d.icon}</span>
                 <div>
                   <h3 style={{ fontSize: 15.5, fontWeight: 800, color: DARK, margin: '2px 0 6px' }}>{d.title}</h3>

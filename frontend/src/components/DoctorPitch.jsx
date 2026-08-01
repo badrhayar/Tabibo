@@ -470,8 +470,8 @@ export default function DoctorPitch({ lang = 'fr', isMobile = false, go }) {
           }]} />
 
           {/* Le livre blanc : le même contenu, en document imprimable. */}
-          <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 18, padding: isMobile ? 22 : 30, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'auto 1fr auto', gap: isMobile ? 16 : 24, alignItems: 'center', marginTop: isMobile ? 4 : 12 }}>
-            <span style={{ width: 54, height: 54, borderRadius: 14, background: '#fff', border: `1px solid ${BORDER}`, color: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: `1px solid ${CARD_EDGE}`, borderRadius: 18, padding: isMobile ? 22 : 30, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'auto 1fr auto', gap: isMobile ? 16 : 24, alignItems: 'center', marginTop: isMobile ? 4 : 12, boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)' }}>
+            <span style={{ width: 54, height: 54, borderRadius: 14, background: '#fff', color: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 18px -10px #0E7C52' }}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 3v5h5" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 14h6M9 17h4" />
               </svg>

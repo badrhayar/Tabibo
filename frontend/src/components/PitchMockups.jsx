@@ -1216,19 +1216,55 @@ function StepSearchVisual({ T, isMobile }) {
               </div>
               <span style={{ fontSize: 5.6, fontWeight: 800, color: DARK, border: '1px solid #EAEFEC', borderRadius: 12, padding: '3.5px 6px' }}>{T('Filtres', 'Filters', 'مرشحات')}</span>
             </div>
-            {/* la carte, EN CLAIR comme la vraie */}
-            <div style={{ position: 'relative', height: 56, borderRadius: 8, overflow: 'hidden', background: 'linear-gradient(160deg,#DCE9F2 0%, #E7F0F6 100%)' }}>
-              <svg viewBox="0 0 160 56" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
-                <path d="M28 0 L82 4 L118 0 L160 8 L160 24 L128 34 L112 56 L58 56 L44 40 L20 34 L0 20 L0 6 Z" fill="#CDE7D4" opacity=".9" />
-                <path d="M118 0 L160 8 L160 24 L128 34 Z" fill="#BFDFC9" opacity=".7" />
-                {[[46, 20], [66, 14], [92, 18], [58, 34], [40, 42], [104, 30]].map(([x, y], i) => (
-                  <g key={i}>
-                    <circle cx={x} cy={y} r="4.5" fill="rgba(22,160,106,.25)" className="tb-anim" style={{ animation: `tbPulse ${2 + (i % 3) * .5}s ease-in-out infinite ${i * .35}s`, transformOrigin: `${x}px ${y}px` }} />
-                    <circle cx={x} cy={y} r="2" fill="#0E7C52" stroke="#fff" strokeWidth=".8" />
+            {/* La carte : reproduction fidèle de la vue MapTiler de l'application
+                — détroit de Gibraltar, côtes atlantique et méditerranéenne,
+                reliefs, villes, attribution — avec les épingles réelles (tige +
+                tête verte brillante, reprises de NearbyMap). Si une VRAIE
+                capture est déposée dans public/ecrans/carte-recherche.png, elle
+                remplace ce dessin automatiquement. */}
+            <div style={{ position: 'relative', height: 66, borderRadius: 8, overflow: 'hidden', background: '#BAD8E6' }}>
+              <svg viewBox="0 0 320 132" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden>
+                {/* Espagne, au-dessus du détroit */}
+                <path d="M112 0 H320 V9 C290 5 268 13 246 9 C224 5 204 12 186 7 L170 13 L158 8 C144 12 128 5 112 0 Z" fill="#F1EEE7" />
+                {/* Maroc + Algérie voisine */}
+                <path d="M153 20 C160 22 166 26 176 28 C192 31 208 29 223 30 C245 32 260 34 320 36 L320 132 L55 132 C57 122 55 114 59 108 C62 100 58 95 55 91 C58 86 62 82 68 78 C74 72 80 66 86 62 C96 59 102 58 109 57 C118 54 122 52 127 49 C130 47 132 46 133 45 C137 40 141 34 144 30 C147 26 150 22 153 20 Z" fill="#F1EEE7" />
+                {/* reliefs (Rif, Moyen et Haut Atlas, Souss) */}
+                <ellipse cx="175" cy="33" rx="26" ry="7" fill="#DBE7CF" opacity=".85" transform="rotate(-8 175 33)" />
+                <ellipse cx="182" cy="62" rx="20" ry="10" fill="#DBE7CF" opacity=".8" transform="rotate(20 182 62)" />
+                <ellipse cx="125" cy="88" rx="45" ry="9" fill="#D6E4C9" opacity=".9" transform="rotate(-18 125 88)" />
+                <ellipse cx="80" cy="112" rx="20" ry="6" fill="#DBE7CF" opacity=".8" transform="rotate(-12 80 112)" />
+                {/* frontière algérienne */}
+                <path d="M247 33 C246 55 242 80 240 100 C239 112 238 122 238 132" fill="none" stroke="#C9B8A8" strokeWidth="1" strokeDasharray="3 2.5" opacity=".8" />
+                {/* villes (points + noms, halo blanc comme sur la vraie carte) */}
+                {[[168, 12, 'Gibraltar'], [131, 46, 'Rabat'], [177, 46, 'Fès'], [252, 35, 'Oujda'], [66, 59, 'El Jadida'], [104, 86, 'Marrakech'], [66, 105, 'Agadir'], [245, 87, 'Bechar']].map(([x, y, n]) => (
+                  <g key={n}>
+                    <circle cx={x} cy={y + 3} r="1.3" fill="#8A9993" />
+                    <text x={x + 3} y={y + 5} fontSize="6.4" fontWeight="600" fill="#4A5A55" style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 2, fontFamily: 'Inter, sans-serif' }}>{n}</text>
                   </g>
                 ))}
+                {/* les épingles de l'application : tige métallique, tête verte */}
+                {[[109, 57, 1], [127, 49, 0], [173, 49, 1], [159, 51, 0], [86, 62, 0], [98, 89, 1], [59, 108, 0]].map(([x, y, pulse], i) => (
+                  <g key={i}>
+                    {pulse === 1 && <circle cx={x} cy={y - 7} r="3.4" fill="rgba(22,160,106,.45)" className="tb-anim" style={{ animation: `tbPulse ${1.9 + i * .2}s ease-out infinite ${i * .4}s`, transformOrigin: `${x}px ${y - 7}px` }} />}
+                    <rect x={x - .7} y={y - 6.5} width="1.4" height="6.5" rx=".7" fill="#98A2AA" />
+                    <circle cx={x} cy={y - 7} r="3.2" fill="#16A06A" stroke="#fff" strokeWidth=".9" />
+                    <circle cx={x - 1} cy={y - 8} r=".9" fill="rgba(255,255,255,.65)" />
+                  </g>
+                ))}
+                {/* attribution */}
+                <rect x="2" y="123" width="88" height="8" rx="2" fill="rgba(255,255,255,.78)" />
+                <text x="5" y="129" fontSize="5.2" fill="#6B7B76" style={{ fontFamily: 'Inter, sans-serif' }}>© MapTiler © OpenStreetMap</text>
               </svg>
+              {/* une capture réelle déposée dans public/ecrans/ prend le dessus */}
+              <img src="/ecrans/carte-recherche.png" alt="" aria-hidden
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               <span style={{ position: 'absolute', top: 4, insetInlineStart: 4, background: '#fff', borderRadius: 8, padding: '1.5px 5px', fontSize: 5, fontWeight: 800, color: DARK, boxShadow: '0 2px 6px rgba(13,43,30,.18)' }}>{T('20 sur la carte', '20 on the map', '20 على الخريطة')}</span>
+              <div style={{ position: 'absolute', top: 4, insetInlineEnd: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {['+', '−'].map((c) => (
+                  <span key={c} style={{ width: 10, height: 10, background: '#fff', borderRadius: 3, display: 'grid', placeItems: 'center', fontSize: 7, fontWeight: 800, color: DARK, boxShadow: '0 1px 4px rgba(13,43,30,.22)', lineHeight: 1 }}>{c}</span>
+                ))}
+              </div>
               <span style={{ position: 'absolute', bottom: 4, insetInlineEnd: 4, background: '#fff', borderRadius: 8, padding: '1.5px 5px', fontSize: 5, fontWeight: 800, color: DARK, boxShadow: '0 2px 6px rgba(13,43,30,.18)' }}>⤢ {T('Agrandir', 'Expand', 'تكبير')}</span>
             </div>
             <div style={{ fontSize: 6, color: DARK }}><b style={{ color: GREEN }}>20 {T('médecins', 'doctors', 'طبيباً')}</b> {T('disponibles', 'available', 'متاحون')}</div>

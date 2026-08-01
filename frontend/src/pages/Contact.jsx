@@ -58,7 +58,7 @@ function InfoCard({ icon, label, value, href }) {
       </div>
     </div>
   );
-  const style = { background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: 18, textDecoration: 'none', display: 'block' };
+  const style = { background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: '1px solid #8CCCAE', boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)', borderRadius: 18, padding: 18, textDecoration: 'none', display: 'block' };
   return href ? <a href={href} style={style}>{inner}</a> : <div style={style}>{inner}</div>;
 }
 
@@ -144,13 +144,13 @@ export default function Contact() {
 
         {/* Map + form */}
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 18, marginBottom: 20 }}>
-          <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: '1px solid #8CCCAE', boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)', borderRadius: 18, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', fontSize: 14, fontWeight: 800, color: DARK, borderBottom: `1px solid ${BORDER}` }}>Nous trouver</div>
             <DoctorLocationMap lat={company.lat} lng={company.lng} height={isMobile ? 240 : 300} />
             <div style={{ padding: '12px 18px', fontSize: 13, color: MUTED }}>{company.address}</div>
           </div>
 
-          <form onSubmit={submit} style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 18 : 22 }}>
+          <form onSubmit={submit} style={{ background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: '1px solid #8CCCAE', boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)', borderRadius: 18, padding: isMobile ? 18 : 22 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 14 }}>Envoyez-nous un message</div>
             {sent && (
               <div style={{ background: '#EAF7F0', border: '1px solid #CDEBDC', borderRadius: 12, padding: '13px 15px', marginBottom: 14 }}>
@@ -180,7 +180,7 @@ export default function Contact() {
         </div>
 
         {/* Legal / company info */}
-        <div style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? 18 : 24 }}>
+        <div style={{ background: 'linear-gradient(160deg, #C7E9D8 0%, #E3F5EC 100%)', border: '1px solid #8CCCAE', boxShadow: '0 1px 2px rgba(16,42,32,0.05), 0 16px 34px -24px rgba(11,90,60,0.5)', borderRadius: 18, padding: isMobile ? 18 : 24 }}>
           <div style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 4 }}>Informations légales</div>
           <div style={{ fontSize: 13, color: MUTED, marginBottom: 18 }}>{company.legalName} — société immatriculée au Maroc.</div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '14px 24px' }}>
