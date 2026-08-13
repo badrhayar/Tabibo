@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
-import { updateAppointment, markAppointmentPaid, PAY_METHOD_FROM_FR } from '../../lib/api';
+import { updateAppointment, markAppointmentPaid, PAY_METHOD_FROM_FR, dbErrorMessage } from '../../lib/api';
 import { greenBtn, greenBtnBusy } from '../../shared.jsx';
 import { buildReceiptPDF, pdfOpen, pdfFileName } from '../../lib/pdf';
 import { moroccoToUTCISO } from '../../lib/time.js';
@@ -154,7 +154,7 @@ export default function History({ state, setState, go, openNewAppt, openAddPatie
           : a) });
       }
     } catch (e) {
-      setState({ toast: 'Enregistrement DB échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement DB échoué : ' + dbErrorMessage(e), toastShow: true });
     }
   }
 

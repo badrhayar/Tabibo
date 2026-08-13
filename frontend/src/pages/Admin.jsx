@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useViewport } from '../hooks/useViewport';
-import { fetchClientErrors, clearClientErrors, fetchActivationStats, fetchAllAccounts, adminDeleteUser, saveAppSettings, fetchAppSettings, fetchDoctorsForReview, reviewDoctor, getCredentialUrl, notifyVerification, sendTestEmail, adminSetBlocked, adminSetSubscription, adminConfirmPayment, adminAddPayment, adminRenewSubscription, adminStopSubscription } from '../lib/api';
+import { fetchClientErrors, clearClientErrors, fetchActivationStats, fetchAllAccounts, adminDeleteUser, saveAppSettings, fetchAppSettings, fetchDoctorsForReview, reviewDoctor, getCredentialUrl, notifyVerification, sendTestEmail, adminSetBlocked, adminSetSubscription, adminConfirmPayment, adminAddPayment, adminRenewSubscription, adminStopSubscription, dbErrorMessage } from '../lib/api';
 import LocationPicker from '../components/LocationPicker';
 import { initials, CREDENTIAL_DOCS, DECLINE_REASONS, subscriptionState, renewalInfo, fmtPeriod, BTN_GREEN } from '../shared.jsx';
 
@@ -40,7 +40,7 @@ export default function Admin() {
       const saved = await saveAppSettings({ contact: company });
       setState({ appSettings: saved, toast: 'Informations de contact enregistrées ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Échec : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 
@@ -65,7 +65,7 @@ export default function Admin() {
     setTestBusy(false);
   };
 
-  const loadReview = () => fetchDoctorsForReview().then(setReviewList).catch((e) => setState({ toast: 'Chargement échoué : ' + (e?.message || ''), toastShow: true }));
+  const loadReview = () => fetchDoctorsForReview().then(setReviewList).catch((e) => setState({ toast: 'Chargement échoué : ' + dbErrorMessage(e), toastShow: true }));
   // Activation dashboard — sorted least-activated first (those are the calls to make).
   const [activation, setActivation] = useState(null);
   useEffect(() => {
@@ -73,10 +73,11 @@ export default function Admin() {
     fetchActivationStats()
       .then((rows) => setActivation(rows.sort((x, y) =>
         (x.hasHours + x.hasSlug + x.hasPhoto + (x.bookings > 0)) - (y.hasHours + y.hasSlug + y.hasPhoto + (y.bookings > 0)))))
-      .catch((e) => setState({ toast: 'Chargement échoué : ' + (e?.message || ''), toastShow: true }));
+      .catch((e) => setState({ toast: 'Chargement échoué : ' + dbErrorMessage(e), toastShow: true }));
   }, [tab, isAdmin]);
   // Client error log (7 days)
   const [errLog, setErrLog] = useState(null);
+  const [errKind, setErrKind] = useState('all');   // all | handled | crash
   useEffect(() => {
     if (tab !== 'errors' || !isAdmin) return;
     fetchClientErrors().then(setErrLog).catch(() => setErrLog([]));
@@ -84,7 +85,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (!isAdmin) return;
-    fetchAllAccounts().then(setAccounts).catch((e) => setState({ toast: 'Chargement comptes échoué : ' + (e?.message || ''), toastShow: true }));
+    fetchAllAccounts().then(setAccounts).catch((e) => setState({ toast: 'Chargement comptes échoué : ' + dbErrorMessage(e), toastShow: true }));
     fetchAppSettings().then((s) => { setRib(s.rib || ''); setBank(s.bank || ''); if (s.contact) setCompany((p) => ({ ...p, ...s.contact })); }).catch(() => {});
     setTestTo(state.appUser?.email || '');
     loadReview();
@@ -131,7 +132,7 @@ export default function Admin() {
 
   const openDoc = async (path) => {
     try { window.open(await getCredentialUrl(path), '_blank'); }
-    catch (e) { setState({ toast: 'Document indisponible : ' + (e?.message || ''), toastShow: true }); }
+    catch (e) { setState({ toast: 'Document indisponible : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   const approve = async (doc) => {
@@ -141,7 +142,7 @@ export default function Admin() {
       setDetailId(null);
       setState({ toast: 'Médecin approuvé ✓', toastShow: true });
       loadReview();
-    } catch (e) { setState({ toast: 'Action impossible : ' + (e?.message || ''), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   const confirmDecline = async () => {
@@ -152,7 +153,7 @@ export default function Admin() {
       setDeclineFor(null); setDetailId(null); setDeclineNote('');
       setState({ toast: 'Médecin refusé', toastShow: true });
       loadReview();
-    } catch (e) { setState({ toast: 'Action impossible : ' + (e?.message || ''), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   if (!isAdmin) {
@@ -188,7 +189,7 @@ export default function Admin() {
       setAccounts((list) => list.filter((x) => x.id !== acc.id));
       setState({ toast: 'Compte supprimé', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Suppression impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Suppression impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -198,7 +199,7 @@ export default function Admin() {
       const saved = await saveAppSettings({ rib, bank });
       setState({ appSettings: saved, toast: 'RIB enregistré ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 
@@ -329,30 +330,70 @@ export default function Admin() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: DARK }}>Erreurs client (7 jours)</h2>
-                <p style={{ margin: '4px 0 0', fontSize: 12.5, color: MUTED }}>Erreurs JavaScript non gérées, remontées automatiquement depuis les navigateurs des utilisateurs.</p>
+                <p style={{ margin: '4px 0 0', fontSize: 12.5, color: MUTED, maxWidth: 620, lineHeight: 1.55 }}>
+                  Remontées automatiquement depuis les navigateurs. Les <strong>opérations refusées</strong> sont
+                  les plus importantes : l'utilisateur n'a vu qu'un message d'erreur et il est reparti.
+                </p>
               </div>
               {errLog?.length > 0 && (
                 <button onClick={() => { clearClientErrors().then(() => setErrLog([])).catch(() => {}); }}
                   style={{ background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 9, padding: '8px 14px', fontSize: 12.5, fontWeight: 700, color: '#C2466A', cursor: 'pointer' }}>Vider le journal</button>
               )}
             </div>
+
             {errLog === null ? (
               <div style={{ padding: 20, textAlign: 'center', color: MUTED, fontSize: 13 }}>Chargement…</div>
             ) : errLog.length === 0 ? (
               <div style={{ marginTop: 16, padding: 20, textAlign: 'center', color: '#0E7C52', fontSize: 13.5, fontWeight: 700, background: '#F0F9F4', borderRadius: 12 }}>✓ Aucune erreur remontée — tout roule.</div>
-            ) : (
-              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {errLog.map((e) => (
-                  <div key={e.id} style={{ border: `1px solid ${BORDER}`, borderRadius: 11, padding: '11px 14px' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#C2466A', wordBreak: 'break-word' }}>{e.message}</div>
-                    <div style={{ fontSize: 11.5, color: MUTED, marginTop: 3 }}>
-                      {new Date(e.created_at).toLocaleString('fr-FR')} · écran : {e.app_screen || '?'} · {e.url}
-                    </div>
-                    {e.stack && <pre style={{ margin: '8px 0 0', fontSize: 10.5, color: MUTED, background: BG, borderRadius: 8, padding: '8px 10px', overflowX: 'auto', maxHeight: 120 }}>{e.stack}</pre>}
+            ) : (() => {
+              // Une même panne frappe des dizaines d'utilisateurs : listée ligne
+              // à ligne, elle noie les autres. On regroupe sur opération+message
+              // et on trie par nombre de personnes touchées — l'ordre dans lequel
+              // il faut corriger.
+              const groups = new Map();
+              errLog.filter((e) => errKind === 'all' || (errKind === 'handled') === (e.kind === 'handled')).forEach((e) => {
+                const key = `${e.kind}|${e.context || ''}|${e.message}`;
+                const g = groups.get(key);
+                if (g) { g.count += 1; if (e.created_at > g.last) g.last = e.created_at; g.versions.add(e.app_version || '?'); g.roles.add(e.user_role || '?'); }
+                else groups.set(key, { ...e, count: 1, last: e.created_at, versions: new Set([e.app_version || '?']), roles: new Set([e.user_role || '?']) });
+              });
+              const rows = [...groups.values()].sort((a, b) => b.count - a.count || (b.last > a.last ? 1 : -1));
+              const handledCount = errLog.filter((e) => e.kind === 'handled').length;
+              return (
+                <>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                    {[['all', `Tout (${errLog.length})`], ['handled', `Opérations refusées (${handledCount})`], ['crash', `Plantages (${errLog.length - handledCount})`]].map(([k, label]) => (
+                      <button key={k} onClick={() => setErrKind(k)}
+                        style={{ background: errKind === k ? PRIMARY : '#fff', color: errKind === k ? '#fff' : MUTED, border: `1px solid ${errKind === k ? PRIMARY : BORDER}`, borderRadius: 999, padding: '6px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>{label}</button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                  {rows.length === 0 ? (
+                    <div style={{ marginTop: 16, padding: 20, textAlign: 'center', color: MUTED, fontSize: 13 }}>Rien dans cette catégorie.</div>
+                  ) : (
+                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {rows.map((e, i) => (
+                      <div key={i} style={{ border: `1px solid ${e.kind === 'handled' ? '#F3D9A0' : BORDER}`, background: e.kind === 'handled' ? '#FFFBF2' : '#fff', borderRadius: 11, padding: '11px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                          {e.count > 1 && (
+                            <span style={{ background: '#C2466A', color: '#fff', borderRadius: 999, padding: '2px 9px', fontSize: 11.5, fontWeight: 800, flexShrink: 0 }}>×{e.count}</span>
+                          )}
+                          {e.context && (
+                            <span style={{ background: '#15314A', color: '#fff', borderRadius: 7, padding: '2px 8px', fontSize: 11.5, fontWeight: 700, fontFamily: 'monospace' }}>{e.context}</span>
+                          )}
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#C2466A', wordBreak: 'break-word' }}>{e.message}</span>
+                        </div>
+                        <div style={{ fontSize: 11.5, color: MUTED, marginTop: 4 }}>
+                          {new Date(e.last).toLocaleString('fr-FR')} · écran : {e.app_screen || '?'} ·{' '}
+                          {[...e.roles].join(', ')} · version {[...e.versions].join(', ')}
+                        </div>
+                        {e.stack && <pre style={{ margin: '8px 0 0', fontSize: 10.5, color: MUTED, background: BG, borderRadius: 8, padding: '8px 10px', overflowX: 'auto', maxHeight: 120 }}>{e.stack}</pre>}
+                      </div>
+                    ))}
+                  </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 

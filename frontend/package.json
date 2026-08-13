@@ -17,7 +17,7 @@
     "test:empty": "node scripts/empty-state-check.mjs",
     "test:slow": "node scripts/late-directory-check.mjs",
     "test:crawl": "node scripts/deep-crawl.mjs",
-    "test:all": "npm run test:contract && npm run test:e2e && npm run test:headers && npm run test:files && npm run test:empty && npm run test:slow && npm run test:green && npm run test:layout && npm run test:stations && npm run test:caps && npm run test:sanitize && npm run test:a11y",
+    "test:all": "npm run test:contract && npm run test:e2e && npm run test:headers && npm run test:files && npm run test:empty && npm run test:slow && npm run test:green && npm run test:layout && npm run test:stations && npm run test:caps && npm run test:sanitize && npm run test:a11y && npm run test:monitor && npm run test:data",
     "test:green": "node scripts/green-audit.mjs",
     "test:layout": "node scripts/layout-audit.mjs",
     "test:stations": "node scripts/stations-sync-check.mjs",
@@ -25,7 +25,9 @@
     "shots": "node scripts/marketing-shots.mjs",
     "test:sanitize": "node scripts/sanitize-check.mjs",
     "test:a11y": "node scripts/a11y-audit.mjs",
-    "test:contract": "node scripts/contract-check.mjs"
+    "test:contract": "node scripts/contract-check.mjs",
+    "test:monitor": "node scripts/monitor-check.mjs",
+    "test:data": "node scripts/data-integrity-check.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

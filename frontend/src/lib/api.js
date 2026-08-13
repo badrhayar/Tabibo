@@ -6,6 +6,71 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { supabase } from './supabaseClient';
 import { moPartsOf } from './time';
+import { reportHandledError } from './monitor.js';
+
+/**
+ * Écriture critique qui échoue : on remonte AVANT de relancer.
+ *
+ * Sans cela, la panne la plus coûteuse est aussi la plus discrète — la page
+ * rattrape l'erreur, affiche « une erreur est survenue », et la console
+ * d'administration reste vide pendant que les rendez-vous se perdent. Posé
+ * uniquement sur les chemins où le silence coûte un patient, un paiement ou
+ * un message : ailleurs, un échec de lecture se voit à l'écran.
+ *
+ * `label` est TOUJOURS une chaîne littérale — jamais une donnée d'utilisateur.
+ */
+function failed(label, error) {
+  reportHandledError(label, error);
+  throw error;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Barrière : un identifiant qui n'est pas un UUID ne doit JAMAIS partir vers
+ * Postgres. Sans elle, l'utilisateur reçoit « invalid input syntax for type
+ * uuid » — un message qui ne lui apprend rien et qui ne nous dit pas d'où
+ * vient la mauvaise valeur. Avec elle, l'erreur nomme le champ fautif et
+ * remonte dans la console d'administration avec son contexte.
+ *
+ * `required = false` accepte l'absence (champ facultatif), jamais une valeur
+ * mal formée : une valeur mal formée est toujours le symptôme d'un défaut.
+ */
+function assertUuid(value, field, { required = true } = {}) {
+  if (value == null || value === '') {
+    if (!required) return null;
+    throw new Error(`Identifiant manquant (${field}).`);
+  }
+  if (!UUID_RE.test(String(value))) {
+    const e = new Error(`Identifiant invalide (${field}). Rechargez la page et réessayez.`);
+    e.code = 'BAD_UUID';
+    e.userMessage = e.message;
+    reportHandledError('assertUuid:' + field, e);
+    throw e;
+  }
+  return String(value);
+}
+
+/**
+ * Message d'erreur base de données destiné à un humain.
+ * Postgres parle anglais et par codes ; un patient en salle d'attente non.
+ */
+export function dbErrorMessage(e, fallback = 'Une erreur est survenue. Réessayez.') {
+  // Erreurs que nous levons nous-mêmes : le texte est déjà écrit pour un humain.
+  if (e?.userMessage) return e.userMessage;
+  const code = e?.code;
+  if (code === '23505') return 'Ce créneau vient d’être réservé. Choisissez-en un autre.';
+  if (code === '23503') return 'Référence introuvable. Rechargez la page et réessayez.';
+  if (code === '22P02') return 'Donnée mal formée. Rechargez la page et réessayez.';
+  if (code === '42501' || code === '42P01') return 'Action non autorisée pour votre compte.';
+  if (code === 'PGRST301' || e?.status === 401) return 'Session expirée. Reconnectez-vous.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(e?.message || '')) {
+    return 'Connexion perdue. Vérifiez votre réseau et réessayez.';
+  }
+  // Jamais le texte brut de Postgres : il est en anglais et ne dit rien
+  // d'actionnable à un patient. Il part dans le journal, pas à l'écran.
+  return fallback;
+}
 
 // Map a row from the public `doctor_directory` view to the shape the UI uses.
 function mapDoctor(row) {
@@ -106,7 +171,7 @@ export async function fetchInvoices(doctorId) {
 export async function createInvoice(doctorId, inv) {
   const { data, error } = await supabase
     .from('invoices').insert(invoiceToRow(inv, doctorId)).select().single();
-  if (error) throw error;
+  if (error) failed('createInvoice', error);
   return invoiceFromRow(data);
 }
 
@@ -360,6 +425,12 @@ export function clampDuration(min) {
 }
 
 export async function createAppointment({ patientId, doctorId, datetime, reason, notes, fee = null, relativeId = null, patientName = null, durationMinutes = 30, stationId = null }) {
+  // Les identifiants sont contrôlés AVANT le réseau : une valeur mal formée
+  // nomme son champ ici, au lieu de revenir de Postgres en anglais.
+  assertUuid(patientId, 'patient');
+  assertUuid(doctorId, 'médecin');
+  assertUuid(relativeId, 'proche', { required: false });
+  assertUuid(stationId, 'poste de soins', { required: false });
   const { data, error } = await supabase
     .from('appointments')
     .insert({
@@ -380,7 +451,7 @@ export async function createAppointment({ patientId, doctorId, datetime, reason,
     })
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('createAppointment', error);
   sendBookingConfirmation(data.id);   // WhatsApp → patient
   notifyApptEmail(data.id, 'booked'); // Email → patient + doctor
   return data;
@@ -392,6 +463,9 @@ export async function createAppointment({ patientId, doctorId, datetime, reason,
  * persist in the DB so the booking calendar greys the slot out for patients.
  */
 export async function createWalkinAppointment({ doctorId, datetime, reason, notes, patientId = null, patientName = null, patientPhone = null, patientEmail = null, fee = null, durationMinutes = 30, stationId = null }) {
+  assertUuid(doctorId, 'médecin');
+  assertUuid(patientId, 'patient', { required: false });
+  assertUuid(stationId, 'poste de soins', { required: false });
   const { data, error } = await supabase
     .from('appointments')
     .insert({
@@ -411,7 +485,7 @@ export async function createWalkinAppointment({ doctorId, datetime, reason, note
     })
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('createWalkinAppointment', error);
   // NOTE: a doctor-created appointment does NOT send a "réservé/booked" message
   // (that's reserved for a patient who books themselves). The patient instead
   // receives an invitation (see DoctorApp) and, later, the confirmation / J-1 /
@@ -578,7 +652,7 @@ export async function updateAppointmentStatus(id, status) {
     .eq('id', id)
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('updateAppointmentStatus', error);
   return data;
 }
 
@@ -717,7 +791,7 @@ export async function createDoctorProfile(appUserId, p) {
     })
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('createDoctorProfile', error);
   return data;
 }
 
@@ -893,7 +967,7 @@ export async function uploadCredential({ file, userId, doctorId, docType }) {
   const up = await supabase.storage.from('credentials').upload(path, file, { upsert: true, contentType: file.type });
   if (up.error) throw up.error;
   const { error } = await supabase.from('doctor_documents').insert({ doctor_id: doctorId, doc_type: docType, file_url: path });
-  if (error) throw error;
+  if (error) failed('uploadCredential', error);
   return path;
 }
 
@@ -906,7 +980,7 @@ export async function getCredentialUrl(path) {
 
 /** Admin: doctors awaiting review (or filtered by status), with their user + docs. */
 /** Admin: recent client errors (last 7 days, newest first). */
-export async function fetchClientErrors(limit = 50) {
+export async function fetchClientErrors(limit = 300) {
   const since = new Date(Date.now() - 7 * 86400e3).toISOString();
   const { data, error } = await supabase.from('client_errors')
     .select('*').gte('created_at', since)
@@ -994,7 +1068,7 @@ export async function fetchDoctorPayments(doctorId) {
 /** Doctor declares a payment as made ("J'ai payé") — secured RPC. */
 export async function declarePayment(paymentId) {
   const { error } = await supabase.rpc('declare_payment', { p_id: paymentId });
-  if (error) throw error;
+  if (error) failed('declarePayment', error);
   return true;
 }
 
@@ -1202,7 +1276,7 @@ export async function updateAppointment(id, fields) {
     .eq('id', id)
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('updateAppointment', error);
   return data;
 }
 
@@ -1330,6 +1404,7 @@ export async function guestBookingStart({ doctorId, datetime, name, phone, reaso
   if (error) {
     let msg = 'Envoi du code impossible.';
     try { const t = await error.context?.text?.(); if (t) msg = JSON.parse(t).error || msg; } catch (_) { /* ignore */ }
+    reportHandledError('guestBookingStart', error);
     throw new Error(msg);
   }
   if (!data?.ok) throw new Error(data?.error || 'Envoi du code impossible.');
@@ -1344,6 +1419,7 @@ export async function guestBookingVerify({ phone, code }) {
   if (error) {
     let msg = 'Vérification impossible.';
     try { const t = await error.context?.text?.(); if (t) msg = JSON.parse(t).error || msg; } catch (_) { /* ignore */ }
+    reportHandledError('guestBookingVerify', error);
     throw new Error(msg);
   }
   if (!data?.ok) throw new Error(data?.error || 'Vérification impossible.');
@@ -1413,7 +1489,7 @@ export async function uploadDocument({ file, ownerId = null, patientId = null, d
     })
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('uploadDocument', error);
   return data;
 }
 
@@ -1596,7 +1672,7 @@ export async function sendMessage(conversationId, senderId, content) {
     .insert({ conversation_id: conversationId, sender_id: senderId, content })
     .select()
     .single();
-  if (error) throw error;
+  if (error) failed('sendMessage', error);
   return data;
 }
 

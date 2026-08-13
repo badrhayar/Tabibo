@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import {
   fetchMedicalHistory, saveMedicalHistory, fetchConsultationNotes, createConsultationNote,
-  fetchPrescriptions, markAppointmentPaid, updateAppointmentStatus, patientKeyOf,
-} from '../../lib/api';
+  fetchPrescriptions, markAppointmentPaid, updateAppointmentStatus, patientKeyOf, dbErrorMessage } from '../../lib/api';
 import { moroccoNow } from '../../lib/time';
 import { sanitizeHtml } from '../../lib/sanitizeHtml';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -610,7 +609,7 @@ export default function PatientFile({ state, setState, go }) {
             if (on) setRx(all.filter((r) => (r.patient_name || '').trim().toLowerCase() === (patient.name || '').trim().toLowerCase() || (patient.userId && r.patient_id === patient.userId)));
           } catch (_) { /* prescriptions optional */ }
         }
-      } catch (e) { setState({ toast: 'Chargement du dossier échoué : ' + (e?.message || 'erreur'), toastShow: true }); }
+      } catch (e) { setState({ toast: 'Chargement du dossier échoué : ' + dbErrorMessage(e), toastShow: true }); }
       finally { on && setMhLoading(false); }
     })();
     return () => { on = false; };
@@ -684,7 +683,7 @@ export default function PatientFile({ state, setState, go }) {
       if (isDemo) setState({ demoMedical: { ...(state.demoMedical || {}), [pkey]: next } });
       else await saveMedicalHistory(doctorId, pkey, next);
       flash('Dossier enregistré ✓');
-    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true }); }
     finally { setMhSaving(false); }
   };
   const patchMh = (patch) => setMh((m) => ({ ...m, ...patch }));
@@ -708,7 +707,7 @@ export default function PatientFile({ state, setState, go }) {
     try {
       await persistMh(next);
       flash('Brouillon enregistré ✓');
-    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true }); }
     finally { setObsSaving(false); }
   };
 
@@ -763,7 +762,7 @@ export default function PatientFile({ state, setState, go }) {
           : 'Consultation enregistrée dans l\'historique ✓',
         toastShow: true,
       });
-    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true }); }
     finally { setObsSaving(false); }
   };
 
@@ -795,7 +794,7 @@ export default function PatientFile({ state, setState, go }) {
       toast: `Encaissement de ${amount.toLocaleString('fr-FR')} MAD enregistré ✓`, toastShow: true,
     });
     setPayOpen(false);
-    if (!isLocalId(id)) { try { await markAppointmentPaid(id, { amount, method: methodKey }); } catch (e) { setState({ toast: 'Paiement non synchronisé : ' + (e?.message || 'erreur'), toastShow: true }); } }
+    if (!isLocalId(id)) { try { await markAppointmentPaid(id, { amount, method: methodKey }); } catch (e) { setState({ toast: 'Paiement non synchronisé : ' + dbErrorMessage(e), toastShow: true }); } }
   };
 
   // ── History feed — the PATIENT's medical timeline: past consultations, the

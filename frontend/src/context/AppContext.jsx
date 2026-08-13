@@ -4,6 +4,7 @@ import { signIn as sbSignIn, signUp as sbSignUp, signOut as sbSignOut, getSessio
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { setPageMeta, SCREEN_META } from '../lib/seo.js';
 import { purgeLocalPhi } from '../lib/localPhi.js';
+import { setMonitorRole } from '../lib/monitor.js';
 import { DOCTORS as MOCK_DOCTORS, DEMO_PATIENTS } from '../shared.jsx';
 
 // Availability rows → weekly end-of-day minutes (Mon=0 … Sun=6). Breaks are
@@ -145,7 +146,11 @@ const initialState = {
   activeChatId: 1,
   consultations: [],
   now: Date.now(),
-  patients: DEMO_PATIENTS,
+  // Même règle que pour l'annuaire : en production, aucune donnée fabriquée.
+  // Ce registre s'affichait tant que le vrai n'avait pas répondu — et un
+  // médecin qui cliquait « Nouveau rendez-vous » sur un patient de
+  // démonstration envoyait un identifiant numérique dans une colonne UUID.
+  patients: isSupabaseConfigured ? [] : DEMO_PATIENTS,
   doctors: [],
   // Faux tant que l'annuaire n'a pas répondu. Sans ce drapeau, un annuaire
   // encore vide est confondu avec un annuaire vide tout court — et les écrans
@@ -193,17 +198,34 @@ export function AppProvider({ children }) {
     return () => clearInterval(id);
   }, []);
 
-  // Load doctors on mount — from Supabase when configured, else mock data.
+  // Load doctors on mount — from Supabase when configured, else demo data.
+  //
+  // GARDE-FOU : quand Supabase est branché, l'annuaire est CE QUE DIT SUPABASE,
+  // y compris vide. Le repli sur les médecins de démonstration ne vaut que pour
+  // le mode vitrine (aucune clé Supabase).
+  //
+  // Auparavant, un annuaire réel vide (aucun médecin encore approuvé — l'état
+  // normal d'une plateforme le jour de son ouverture) faisait basculer l'écran
+  // sur vingt médecins fictifs aux identifiants numériques. Le patient
+  // parcourait un annuaire crédible, choisissait un créneau, remplissait tout
+  // le formulaire — et la réservation mourait au dernier clic sur
+  // « invalid input syntax for type uuid: "2" », parce qu'un identifiant de
+  // démonstration ne peut pas entrer dans une colonne UUID.
+  //
+  // Un annuaire vide est une vérité désagréable ; un annuaire faux est un
+  // rendez-vous perdu et un patient qui ne revient pas.
   useEffect(() => {
     let active = true;
     (async () => {
       if (isSupabaseConfigured) {
         try {
           const docs = await fetchDoctors();
-          if (active && docs.length) { dispatch({ doctors: docs, doctorsLoaded: true }); return; }
+          if (active) dispatch({ doctors: docs, doctorsLoaded: true });
         } catch (e) {
-          console.warn('[Tabibo] Supabase fetchDoctors failed — falling back to mock data.', e);
+          console.warn('[Tabibo] fetchDoctors a échoué — annuaire vide, jamais de données de démonstration.', e);
+          if (active) dispatch({ doctors: [], doctorsLoaded: true });
         }
+        return;
       }
       if (active) dispatch({ doctors: MOCK_DOCTORS, doctorsLoaded: true });
     })();
@@ -220,12 +242,17 @@ export function AppProvider({ children }) {
   // ── Auth: load the signed-in profile + their appointments ──────────────────
   const loadUser = async (session) => {
     if (!session) {
+      setMonitorRole(null);
       dispatch({ appUser: null, patient: null, myAppointments: [] });
       return null;
     }
     try {
       const u = await getCurrentAppUser();
-      if (!u) { dispatch({ appUser: null }); return null; }
+      if (!u) { setMonitorRole(null); dispatch({ appUser: null }); return null; }
+      // Le rôle accompagne désormais chaque erreur remontée : savoir qu'une
+      // panne ne touche que les patients, ou que les secrétaires, divise le
+      // temps de diagnostic. Le rôle seul — jamais l'identifiant.
+      setMonitorRole(u.role);
       dispatch({
         appUser: u,
         patient: u.role === 'patient'
@@ -302,6 +329,8 @@ export function AppProvider({ children }) {
             try { patch.patients = await fetchMyPatients(md.id); } catch (_) {}
             try { patch.weekEndMin = weekEndMinFromAvailability(await fetchAvailability(md.id)); } catch (_) {}
             u.isStaff = true;   // let the login pages route them into the cabinet
+            setMonitorRole('staff');   // affiner le tri : secrétaire, pas patient
+
           }
         } catch (_) { /* not staff */ }
       }

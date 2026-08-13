@@ -3,7 +3,7 @@ import { useViewport } from '../../hooks/useViewport';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { initials, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import Icon from '../../components/Icon';
-import { updateAppointmentStatus, updateAppointment, markAppointmentPaid, markArrived, markInConsultation, sendApptWhatsApp, notifyApptEmail, ringPatient, STATUS_FR, PAY_METHOD_FR } from '../../lib/api';
+import { updateAppointmentStatus, updateAppointment, markAppointmentPaid, markArrived, markInConsultation, sendApptWhatsApp, notifyApptEmail, ringPatient, STATUS_FR, PAY_METHOD_FR, dbErrorMessage } from '../../lib/api';
 import { moroccoToUTCISO, moPartsOf } from '../../lib/time.js';
 import Pager, { usePager } from '../../components/Pager';
 import ApptPanel from '../../components/ApptPanel';
@@ -193,7 +193,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       setState({ myAppointments: (state.myAppointments || []).map(a => a.id === id ? { ...a, status } : a) });
       return true;
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
       return false;
     }
   };
@@ -214,7 +214,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       await markArrived(appt.id, arrived);
       setState({ myAppointments: (state.myAppointments || []).map(a => a.id === appt.id ? { ...a, arrivedAt: ts } : a) });
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -235,7 +235,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       await markInConsultation(appt.id, on);
       setState({ myAppointments: (state.myAppointments || []).map(patchRow) });
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -279,7 +279,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       });
       setPayModal(null);
     } catch (e) {
-      setState({ toast: 'Enregistrement impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -334,7 +334,7 @@ export default function Appointments({ state, setState, go, openNewAppt }) {
       sendApptWhatsApp(r.id, 'rescheduled');
       notifyApptEmail(r.id, 'rescheduled');
     } catch (e) {
-      setState({ toast: 'Report impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Report impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 

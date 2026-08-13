@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { useViewport } from '../../hooks/useViewport';
-import { fetchTimeOff, addTimeOff, updateAppointment, sendApptWhatsApp, notifyApptEmail } from '../../lib/api';
+import { fetchTimeOff, addTimeOff, updateAppointment, sendApptWhatsApp, notifyApptEmail, dbErrorMessage } from '../../lib/api';
 import { moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import ApptPanel from '../../components/ApptPanel';
 
@@ -197,7 +197,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
     });
     if (!isLocalId(moveId)) {
       try { await updateAppointment(moveId, { datetime: dt }); sendApptWhatsApp(moveId, 'rescheduled'); notifyApptEmail(moveId, 'rescheduled'); }
-      catch (e) { setState({ toast: 'Déplacement non synchronisé : ' + (e?.message || 'erreur'), toastShow: true }); }
+      catch (e) { setState({ toast: 'Déplacement non synchronisé : ' + dbErrorMessage(e), toastShow: true }); }
     }
   };
 
@@ -255,7 +255,7 @@ export default function Calendar({ state, setState, go, openNewAppt }) {
         const row = await addTimeOff(doctorId, dateISO, dateISO, reason);
         setTimeOff((l) => [...l, row]);
         setState({ toast: `Journée ${reason === 'Férié' ? 'fériée' : 'bloquée'} — les patients ne peuvent plus réserver ✓`, toastShow: true });
-      } catch (e) { setState({ toast: 'Blocage impossible : ' + (e?.message || 'erreur'), toastShow: true }); }
+      } catch (e) { setState({ toast: 'Blocage impossible : ' + dbErrorMessage(e), toastShow: true }); }
     } else {
       const row = { id: `local_off_${dateISO}`, start_date: dateISO, end_date: dateISO, reason };
       setState({ demoTimeOff: [...(state.demoTimeOff || []), row], toast: 'Journée bloquée ✓', toastShow: true });

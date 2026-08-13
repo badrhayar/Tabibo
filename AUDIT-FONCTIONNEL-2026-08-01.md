@@ -132,13 +132,17 @@ choix actif ne change rien, c'est le comportement attendu.
 
 ## 4 · Avant de déployer
 
+> La procédure complète — secrets, fonctions, `pg_cron` des rappels, essais de
+> bout en bout — est dans **`MISE-EN-SERVICE.md`**. Ci-dessous, uniquement ce
+> que le présent audit ajoute à cette procédure.
+
 1. **Exécuter les migrations en attente**, dans l'ordre :
    `20260805120000_prelaunch_hardening_2.sql` puis
    `20260801120000_invoices.sql`.
    Sans la seconde, l'écran Facturation affichera le bandeau rouge
    « Facturation non synchronisée » — il ne perdra rien, mais ne persistera rien
    en base non plus.
-2. Déployer, puis recharger deux fois : le service worker passe en **v154**.
+2. Déployer, puis recharger deux fois : le service worker passe en **v159**.
 3. Contrôle de bon fonctionnement : créer une facture, la recharger depuis un
    autre navigateur — elle doit apparaître.
 

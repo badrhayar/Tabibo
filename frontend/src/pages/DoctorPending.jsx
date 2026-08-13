@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CREDENTIAL_DOCS, BTN_GREEN } from '../shared.jsx';
 import BrandMark from '../components/BrandMark';
-import { uploadCredential, doctorResubmit, notifyVerification, fetchMyCredentialDocs } from '../lib/api';
+import { uploadCredential, doctorResubmit, notifyVerification, fetchMyCredentialDocs, dbErrorMessage } from '../lib/api';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -46,7 +46,7 @@ export default function DoctorPending() {
       setDocsCount(Object.values(docFiles).filter(Boolean).length);
       setState({ toast: 'Documents transmis ✓ — votre dossier est complet.', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Téléversement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Téléversement échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 
@@ -74,7 +74,7 @@ export default function DoctorPending() {
       setState({ myDoctor: { ...d, verification_status: 'pending', rejection_reason: null, rejection_note: null }, toast: 'Documents soumis ✓', toastShow: true });
       setResubmit(false);
     } catch (e) {
-      setState({ toast: 'Échec de la soumission : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec de la soumission : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 

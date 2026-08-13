@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useViewport } from '../../hooks/useViewport';
-import { uploadDocument, listDocuments, downloadDocument } from '../../lib/api';
+import { uploadDocument, listDocuments, downloadDocument, dbErrorMessage } from '../../lib/api';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { DEMO_PATIENTS, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
@@ -71,13 +71,13 @@ export default function Documents({ state, setState, go, openNewAppt, openAddPat
       await refresh();
       setState({ toast: `Document envoyé à ${docPatient.name} ✓`, toastShow: true });
     } catch (e) {
-      setState({ toast: 'Échec de l’envoi : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec de l’envoi : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 
   const download = async (path) => {
     try { await downloadDocument(path, fileName(path)); }
-    catch (e) { setState({ toast: 'Téléchargement impossible : ' + (e?.message || 'erreur'), toastShow: true }); }
+    catch (e) { setState({ toast: 'Téléchargement impossible : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   // From the doctor's viewpoint: 'to_patient' = Envoyé, 'to_doctor' = Reçu.

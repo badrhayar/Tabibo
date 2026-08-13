@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { moTime, moDateKeyOf, moroccoNow, moroccoToUTCISO } from '../../lib/time';
 import { initials as initialsOf, BTN_GREEN } from '../../shared.jsx';
-import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations , withUrgentTag } from '../../lib/api';
+import { markArrived, markInConsultation, updateAppointmentStatus, updateAppointment, createWalkinAppointment, fetchStaff, saveDoctorStations , withUrgentTag, dbErrorMessage } from '../../lib/api';
 import { activeStations, saveStations, STATION_KINDS, kindOf, stationName } from '../../lib/stations';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 
@@ -582,7 +582,7 @@ function WalkinModal({ state, setState, onClose, isMobile, practitioners, doctor
         }
       }
     } catch (e) {
-      setState({ toast: 'Walk-in non synchronisé : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Walk-in non synchronisé : ' + dbErrorMessage(e), toastShow: true });
     }
     setState({ manualAppts: [...(state.manualAppts || []), row], toast: `${n} ajouté en salle d’attente ✓`, toastShow: true });
     setSaving(false);

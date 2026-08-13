@@ -3,7 +3,7 @@ import { BTN_GREEN } from '../../shared.jsx';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useViewport } from '../../hooks/useViewport';
 import { STATION_KINDS, kindOf, loadStations, saveStations, defaultStations } from '../../lib/stations';
-import { saveDoctorStations } from '../../lib/api';
+import { saveDoctorStations, dbErrorMessage } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Postes de soins — le médecin décrit ici la géographie de son cabinet :
@@ -93,7 +93,7 @@ export default function Stations({ state, setState, go }) {
       setNeverSaved(false);
       setState({ toast: 'Postes de soins enregistrés ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusy(false); }
   };
 

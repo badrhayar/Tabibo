@@ -7,7 +7,7 @@ import LangPill from '../components/LangPill';
 import BrandMark, { Wordmark } from '../components/BrandMark';
 import { pushSupported, pushState, enablePush, disablePush } from '../lib/push';
 import QRCode from 'qrcode';
-import { fetchRelatives, addRelative, deleteRelative, downloadICS, createReview, getOrCreateConversation, findConversation, fetchMessages, sendMessage, subscribeToConversation, uploadAvatar, updateMyProfile, updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail, uploadChatImage, isImageMessage, uploadDocument, listDocuments, downloadDocument, fetchMyPrescriptions } from '../lib/api';
+import { fetchRelatives, addRelative, deleteRelative, downloadICS, createReview, getOrCreateConversation, findConversation, fetchMessages, sendMessage, subscribeToConversation, uploadAvatar, updateMyProfile, updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail, uploadChatImage, isImageMessage, uploadDocument, listDocuments, downloadDocument, fetchMyPrescriptions, dbErrorMessage } from '../lib/api';
 import { buildPrescriptionPDF, pdfOpen, pdfFileName, loadBrandLogo } from '../lib/pdf';
 import ChatImage from '../components/ChatImage';
 import PhoneField from '../components/PhoneField';
@@ -79,7 +79,7 @@ export default function PatientAccount() {
       const row = await addRelative(state.appUser.id, { fullName: name, relation: relForm.relation, dob: relForm.dob || null });
       setRelatives((l) => [...l, row]);
       setRelForm({ name: '', relation: 'Enfant', dob: '' });
-    } catch (e) { setState({ toast: 'Échec : ' + (e?.message || 'erreur'), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Échec : ' + dbErrorMessage(e), toastShow: true }); }
     finally { setRelBusy(false); }
   };
   // Push notifications opt-in (visible only when VAPID is configured).
@@ -287,7 +287,7 @@ export default function PatientAccount() {
       sendApptWhatsApp(id, 'cancelled');
       notifyApptEmail(id, 'cancelled_by_patient');
     } catch (e) {
-      setState({ toast: 'Annulation impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Annulation impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
   const saveProfile = async () => {
@@ -297,7 +297,7 @@ export default function PatientAccount() {
       const saved = await updateMyProfile(state.appUser.id, pf);
       setState({ appUser: { ...state.appUser, ...(saved || {}) }, toast: 'Profil mis à jour ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Échec de la mise à jour : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec de la mise à jour : ' + dbErrorMessage(e), toastShow: true });
     } finally { setPfSaving(false); }
   };
 
@@ -356,7 +356,7 @@ export default function PatientAccount() {
       await loadDocs();
       setState({ toast: 'Document envoyé à votre médecin ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Envoi du document échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Envoi du document échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setDocBusy(false); }
   };
 
@@ -406,7 +406,7 @@ export default function PatientAccount() {
       await sendMessage(conv.id, state.appUser.id, text);
     } catch (e) {
       setThread((m) => m.filter((x) => !(String(x.id).startsWith('tmp_') && x.text === text)));
-      setState({ toast: 'Envoi impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Envoi impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -435,7 +435,7 @@ export default function PatientAccount() {
       await createReview(state.reviewApptId, reviewStars, reviewText);
       setState({ reviewOpen: false, reviewDone: true, toast: 'Avis publié — merci !', toastShow: true });
     } catch (e) {
-      setState({ reviewOpen: false, toast: 'Avis impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ reviewOpen: false, toast: 'Avis impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 

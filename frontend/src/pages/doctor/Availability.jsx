@@ -5,8 +5,7 @@ import {
   fetchMyDoctor, fetchAvailability, saveAvailability,
   fetchBlockedSlots, saveBlockedSlotsForDate, fetchBookedSlots, slotsOverlappingBooked, saveDoctorPlanning,
   fetchTimeOff, addTimeOff, deleteTimeOff,
-  updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail,
-} from '../../lib/api';
+  updateAppointmentStatus, sendApptWhatsApp, notifyApptEmail, dbErrorMessage } from '../../lib/api';
 import { BOOK_SLOTS, genSlots, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow, moDateKeyOf } from '../../lib/time.js';
 import { fetchPrayerTimes, PRAYER_FALLBACK, PRAYER_LABELS, prayerBlockedSlots } from '../../lib/prayer.js';
@@ -239,7 +238,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
     try {
       await saveBlockedSlotsForDate(doctorId, selDate, [...blockedForDate]);
       setSlotsMsg('Enregistré ✓'); setTimeout(() => setSlotsMsg(''), 2500);
-    } catch (e) { setSlotsMsg('Échec : ' + (e?.message || 'erreur')); }
+    } catch (e) { setSlotsMsg('Échec : ' + dbErrorMessage(e)); }
     finally { setSlotsSaving(false); }
   };
 
@@ -264,7 +263,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
       setTimeOff((l) => [...l, row].sort((a, b) => a.start_date.localeCompare(b.start_date)));
       setOffStart(''); setOffEnd(''); setOffReason('');
       setOffMsg('Période enregistrée ✓'); setTimeout(() => setOffMsg(''), 2500);
-    } catch (e) { setOffMsg('Échec : ' + (e?.message || 'erreur')); }
+    } catch (e) { setOffMsg('Échec : ' + dbErrorMessage(e)); }
     finally { setOffSaving(false); }
   };
   const handleDeleteOff = async (row) => {
@@ -330,7 +329,7 @@ export default function Availability({ state, setState, go, openNewAppt, openAdd
       await saveAvailability(doctorId, rows);
       await saveDoctorPlanning(doctorId, { maxPerDay, prayerBlock, prayerIds: [...prayerSet], slotMinutes: slotDuration });
       setSavedMsg('Enregistré ✓'); setTimeout(() => setSavedMsg(''), 2500);
-    } catch (e) { setSavedMsg('Échec : ' + (e?.message || 'erreur')); }
+    } catch (e) { setSavedMsg('Échec : ' + dbErrorMessage(e)); }
     finally { setSaving(false); }
   };
 

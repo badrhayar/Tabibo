@@ -51,7 +51,7 @@ rejetés.
 
 ## Étape 1 · Base de données
 
-Deux migrations sont en attente. **L'ordre compte.**
+Trois migrations sont en attente. **L'ordre compte.**
 
 ```bash
 supabase db push
@@ -62,6 +62,7 @@ Ou, à la main dans l'éditeur SQL, dans cet ordre :
 1. `20260805120000_prelaunch_hardening_2.sql` — durcissement (ordonnances,
    invitations, téléphones normalisés, OTP atomique)
 2. `20260801120000_invoices.sql` — table des factures + RLS
+3. `20260806120000_client_errors_context.sql` — contexte du journal d'erreurs
 
 **Contrôle :**
 
@@ -69,6 +70,45 @@ Ou, à la main dans l'éditeur SQL, dans cet ordre :
 select count(*) from public.invoices;                    -- doit répondre 0, pas une erreur
 select routine_name from information_schema.routines
   where routine_schema='public' and routine_name='otp_claim_attempt';   -- doit renvoyer 1 ligne
+select kind, context from public.client_errors limit 0;  -- doit répondre sans erreur de colonne
+```
+
+### 1.1 · Créer l'administrateur ⚠️ — sans lui, la plateforme reste vide
+
+Le rôle `admin` ne peut PAS s'obtenir par inscription (c'est voulu : sinon
+n'importe qui le demanderait au formulaire). Il se donne à la main, une fois :
+
+1. inscrivez-vous normalement sur le site avec votre adresse ;
+2. puis, dans l'éditeur SQL Supabase :
+
+```sql
+select public.promote_to_admin('votre-adresse@exemple.ma');
+select email, role from public.users where role = 'admin';   -- doit vous lister
+```
+
+**Si vous sautez cette étape, personne ne peut approuver un médecin.** Les
+médecins s'inscrivent, restent sur l'écran « dossier en cours de vérification »,
+l'annuaire public reste vide, et aucun patient ne peut réserver — sans le
+moindre message d'erreur pour vous prévenir.
+
+**Contrôle :** connectez-vous, vous devez atterrir sur la console
+d'administration.
+
+### 1.2 · Le vrai RIB et le nettoyage des données de démonstration
+
+La table `app_settings` est amorcée avec un RIB de remplissage au nom de
+l'ancienne marque. Il s'affiche tel quel aux médecins qui souscrivent.
+
+```sql
+update public.app_settings
+   set rib = '‹votre RIB›', bank = '‹votre banque› — ‹votre raison sociale›'
+ where id = 1;
+
+-- Les 20 médecins de démonstration (arrivés en 'pending', donc invisibles du
+-- public, mais qui encombrent votre file de vérification) :
+delete from public.doctors
+ where user_id in (select id from public.users where email like '%@tikdoc.demo');
+delete from public.users where email like '%@tikdoc.demo';
 ```
 
 Si `invoices` n'existe pas, l'écran Facturation affichera un bandeau rouge
@@ -288,7 +328,27 @@ select status, count(*) from cron.job_run_details
 
 -- Qui est administrateur ? (à auditer périodiquement)
 select email, role from public.users where role = 'admin';
+
+-- Les opérations refusées : la panne la plus coûteuse et la plus discrète.
+-- L'utilisateur n'a vu qu'un message d'erreur, il est reparti, et rien ne
+-- vous l'a signalé. À regarder DEUX FOIS PAR JOUR la première semaine.
+select context, message, user_role, app_version, count(*) as touches,
+       max(created_at) as dernier
+  from public.client_errors
+ where kind = 'handled' and created_at > now() - interval '24 hours'
+ group by 1,2,3,4 order by touches desc;
 ```
+
+**Le même écran, en plus lisible :** console d'administration → onglet
+**Erreurs** → filtre « Opérations refusées ». Les lignes sont regroupées et
+triées par nombre de personnes touchées, c'est-à-dire par ordre de correction.
+Chaque ligne porte l'opération (`createAppointment`…), le rôle concerné et la
+version de build — de quoi savoir si l'erreur vient du correctif que vous venez
+de publier ou d'une version encore servie depuis un cache.
+
+Une ligne `[42501]` est un refus de la RLS. Une ligne `[23505]` est une
+contrainte violée. Aucun message ne contient de donnée personnelle : courriels,
+téléphones, CIN et RIB sont masqués avant l'envoi (banc `npm run test:monitor`).
 
 ---
 

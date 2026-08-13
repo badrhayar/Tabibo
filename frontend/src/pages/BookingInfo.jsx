@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import PhoneField from '../components/PhoneField';
 import { useViewport } from '../hooks/useViewport';
 import { DOCTORS, MOTIF_OPTS, greenBtn, greenBtnBusy, BTN_GREEN } from '../shared.jsx';
-import { createAppointment, guestBookingEnabled, guestBookingStart, guestBookingVerify, fetchRelatives } from '../lib/api';
+import { createAppointment, guestBookingEnabled, guestBookingStart, guestBookingVerify, fetchRelatives, dbErrorMessage } from '../lib/api';
 import { stationsOf } from '../lib/stations';
 import { moroccoToUTCISO } from '../lib/time.js';
 import LangPill from '../components/LangPill';
@@ -176,7 +176,9 @@ export default function BookingInfo() {
           setState({ bookSlot: '', toast: 'Ce créneau vient d’être réservé. Choisissez-en un autre.', toastShow: true });
           go('profile');
         } else {
-          setState({ toast: 'Échec de la réservation : ' + (e?.message || 'erreur'), toastShow: true });
+          // Jamais le texte brut de Postgres : « invalid input syntax for type
+          // uuid » n'apprend rien au patient. Le détail part dans le journal.
+          setState({ toast: 'Échec de la réservation : ' + dbErrorMessage(e), toastShow: true });
         }
       }
       return;

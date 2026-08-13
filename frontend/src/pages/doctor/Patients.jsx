@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useViewport } from '../../hooks/useViewport';
 import { DEMO_PATIENTS, CITY_OPTS, greenBtn, greenBtnBusy } from '../../shared.jsx';
-import { updatePatient, fetchPrescriptions } from '../../lib/api';
+import { updatePatient, fetchPrescriptions, dbErrorMessage } from '../../lib/api';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import Icon from '../../components/Icon';
 import Pager, { usePager } from '../../components/Pager';
@@ -96,7 +96,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
       setViewPatient((v) => v && v.id === editForm.id ? { ...v, ...merged } : v);
       setEditForm(null);
     } catch (e) {
-      setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setEditBusy(false); }
   };
 
@@ -137,7 +137,7 @@ export default function Patients({ state, setState, go, openNewAppt, openAddPati
       });
       setViewPatient((v) => v ? { ...v, notes: pNotes } : v);
     } catch (e) {
-      setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setNotesBusy(false); }
   };
 

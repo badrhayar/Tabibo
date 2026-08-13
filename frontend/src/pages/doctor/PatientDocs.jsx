@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { BTN_GREEN_SOLID } from '../../shared.jsx';
-import { uploadDocument, listDocuments, getDocumentUrl, downloadDocument, updateAppointment } from '../../lib/api';
+import { uploadDocument, listDocuments, getDocumentUrl, downloadDocument, updateAppointment, dbErrorMessage } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Documents du patient — the dossier's document desk.
@@ -99,7 +99,7 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
         const rows = await fetchPatientDocs({ state, patient, pkey });
         if (on) setDocs(rows);
       } catch (e) {
-        setState({ toast: 'Chargement des documents échoué : ' + (e?.message || 'erreur'), toastShow: true });
+        setState({ toast: 'Chargement des documents échoué : ' + dbErrorMessage(e), toastShow: true });
       } finally { on && setLoading(false); }
     })();
     return () => { on = false; };
@@ -179,7 +179,7 @@ export default function PatientDocs({ state, setState, patient, pkey, isMobile, 
     try {
       if (d.blobUrl) { const a = document.createElement('a'); a.href = d.blobUrl; a.download = d.name; a.click(); return; }
       if (d.path) await downloadDocument(d.path, d.name);
-    } catch (e) { setState({ toast: 'Téléchargement impossible : ' + (e?.message || 'erreur'), toastShow: true }); }
+    } catch (e) { setState({ toast: 'Téléchargement impossible : ' + dbErrorMessage(e), toastShow: true }); }
   };
   const printDoc = () => { if (previewUrl) window.open(previewUrl, '_blank', 'noopener'); };
 

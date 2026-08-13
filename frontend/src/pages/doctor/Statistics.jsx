@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
-import { fetchDoctorReviews, replyToReview } from '../../lib/api';
+import { fetchDoctorReviews, replyToReview, dbErrorMessage } from '../../lib/api';
 import { greenBtn, greenBtnBusy } from '../../shared.jsx';
 import Pager, { usePager } from '../../components/Pager';
 import { moroccoNow } from '../../lib/time';
@@ -136,7 +136,7 @@ export default function Statistics({ state, setState, go, openNewAppt, openAddPa
       setMyReviews((l) => l.map((r) => r.id === id ? { ...r, reply: text || null, replied_at: text ? new Date().toISOString() : null } : r));
       setReplyDraft((d) => { const n = { ...d }; delete n[id]; return n; });
     } catch (e) {
-      setState({ toast: 'Réponse impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Réponse impossible : ' + dbErrorMessage(e), toastShow: true });
     } finally { setReplySaving(null); }
   };
 

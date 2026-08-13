@@ -6,8 +6,7 @@ import {
   fetchColleagues, fetchMyLinks, requestLink, respondLink, removeLink,
   fetchReferrals, sendReferral, updateReferralStatus,
   fetchColleagueNotes, sendColleagueNote, fetchNetworkThreads,
-  markColleagueNotesRead, uploadConfrereFile, getConfrereFileUrl,
-} from '../../lib/api';
+  markColleagueNotesRead, uploadConfrereFile, getConfrereFileUrl, dbErrorMessage } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tabibo Network — le réseau des confrères.
@@ -527,7 +526,7 @@ export default function Network({ state, setState, go }) {
           return [...known.values()];
         });
       }
-    } catch (e) { toast('Chargement du réseau impossible : ' + (e?.message || 'erreur')); }
+    } catch (e) { toast('Chargement du réseau impossible : ' + dbErrorMessage(e)); }
     finally { setLoading(false); }
   };
   useEffect(() => { reload(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [myDoctorId]);
@@ -537,7 +536,7 @@ export default function Network({ state, setState, go }) {
     if (!live) return;
     setLoading(true);
     try { setColleagues(await fetchColleagues({ q, specialty: spec, city, exclude: myDoctorId })); }
-    catch (e) { toast('Recherche impossible : ' + (e?.message || 'erreur')); }
+    catch (e) { toast('Recherche impossible : ' + dbErrorMessage(e)); }
     finally { setLoading(false); }
   };
 
@@ -568,14 +567,14 @@ export default function Network({ state, setState, go }) {
     if (!live) return void demoBlock();
     setBusy(c.id);
     try { await requestLink(myDoctorId, c.id); await reload(); toast(`Demande envoyée à ${docDisplayName(c.name, c.spec)}.`); }
-    catch (e) { toast('Demande impossible : ' + (e?.message || 'erreur')); }
+    catch (e) { toast('Demande impossible : ' + dbErrorMessage(e)); }
     finally { setBusy(null); }
   };
   const answer = async (l, accept) => {
     if (!live) return void demoBlock();
     setBusy(l.id);
     try { await respondLink(l.id, accept); await reload(); toast(accept ? 'Confrère ajouté à votre réseau.' : 'Demande refusée.'); }
-    catch (e) { toast('Réponse impossible : ' + (e?.message || 'erreur')); }
+    catch (e) { toast('Réponse impossible : ' + dbErrorMessage(e)); }
     finally { setBusy(null); }
   };
   const unlink = async (l) => {
@@ -583,7 +582,7 @@ export default function Network({ state, setState, go }) {
     if (!window.confirm('Retirer ce confrère de votre réseau ? Vous ne pourrez plus lui adresser de patient ni lui écrire.')) return;
     setBusy(l.id);
     try { await removeLink(l.id); await reload(); toast('Confrère retiré du réseau.'); }
-    catch (e) { toast('Retrait impossible : ' + (e?.message || 'erreur')); }
+    catch (e) { toast('Retrait impossible : ' + dbErrorMessage(e)); }
     finally { setBusy(null); }
   };
   const answerRef = async (r, status) => {
@@ -594,7 +593,7 @@ export default function Network({ state, setState, go }) {
     }
     setBusy(r.id);
     try { await updateReferralStatus(r.id, status); await reload(); toast('Adressage mis à jour.'); }
-    catch (e) { toast('Mise à jour impossible : ' + (e?.message || 'erreur')); }
+    catch (e) { toast('Mise à jour impossible : ' + dbErrorMessage(e)); }
     finally { setBusy(null); }
   };
 
@@ -609,7 +608,7 @@ export default function Network({ state, setState, go }) {
     try {
       setMessages(await fetchColleagueNotes(myDoctorId, c.id));
       await markColleagueNotesRead(myDoctorId, c.id).catch(() => {});
-    } catch (e) { toast('Conversation indisponible : ' + (e?.message || 'erreur')); setMessages([]); }
+    } catch (e) { toast('Conversation indisponible : ' + dbErrorMessage(e)); setMessages([]); }
     finally { setChatLoading(false); }
   };
 
@@ -629,7 +628,7 @@ export default function Network({ state, setState, go }) {
       const n = await sendColleagueNote(myDoctorId, chatWith, { body });
       setMessages((m) => [...m, n]);
       setThreads((t) => ({ ...t, [chatWith]: { last: n, unread: 0 } }));
-    } catch (e) { toast('Envoi impossible : ' + (e?.message || 'erreur')); }
+    } catch (e) { toast('Envoi impossible : ' + dbErrorMessage(e)); }
     finally { setSending(false); }
   };
 
@@ -647,7 +646,7 @@ export default function Network({ state, setState, go }) {
       const n = await sendColleagueNote(myDoctorId, chatWith, { file });
       setMessages((m) => [...m, n]);
       setThreads((t) => ({ ...t, [chatWith]: { last: n, unread: 0 } }));
-    } catch (e) { toast('Envoi impossible : ' + (e?.message || 'erreur')); }
+    } catch (e) { toast('Envoi impossible : ' + dbErrorMessage(e)); }
     finally { setSending(false); }
   };
 
@@ -893,7 +892,7 @@ export default function Network({ state, setState, go }) {
               await sendReferral(myDoctorId, { toDoctorId: refFor.id, ...payload });
               await reload(); setRefFor(null); setTab('adressages');
               toast(`Patient adressé à ${docDisplayName(refFor.name, refFor.spec)} ✓`);
-            } catch (e) { toast('Envoi impossible : ' + (e?.message || 'erreur')); }
+            } catch (e) { toast('Envoi impossible : ' + dbErrorMessage(e)); }
           }}
         />
       )}

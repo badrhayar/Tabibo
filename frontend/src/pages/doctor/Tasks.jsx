@@ -4,7 +4,7 @@ import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { autoTasks, loadManualTasks, saveManualTasks, TASK_CATS, catOf, EMPTY_TASK } from '../../lib/tasks';
 import { moroccoNow } from '../../lib/time';
 import { DEMO_PATIENTS, initials as initialsOf, BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
-import { updateAppointmentStatus, markInConsultation, sendApptWhatsApp, notifyApptEmail, fetchStaff } from '../../lib/api';
+import { updateAppointmentStatus, markInConsultation, sendApptWhatsApp, notifyApptEmail, fetchStaff, dbErrorMessage } from '../../lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tâches — the cabinet's task board (Doctolib-grade).
@@ -148,7 +148,7 @@ export default function Tasks({ state, setState, go }) {
         go('dappts');
       }
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusyId(null); }
   };
 

@@ -3,7 +3,7 @@ import PasswordInput from '../../components/PasswordInput';
 import { SPEC_INFO, SPEC_OPTS, CITY_OPTS, greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 import LocationPicker from '../../components/LocationPicker';
-import { saveDoctorServices, updateDoctorFields, updateMyProfile, uploadAvatar, setMySlug } from '../../lib/api';
+import { saveDoctorServices, updateDoctorFields, updateMyProfile, uploadAvatar, setMySlug, dbErrorMessage } from '../../lib/api';
 import { signIn, updatePassword, authErrorMessage } from '../../lib/auth';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 
@@ -282,7 +282,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
         });
         return true;
       } catch (e) {
-        setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+        setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
         return false;
       }
     }
@@ -321,7 +321,7 @@ export default function Settings({ state, setState, go, openNewAppt, openAddPati
       if (/déjà pris|already|unique|duplicate|23505/i.test(msg)) {
         setSlugError('Ce lien existe déjà, essayez-en un autre.');
       } else {
-        setSlugError(msg || 'Identifiant indisponible.');
+        setSlugError(dbErrorMessage(e, 'Identifiant indisponible.'));
       }
     } finally { setSlugBusy(false); }
   };

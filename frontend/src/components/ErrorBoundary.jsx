@@ -19,7 +19,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    try { reportClientError(error?.message || 'ErrorBoundary', error?.stack); } catch (_) {}
+    try { reportClientError(error?.message || 'ErrorBoundary', error?.stack, 'boundary'); } catch (_) {}
     // eslint-disable-next-line no-console
     console.error('Tabibo UI error:', error, info?.componentStack);
   }

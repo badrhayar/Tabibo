@@ -13,8 +13,7 @@ import {
   savePrescriptionTemplate,
   deletePrescriptionTemplate,
   sendPrescriptionToPatient,
-  deletePrescription,
-} from '../../lib/api';
+  deletePrescription, dbErrorMessage } from '../../lib/api';
 
 // The QR/verification link always points at the live domain, never a preview URL.
 const PUBLIC_BASE = (import.meta.env.VITE_APP_URL || 'https://tabibo.ma').replace(/\/$/, '');
@@ -195,7 +194,7 @@ export default function Prescriptions() {
       await refreshTemplates();
       setState({ toast: 'Modèle enregistré ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Échec : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec : ' + dbErrorMessage(e), toastShow: true });
     }
   };
   const removeTemplate = async (tpl) => {
@@ -205,7 +204,7 @@ export default function Prescriptions() {
       await refreshTemplates();
       setState({ toast: 'Modèle supprimé', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Échec : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Échec : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
@@ -250,7 +249,7 @@ export default function Prescriptions() {
       return 'saved';
     } catch (e) {
       savedSigRef.current = null;                // allow a retry on the next action
-      setState({ toast: 'Enregistrement échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement échoué : ' + dbErrorMessage(e), toastShow: true });
       return 'error';
     }
   };
@@ -298,7 +297,7 @@ export default function Prescriptions() {
       await refreshRecent();
       setState({ toast: 'Ordonnance envoyée au patient ✓', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Envoi échoué : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Envoi échoué : ' + dbErrorMessage(e), toastShow: true });
     } finally { setSendBusyId(null); }
   };
   const removeRecent = async (p) => {
@@ -308,7 +307,7 @@ export default function Prescriptions() {
       await refreshRecent();
       setState({ toast: 'Ordonnance supprimée', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Suppression échouée : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Suppression échouée : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 

@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useViewport } from '../../hooks/useViewport';
 import { tint, initials, MOTIF_OPTS, CITY_OPTS, DOC_TYPE_OPTS, subscriptionState, billingDue, docDisplayName, greenBtn, GREEN_GRAD, BTN_GREEN } from '../../shared.jsx';
 import { moroccoNow, moroccoToUTCISO } from '../../lib/time.js';
-import { inviteNewPatient, createWalkinAppointment, createPatient, subscribeToInbox, fetchDoctorPayments, declareCurrentPayment, notifyVerification } from '../../lib/api';
+import { inviteNewPatient, createWalkinAppointment, createPatient, subscribeToInbox, fetchDoctorPayments, declareCurrentPayment, notifyVerification, dbErrorMessage } from '../../lib/api';
 import PhoneField from '../../components/PhoneField';
 import CommandPalette from '../../components/CommandPalette';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -361,7 +361,7 @@ export default function DoctorApp() {
           return;
         }
         // Otherwise fall through to a local-only appointment.
-        setState({ toast:'Enregistré localement (base indisponible) : ' + (e?.message || 'erreur'), toastShow:true });
+        setState({ toast:'Enregistré localement (base indisponible) : ' + dbErrorMessage(e), toastShow:true });
       }
     }
 
@@ -397,7 +397,7 @@ export default function DoctorApp() {
         setTimeout(() => setState({ patientAdded:false }), 3000);
         return;
       } catch (e) {
-        setState({ toast: 'Ajout du patient échoué : ' + (e?.message || 'erreur'), toastShow: true });
+        setState({ toast: 'Ajout du patient échoué : ' + dbErrorMessage(e), toastShow: true });
         return;
       }
     }

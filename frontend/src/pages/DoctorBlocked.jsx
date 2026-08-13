@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { subscriptionState, paymentRef, fmtPeriod, BTN_GREEN } from '../shared.jsx';
-import { fetchDoctorPayments, declarePayment, declareCurrentPayment, notifyVerification } from '../lib/api';
+import { fetchDoctorPayments, declarePayment, declareCurrentPayment, notifyVerification, dbErrorMessage } from '../lib/api';
 
 const PRIMARY = '#16A06A';
 const DARK = '#15314A';
@@ -31,7 +31,7 @@ export default function DoctorBlocked() {
       setPayments((list) => list.map((x) => x.id === p.id ? { ...x, status: 'declared', declared_at: new Date().toISOString() } : x));
       setState({ toast: 'Paiement signalé — en attente de confirmation par Tabibo.', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusyId(null); }
   };
 
@@ -46,7 +46,7 @@ export default function DoctorBlocked() {
       notifyVerification({ type: 'payment_declared', doctorName: state.appUser?.full_name, doctorEmail: state.appUser?.email, plan: d?.plan || '', amount: row?.amount });
       setState({ toast: 'Paiement signalé — en attente de confirmation par Tabibo.', toastShow: true });
     } catch (e) {
-      setState({ toast: 'Action impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Action impossible : ' + dbErrorMessage(e), toastShow: true });
     } finally { setBusyId(null); }
   };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchReminderLog, fetchReminderSettings, saveReminderSettings } from '../../lib/api';
+import { fetchReminderLog, fetchReminderSettings, saveReminderSettings, dbErrorMessage } from '../../lib/api';
 import Pager, { usePager } from '../../components/Pager';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 
@@ -120,7 +120,7 @@ export default function Notifications({ state, setState, go, openNewAppt, openAd
     const next = { ...toggles, [key]: !toggles[key] };
     setToggles(next);
     try { await saveReminderSettings(doctorId, next); }
-    catch (e) { setToggles(toggles); setState?.({ toast: 'Échec de l’enregistrement : ' + (e?.message || 'erreur'), toastShow: true }); }
+    catch (e) { setToggles(toggles); setState?.({ toast: 'Échec de l’enregistrement : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   // Stats derived from the real delivery log.

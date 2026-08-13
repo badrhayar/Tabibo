@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { fetchInvoices, createInvoice, updateInvoice, deleteInvoice } from '../../lib/api';
+import { fetchInvoices, createInvoice, updateInvoice, deleteInvoice, dbErrorMessage } from '../../lib/api';
 import { BTN_GREEN, BTN_GREEN_SOLID } from '../../shared.jsx';
 import { SEC, Hero, ICONS } from '../../components/SectionKit.jsx';
 import { useViewport } from '../../hooks/useViewport';
@@ -111,7 +111,7 @@ export default function Billing({ state, setState, go }) {
     try { await run(); setSyncErr(''); }
     catch (e) {
       setSyncErr(e?.message || 'enregistrement refusé');
-      setState({ toast: 'Enregistrement refusé : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Enregistrement refusé : ' + dbErrorMessage(e), toastShow: true });
       try { setList(await fetchInvoices(doctorId)); } catch { /* hors ligne */ }
     }
   };
@@ -183,7 +183,7 @@ export default function Billing({ state, setState, go }) {
         .then((saved) => { setList((l) => l.map((i) => (i.id === inv.id ? saved : i))); setSyncErr(''); })
         .catch((e) => {
           setSyncErr(e?.message || 'création refusée');
-          setState({ toast: 'Facture non enregistrée : ' + (e?.message || 'erreur'), toastShow: true });
+          setState({ toast: 'Facture non enregistrée : ' + dbErrorMessage(e), toastShow: true });
           setList((l) => l.filter((i) => i.id !== inv.id));
         });
     } else patch([inv, ...list]);

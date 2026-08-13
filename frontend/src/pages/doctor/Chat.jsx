@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useViewport } from '../../hooks/useViewport';
-import { fetchConversations, fetchMessages, sendMessage, getOrCreateConversation, deleteConversation, subscribeToConversation, subscribeToInbox, uploadChatImage, isImageMessage } from '../../lib/api';
+import { fetchConversations, fetchMessages, sendMessage, getOrCreateConversation, deleteConversation, subscribeToConversation, subscribeToInbox, uploadChatImage, isImageMessage, dbErrorMessage } from '../../lib/api';
 import { greenBtn, greenBtnBusy, BTN_GREEN } from '../../shared.jsx';
 import { SEC, ICONS } from '../../components/SectionKit.jsx';
 import ChatImage from '../../components/ChatImage';
@@ -126,7 +126,7 @@ export default function Chat({ state, setState }) {
       setActiveId(conv.id);
       loadConvs(false);
     } catch (e) {
-      setState({ toast: 'Impossible de démarrer la conversation : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Impossible de démarrer la conversation : ' + dbErrorMessage(e), toastShow: true });
     } finally { setCreating(false); }
   };
 
@@ -206,7 +206,7 @@ export default function Chat({ state, setState }) {
     setInputVal('');
     setMsgs((m) => [...m, { id: 'tmp_' + Date.now(), mine: true, type: 'text', text, time: 'maintenant' }]);
     try { await sendMessage(activeId, appUser.id, text); }
-    catch (e) { setState({ toast: 'Envoi impossible : ' + (e?.message || 'erreur'), toastShow: true }); }
+    catch (e) { setState({ toast: 'Envoi impossible : ' + dbErrorMessage(e), toastShow: true }); }
   };
 
   const handleKeyDown = (e) => {
@@ -226,7 +226,7 @@ export default function Chat({ state, setState }) {
       setConvs((list) => list.filter((c) => c.id !== id));
       if (activeId === id) { setActiveId(null); setMsgs([]); }
     } catch (e) {
-      setState({ toast: 'Suppression impossible : ' + (e?.message || 'erreur'), toastShow: true });
+      setState({ toast: 'Suppression impossible : ' + dbErrorMessage(e), toastShow: true });
     }
   };
 
