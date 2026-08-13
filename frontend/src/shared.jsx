@@ -235,6 +235,42 @@ export function subscriptionState(d) {
   };
 }
 
+/**
+ * La fiche du médecin est-elle VISIBLE par les patients ?
+ *
+ * Reproduit, mot pour mot, les quatre conditions de la vue `doctor_directory` :
+ *   verification_status = 'approved'
+ *   and blocked = false
+ *   and subscription_status <> 'expired'
+ *   and (current_period_end is null or current_period_end >= now())
+ *
+ * Pourquoi le dupliquer côté client : un médecin qui s'est inscrit, qui voit
+ * son cabinet et son agenda, mais qui n'apparaît dans aucune recherche, n'a
+ * AUCUN moyen de le savoir. Il attend des rendez-vous qui ne viendront jamais
+ * et conclut que la plateforme ne marche pas. La règle vit en base ; ici elle
+ * est seulement expliquée à celui qu'elle concerne.
+ *
+ * Toute modification de la vue doit être répercutée ici (banc `test:data`).
+ */
+export function publicListing(d) {
+  if (!d) return { listed: false, reason: 'unknown', label: 'Statut inconnu', help: '' };
+  if (d.verification_status !== 'approved') {
+    return { listed: false, reason: 'pending', label: 'Dossier en cours de vérification',
+             help: 'Votre fiche apparaîtra dans les recherches dès que Tabibo aura validé vos justificatifs.' };
+  }
+  if (d.blocked) {
+    return { listed: false, reason: 'blocked', label: 'Compte suspendu',
+             help: 'Contactez Tabibo pour rétablir votre visibilité.' };
+  }
+  const sub = subscriptionState(d);
+  if (sub.expired || d.subscription_status === 'expired') {
+    return { listed: false, reason: 'expired', label: 'Abonnement échu',
+             help: 'Votre fiche est retirée des recherches tant que l’abonnement n’est pas renouvelé.' };
+  }
+  return { listed: true, reason: 'ok', label: 'Visible par les patients',
+           help: 'Votre fiche apparaît dans la recherche et vos créneaux sont réservables.' };
+}
+
 // Renewal date + days left, straight from the concrete period end (no cycle math).
 export function renewalInfo(d) {
   const s = subscriptionState(d);

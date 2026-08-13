@@ -259,7 +259,27 @@ export default function Search() {
             {list.length} {tr(list.length !== 1 ? 'médecins' : 'médecin', list.length !== 1 ? 'doctors' : 'doctor', 'طبيب')} <span style={{ color: MUTED, fontWeight: 500 }}>{tr(list.length !== 1 ? 'disponibles' : 'disponible', 'available', 'متاح')}</span>
           </p>
 
-          {list.length === 0 && (
+          {/* L'annuaire n'a pas pu être chargé : ce n'est PAS « aucun médecin ».
+              Sans cette distinction, une panne réseau ou un refus de la base
+              ressemble trait pour trait à une plateforme encore vide — et on
+              cherche le défaut du mauvais côté pendant des heures. */}
+          {state.doctorsError && (
+            <div style={{ background: '#FFF6F6', border: '1px solid #F0C9C9', borderRadius: 12, padding: '14px 16px', marginBottom: 16 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#B4374F', marginBottom: 4 }}>
+                {tr('Annuaire momentanément indisponible', 'Directory temporarily unavailable', 'الدليل غير متاح مؤقتاً')}
+              </div>
+              <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.55 }}>
+                {tr('Nous n’avons pas pu joindre la liste des médecins. Vérifiez votre connexion et réessayez.',
+                    'We could not reach the doctor list. Check your connection and try again.',
+                    'تعذر الوصول إلى قائمة الأطباء. تحقق من اتصالك وحاول مرة أخرى.')}
+              </div>
+              <button onClick={() => window.location.reload()} style={{ marginTop: 10, background: '#fff', color: '#B4374F', border: '1px solid #F0C9C9', borderRadius: 9, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                {tr('Réessayer', 'Retry', 'إعادة المحاولة')}
+              </button>
+            </div>
+          )}
+
+          {list.length === 0 && !state.doctorsError && (
             <div style={{ textAlign: 'center', padding: '48px 20px', color: MUTED }}>
               <div style={{ marginBottom: 16, color: "#CBD5D0", display:"flex", justifyContent:"center" }}><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></div>
               <div style={{ fontSize: 16, fontWeight: 700, color: DARK, marginBottom: 8 }}>

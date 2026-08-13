@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { STATUS_FR, fetchConversationPreviews, isImageMessage, markInConsultation, markArrived } from '../../lib/api';
 import { moTime, moDateKeyOf, moroccoNow } from '../../lib/time';
 import { useViewport } from '../../hooks/useViewport';
-import { initials as initialsOf, tint, greenBtn, greenBtnBusy } from '../../shared.jsx';
+import { initials as initialsOf, tint, greenBtn, greenBtnBusy, publicListing } from '../../shared.jsx';
 import { monthlyReport, ymOf } from '../../lib/metrics';
 import { SEC, Hero, Panel } from '../../components/SectionKit.jsx';
 
@@ -183,6 +183,36 @@ export default function Dashboard({ state, setState, go, openNewAppt, openAddPat
           { value: `${collectedToday.toLocaleString('fr-FR')}`, label: 'MAD encaissés', color: '#0E7C52' },
           expectedToday !== collectedToday ? { value: `${expectedToday.toLocaleString('fr-FR')}`, label: 'MAD attendus' } : null,
         ]} />
+
+      {/* Visibilité publique — la question qu'un médecin ne pense pas à poser.
+          Un compte peut être parfaitement fonctionnel côté cabinet et pourtant
+          absent de toute recherche patient : la vue `doctor_directory` exige
+          quatre conditions. Sans ce bandeau, le médecin attend des rendez-vous
+          qui ne viendront jamais et conclut que la plateforme ne marche pas. */}
+      {(() => {
+        const vis = publicListing(state.myDoctor);
+        if (!state.myDoctor || vis.listed) return null;
+        return (
+          <div style={{ background: '#FFF9EC', border: '1px solid #F2DFAF', borderRadius: 16, padding: isMobile ? 14 : '16px 20px', marginBottom: isMobile ? 16 : 26, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <span style={{ width: 34, height: 34, flexShrink: 0, borderRadius: 11, background: '#fff', color: '#B4770E', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px -6px #B4770E' }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 800, color: '#8A5A06', marginBottom: 3 }}>
+                Vous n’apparaissez pas encore dans la recherche des patients
+              </div>
+              <div style={{ fontSize: 13, color: '#6B5A38', lineHeight: 1.6 }}>
+                <strong>{vis.label}.</strong> {vis.help}
+              </div>
+              {vis.reason === 'expired' && (
+                <button onClick={() => go('dabo')} style={{ marginTop: 10, background: '#fff', color: '#8A5A06', border: '1px solid #F2DFAF', borderRadius: 9, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  Voir mon abonnement
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Ma journée — waiting room + live end-of-day summary */}
       {todayAppts.length > 0 && (

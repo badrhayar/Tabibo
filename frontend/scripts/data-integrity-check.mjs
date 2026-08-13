@@ -55,6 +55,41 @@ console.log('\n  État initial');
   ? ok('registre patients vide en production')
   : ko('le registre patients est amorcé avec des patients de démonstration');
 
+// ── 2c. Annuaire vide ≠ annuaire injoignable ────────────────────────────────
+console.log('\n  Annuaire injoignable');
+/doctorsError: true/.test(ctx)
+  ? ok('un échec de chargement est marqué distinctement')
+  : ko('un échec de chargement est confondu avec un annuaire vide');
+/reportHandledError\('fetchDoctors'/.test(ctx)
+  ? ok('l\'échec part dans la console d\'exploitation')
+  : ko('l\'échec de l\'annuaire n\'est pas remonté');
+read('src/pages/Search.jsx').includes('state.doctorsError')
+  ? ok('la recherche distingue les deux cas à l\'écran')
+  : ko('la recherche affiche le même écran dans les deux cas');
+
+// ── 2d. Le médecin sait s'il est visible ────────────────────────────────────
+console.log('\n  Visibilité du médecin');
+const shared = read('src/shared.jsx');
+// publicListing DOIT refléter les quatre conditions de la vue doctor_directory.
+const mig = readFileSync(resolve(root, '../supabase/migrations/20260801120000_care_stations.sql'), 'utf8');
+const view = mig.slice(mig.indexOf('create or replace view public.doctor_directory'), mig.indexOf('grant select on public.doctor_directory'));
+for (const [col, needle] of [['verification_status', "verification_status !== 'approved'"],
+                             ['blocked', 'd.blocked'],
+                             ['subscription_status', "subscription_status === 'expired'"]]) {
+  if (!view.includes(col)) { ko(`la vue ne filtre plus sur ${col} — publicListing est à revoir`); continue; }
+  shared.includes(needle) ? ok(`publicListing couvre ${col}`) : ko(`publicListing ignore ${col}`);
+}
+read('src/pages/doctor/Dashboard.jsx').includes('publicListing')
+  ? ok('le tableau de bord affiche la raison de l\'invisibilité')
+  : ko('le médecin n\'a aucun moyen de savoir qu\'il est invisible');
+
+// ── 2e. Une carte muette se signale ─────────────────────────────────────────
+console.log('\n  Carte');
+const map = read('src/components/NearbyMap.jsx');
+/setMapErr/.test(map) && /reportHandledError\('carte'/.test(map)
+  ? ok('un fond de carte qui échoue s\'affiche et se journalise')
+  : ko('un échec de carte reste un rectangle muet');
+
 // ── 3. Les identifiants sont contrôlés avant le réseau ──────────────────────
 console.log('\n  Barrière UUID');
 const api = read('src/lib/api.js');

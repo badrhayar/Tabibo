@@ -142,7 +142,7 @@ choix actif ne change rien, c'est le comportement attendu.
    Sans la seconde, l'écran Facturation affichera le bandeau rouge
    « Facturation non synchronisée » — il ne perdra rien, mais ne persistera rien
    en base non plus.
-2. Déployer, puis recharger deux fois : le service worker passe en **v159**.
+2. Déployer, puis recharger deux fois : le service worker passe en **v160**.
 3. Contrôle de bon fonctionnement : créer une facture, la recharger depuis un
    autre navigateur — elle doit apparaître.
 

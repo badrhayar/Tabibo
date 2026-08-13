@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { cleanMoroccoMap } from '../lib/mapClean';
+import { reportHandledError } from '../lib/monitor.js';
 
 const KEY = import.meta.env.VITE_MAPTILER_KEY;
 // MapTiler when a key is set, else MapLibre's free demo style (no key needed).
@@ -70,6 +71,10 @@ export default function NearbyMap({ doctors = [], onSelect, selectedId }) {
   const markersRef = useRef(new Map());   // id -> maplibregl.Marker
   const onSelectRef = useRef(onSelect);
   const lastSigRef = useRef('');
+  // Une carte qui échoue rendait un rectangle crème muet : le style se charge,
+  // les tuiles non (clé absente, restreinte au mauvais domaine, quota dépassé).
+  // Rien à l'écran, rien dans le journal — impossible à diagnostiquer à distance.
+  const [mapErr, setMapErr] = useState('');
   onSelectRef.current = onSelect;
   injectCss();
 
@@ -99,7 +104,18 @@ export default function NearbyMap({ doctors = [], onSelect, selectedId }) {
       return;
     }
     mapRef.current = map;
-    map.on('error', (e) => console.warn('NearbyMap:', e?.error?.message || e));
+    map.on('error', (e) => {
+      const err = e?.error || e;
+      const msg = String(err?.message || err || '');
+      console.warn('NearbyMap:', msg);
+      // 401/403 = clé absente, invalide ou restreinte à un autre domaine.
+      if (/401|403|Unauthorized|Forbidden/i.test(msg)) {
+        setMapErr(KEY ? 'cle' : 'absente');
+      } else if (/style|Failed to fetch/i.test(msg)) {
+        setMapErr('reseau');
+      }
+      reportHandledError('carte', err);
+    });
     // A 0-size container at init is the usual cause of a blank map (style loads
     // but no tiles are ever requested). Force a resize on load and whenever the
     // container changes size.
@@ -168,7 +184,30 @@ export default function NearbyMap({ doctors = [], onSelect, selectedId }) {
     }
   }, [selectedId]);
 
-  return <div ref={elRef} style={{ width: '100%', height: '100%' }} />;
+  const ERR_TEXT = {
+    absente: 'Carte indisponible — la clé MapTiler n’est pas configurée (VITE_MAPTILER_KEY).',
+    cle: 'Carte indisponible — la clé MapTiler est refusée (invalide, expirée, ou restreinte à un autre domaine).',
+    reseau: 'Carte indisponible — le fond de carte n’a pas pu être chargé.',
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div ref={elRef} style={{ width: '100%', height: '100%' }} />
+      {mapErr && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: 'rgba(255,255,255,0.92)', textAlign: 'center' }}>
+          <div style={{ maxWidth: 340 }}>
+            <div style={{ color: '#B4374F', marginBottom: 10, display: 'flex', justifyContent: 'center' }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#15314A', lineHeight: 1.55 }}>{ERR_TEXT[mapErr]}</div>
+            <div style={{ fontSize: 12.5, color: '#6B7B76', marginTop: 8, lineHeight: 1.55 }}>
+              La liste des médecins ci-contre reste utilisable normalement.
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // Stable key for the current set of doctor positions (decides camera re-fit).

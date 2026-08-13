@@ -4,7 +4,7 @@ import { signIn as sbSignIn, signUp as sbSignUp, signOut as sbSignOut, getSessio
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { setPageMeta, SCREEN_META } from '../lib/seo.js';
 import { purgeLocalPhi } from '../lib/localPhi.js';
-import { setMonitorRole } from '../lib/monitor.js';
+import { setMonitorRole, reportHandledError } from '../lib/monitor.js';
 import { DOCTORS as MOCK_DOCTORS, DEMO_PATIENTS } from '../shared.jsx';
 
 // Availability rows → weekly end-of-day minutes (Mon=0 … Sun=6). Breaks are
@@ -157,6 +157,8 @@ const initialState = {
   // qui dépendent d'un médecin renvoient le patient ailleurs avant l'arrivée
   // des données (un lien partagé ouvert en 3G, typiquement).
   doctorsLoaded: false,
+  // Vrai quand l'annuaire n'a PAS pu être chargé (à ne pas confondre avec vide).
+  doctorsError: false,
 };
 
 function reducer(state, patch) {
@@ -220,10 +222,15 @@ export function AppProvider({ children }) {
       if (isSupabaseConfigured) {
         try {
           const docs = await fetchDoctors();
-          if (active) dispatch({ doctors: docs, doctorsLoaded: true });
+          if (active) dispatch({ doctors: docs, doctorsLoaded: true, doctorsError: false });
         } catch (e) {
-          console.warn('[Tabibo] fetchDoctors a échoué — annuaire vide, jamais de données de démonstration.', e);
-          if (active) dispatch({ doctors: [], doctorsLoaded: true });
+          // Un annuaire VIDE et un annuaire INJOIGNABLE affichaient le même
+          // écran — impossible de savoir, en regardant l'application, si
+          // personne n'est encore inscrit ou si la requête est refusée. On
+          // distingue les deux, et l'échec part dans la console d'exploitation.
+          console.warn('[Tabibo] fetchDoctors a échoué.', e);
+          reportHandledError('fetchDoctors', e);
+          if (active) dispatch({ doctors: [], doctorsLoaded: true, doctorsError: true });
         }
         return;
       }
